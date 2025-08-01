@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="23788" systemVersion="24D70" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="BottleAddition" representedClassName="BottleAddition" syncable="YES" codeGenerationType="class">
+        <attribute name="amount" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="date" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="modificationDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="notes" optional="YES" attributeType="String"/>
+        <attribute name="proof" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="recordID" optional="YES" attributeType="String"/>
+        <relationship name="infinityBottle" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="InfinityBottle" inverseName="additions" inverseEntity="InfinityBottle"/>
+        <relationship name="whiskey" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Whiskey" inverseName="bottleAdditions" inverseEntity="Whiskey"/>
+    </entity>
+    <entity name="BottleTasting" representedClassName="BottleTasting" syncable="YES" codeGenerationType="class">
+        <attribute name="date" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="finish" optional="YES" attributeType="String"/>
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="modificationDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="nose" optional="YES" attributeType="String"/>
+        <attribute name="notes" optional="YES" attributeType="String"/>
+        <attribute name="palate" optional="YES" attributeType="String"/>
+        <attribute name="rating" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="recordID" optional="YES" attributeType="String"/>
+        <attribute name="volumeConsumed" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <relationship name="infinityBottle" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="InfinityBottle" inverseName="tastings" inverseEntity="InfinityBottle"/>
+    </entity>
+    <entity name="InfinityBottle" representedClassName="InfinityBottle" syncable="YES" codeGenerationType="class">
+        <attribute name="bottleImage" optional="YES" attributeType="Binary" allowsExternalBinaryDataStorage="YES"/>
+        <attribute name="creationDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="currentVolume" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="maxVolume" optional="YES" attributeType="Double" defaultValueString="750" usesScalarValueType="YES"/>
+        <attribute name="modificationDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="name" optional="YES" attributeType="String"/>
+        <attribute name="notes" optional="YES" attributeType="String"/>
+        <attribute name="recordID" optional="YES" attributeType="String"/>
+        <attribute name="typeCategory" optional="YES" attributeType="String"/>
+        <relationship name="additions" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="BottleAddition" inverseName="infinityBottle" inverseEntity="BottleAddition"/>
+        <relationship name="journalEntries" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="JournalEntry" inverseName="infinityBottle" inverseEntity="JournalEntry"/>
+        <relationship name="tastings" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="BottleTasting" inverseName="infinityBottle" inverseEntity="BottleTasting"/>
+    </entity>
+    <entity name="JournalCustomField" representedClassName="JournalCustomField" syncable="YES" codeGenerationType="class">
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="modificationDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="name" optional="YES" attributeType="String"/>
+        <attribute name="recordID" optional="YES" attributeType="String"/>
+        <attribute name="type" optional="YES" attributeType="String"/>
+        <attribute name="value" optional="YES" attributeType="Transformable" valueTransformerName="SecureValueTransformer"/>
+        <relationship name="journalEntry" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="JournalEntry" inverseName="customFields" inverseEntity="JournalEntry"/>
+    </entity>
+    <entity name="JournalEntry" representedClassName="JournalEntry" syncable="YES" codeGenerationType="class">
+        <attribute name="date" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="finish" optional="YES" attributeType="String"/>
+        <attribute name="flavorProfile" optional="YES" attributeType="Binary"/>
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="isInfinityBottle" optional="YES" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="modificationDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="nose" optional="YES" attributeType="String"/>
+        <attribute name="notes" optional="YES" attributeType="String"/>
+        <attribute name="overallRating" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="palate" optional="YES" attributeType="String"/>
+        <attribute name="recordID" optional="YES" attributeType="String"/>
+        <attribute name="review" optional="YES" attributeType="String"/>
+        <attribute name="servingMethod" optional="YES" attributeType="String"/>
+        <attribute name="setting" optional="YES" attributeType="String"/>
+        <relationship name="customFields" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="JournalCustomField" inverseName="journalEntry" inverseEntity="JournalCustomField"/>
+        <relationship name="infinityBottle" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="InfinityBottle" inverseName="journalEntries" inverseEntity="InfinityBottle"/>
+        <relationship name="whiskey" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Whiskey" inverseName="journalEntries" inverseEntity="Whiskey"/>
+    </entity>
+    <entity name="WebContent" representedClassName="WebContent" syncable="YES" codeGenerationType="class">
+        <attribute name="content" optional="YES" attributeType="String"/>
+        <attribute name="date" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="sourceURL" optional="YES" attributeType="String"/>
+        <attribute name="title" optional="YES" attributeType="String"/>
+        <relationship name="whiskey" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Whiskey" inverseName="webContent" inverseEntity="Whiskey"/>
+    </entity>
+    <entity name="Whiskey" representedClassName="Whiskey" syncable="YES" codeGenerationType="class">
+        <attribute name="addedDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="age" optional="YES" attributeType="String"/>
+        <attribute name="distillery" optional="YES" attributeType="String"/>
+        <attribute name="externalReviews" optional="YES" attributeType="String"/>
+        <attribute name="finish" optional="YES" attributeType="String"/>
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="isBiB" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="isCaskStrength" optional="YES" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="isFinished" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="isOpen" optional="YES" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="isSiB" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="isStorePick" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="isTasted" optional="YES" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="modificationDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="name" optional="YES" attributeType="String"/>
+        <attribute name="notes" optional="YES" attributeType="String"/>
+        <attribute name="numberOfBottles" optional="YES" attributeType="Integer 16" defaultValueString="1" usesScalarValueType="YES"/>
+        <attribute name="price" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="priority" optional="YES" attributeType="Integer 16" defaultValueString="3" usesScalarValueType="YES"/>
+        <attribute name="proof" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="rarity" optional="YES" attributeType="String" defaultValueString="not_sure"/>
+        <attribute name="recordID" optional="YES" attributeType="String"/>
+        <attribute name="replacementStatus" optional="YES" attributeType="String" defaultValueString="none"/>
+        <attribute name="status" optional="YES" attributeType="String" defaultValueString="owned"/>
+        <attribute name="storePickName" optional="YES" attributeType="String"/>
+        <attribute name="targetPrice" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="type" optional="YES" attributeType="String"/>
+        <attribute name="whereToFind" optional="YES" attributeType="String"/>
+        <relationship name="bottleAdditions" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="BottleAddition" inverseName="whiskey" inverseEntity="BottleAddition"/>
+        <relationship name="customFields" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="WhiskeyCustomField" inverseName="whiskey" inverseEntity="WhiskeyCustomField"/>
+        <relationship name="journalEntries" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="JournalEntry" inverseName="whiskey" inverseEntity="JournalEntry"/>
+        <relationship name="replacedBy" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Whiskey" inverseName="replaces" inverseEntity="Whiskey"/>
+        <relationship name="replaces" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Whiskey" inverseName="replacedBy" inverseEntity="Whiskey"/>
+        <relationship name="webContent" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="WebContent" inverseName="whiskey" inverseEntity="WebContent"/>
+        <relationship name="bottleInstances" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="BottleInstance" inverseName="whiskey" inverseEntity="BottleInstance"/>
+        <relationship name="stores" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Store" inverseName="whiskeys" inverseEntity="Store"/>
+    </entity>
+    <entity name="WhiskeyCustomField" representedClassName="WhiskeyCustomField" syncable="YES" codeGenerationType="class">
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="modificationDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="name" optional="YES" attributeType="String"/>
+        <attribute name="recordID" optional="YES" attributeType="String"/>
+        <attribute name="type" optional="YES" attributeType="String"/>
+        <attribute name="value" optional="YES" attributeType="Transformable" valueTransformerName="SecureValueTransformer"/>
+        <relationship name="whiskey" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Whiskey" inverseName="customFields" inverseEntity="Whiskey"/>
+    </entity>
+    <entity name="BottleInstance" representedClassName="BottleInstance" syncable="YES" codeGenerationType="class">
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="isOpen" optional="YES" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="isDead" optional="YES" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="dateAdded" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="dateOpened" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="dateFinished" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="notes" optional="YES" attributeType="String"/>
+        <attribute name="price" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="bottleNumber" optional="YES" attributeType="Integer 16" defaultValueString="1" usesScalarValueType="YES"/>
+        <relationship name="whiskey" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Whiskey" inverseName="bottleInstances" inverseEntity="Whiskey"/>
+    </entity>
+    <entity name="Store" representedClassName="Store" syncable="YES" codeGenerationType="class">
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="name" optional="YES" attributeType="String"/>
+        <attribute name="address" optional="YES" attributeType="String"/>
+        <attribute name="latitude" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="longitude" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="modificationDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="isFavorite" optional="YES" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <relationship name="whiskeys" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Whiskey" inverseName="stores" inverseEntity="Whiskey"/>
+    </entity>
+</model>

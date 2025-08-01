@@ -1,0 +1,658 @@
+{
+  "" : {
+    "diagnostics" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/BarrelBook-master.dia",
+    "emit-module-dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/BarrelBook-master-emit-module.d",
+    "emit-module-diagnostics" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/BarrelBook-master-emit-module.dia",
+    "swift-dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/BarrelBook-master.swiftdeps"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/BarrelBookApp.swift" : {
+    "const-values" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/BarrelBookApp.swiftconstvalues",
+    "dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/BarrelBookApp.d",
+    "diagnostics" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/BarrelBookApp.dia",
+    "index-unit-output-path" : "/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/BarrelBookApp.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/BarrelBookApp.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/BarrelBookApp.o",
+    "swift-dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/BarrelBookApp.swiftdeps",
+    "swiftmodule" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/BarrelBookApp~partial.swiftmodule"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Models/CoreDataModelExtensions.swift" : {
+    "const-values" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/CoreDataModelExtensions.swiftconstvalues",
+    "dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/CoreDataModelExtensions.d",
+    "diagnostics" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/CoreDataModelExtensions.dia",
+    "index-unit-output-path" : "/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/CoreDataModelExtensions.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/CoreDataModelExtensions.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/CoreDataModelExtensions.o",
+    "swift-dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/CoreDataModelExtensions.swiftdeps",
+    "swiftmodule" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/CoreDataModelExtensions~partial.swiftmodule"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Models/SecureValueTransformer.swift" : {
+    "const-values" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/SecureValueTransformer.swiftconstvalues",
+    "dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/SecureValueTransformer.d",
+    "diagnostics" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/SecureValueTransformer.dia",
+    "index-unit-output-path" : "/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/SecureValueTransformer.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/SecureValueTransformer.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/SecureValueTransformer.o",
+    "swift-dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/SecureValueTransformer.swiftdeps",
+    "swiftmodule" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/SecureValueTransformer~partial.swiftmodule"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Models/Whiskey+Extensions.swift" : {
+    "const-values" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/Whiskey+Extensions.swiftconstvalues",
+    "dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/Whiskey+Extensions.d",
+    "diagnostics" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/Whiskey+Extensions.dia",
+    "index-unit-output-path" : "/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/Whiskey+Extensions.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/Whiskey+Extensions.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/Whiskey+Extensions.o",
+    "swift-dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/Whiskey+Extensions.swiftdeps",
+    "swiftmodule" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/Whiskey+Extensions~partial.swiftmodule"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Models/WhiskeyStatus.swift" : {
+    "const-values" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/WhiskeyStatus.swiftconstvalues",
+    "dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/WhiskeyStatus.d",
+    "diagnostics" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/WhiskeyStatus.dia",
+    "index-unit-output-path" : "/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/WhiskeyStatus.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/WhiskeyStatus.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/WhiskeyStatus.o",
+    "swift-dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/WhiskeyStatus.swiftdeps",
+    "swiftmodule" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/WhiskeyStatus~partial.swiftmodule"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Services/CSVService.swift" : {
+    "const-values" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/CSVService.swiftconstvalues",
+    "dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/CSVService.d",
+    "diagnostics" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/CSVService.dia",
+    "index-unit-output-path" : "/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/CSVService.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/CSVService.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/CSVService.o",
+    "swift-dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/CSVService.swiftdeps",
+    "swiftmodule" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/CSVService~partial.swiftmodule"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Services/CSVSyncService.swift" : {
+    "const-values" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/CSVSyncService.swiftconstvalues",
+    "dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/CSVSyncService.d",
+    "diagnostics" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/CSVSyncService.dia",
+    "index-unit-output-path" : "/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/CSVSyncService.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/CSVSyncService.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/CSVSyncService.o",
+    "swift-dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/CSVSyncService.swiftdeps",
+    "swiftmodule" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/CSVSyncService~partial.swiftmodule"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Services/MarkdownExtractor.swift" : {
+    "const-values" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/MarkdownExtractor.swiftconstvalues",
+    "dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/MarkdownExtractor.d",
+    "diagnostics" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/MarkdownExtractor.dia",
+    "index-unit-output-path" : "/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/MarkdownExtractor.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/MarkdownExtractor.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/MarkdownExtractor.o",
+    "swift-dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/MarkdownExtractor.swiftdeps",
+    "swiftmodule" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/MarkdownExtractor~partial.swiftmodule"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Services/MarkdownRenderer.swift" : {
+    "const-values" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/MarkdownRenderer.swiftconstvalues",
+    "dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/MarkdownRenderer.d",
+    "diagnostics" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/MarkdownRenderer.dia",
+    "index-unit-output-path" : "/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/MarkdownRenderer.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/MarkdownRenderer.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/MarkdownRenderer.o",
+    "swift-dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/MarkdownRenderer.swiftdeps",
+    "swiftmodule" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/MarkdownRenderer~partial.swiftmodule"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Services/ReadabilityExtractor.swift" : {
+    "const-values" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/ReadabilityExtractor.swiftconstvalues",
+    "dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/ReadabilityExtractor.d",
+    "diagnostics" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/ReadabilityExtractor.dia",
+    "index-unit-output-path" : "/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/ReadabilityExtractor.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/ReadabilityExtractor.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/ReadabilityExtractor.o",
+    "swift-dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/ReadabilityExtractor.swiftdeps",
+    "swiftmodule" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/ReadabilityExtractor~partial.swiftmodule"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Utils/AppColorScheme.swift" : {
+    "const-values" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/AppColorScheme.swiftconstvalues",
+    "dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/AppColorScheme.d",
+    "diagnostics" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/AppColorScheme.dia",
+    "index-unit-output-path" : "/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/AppColorScheme.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/AppColorScheme.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/AppColorScheme.o",
+    "swift-dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/AppColorScheme.swiftdeps",
+    "swiftmodule" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/AppColorScheme~partial.swiftmodule"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Utils/AppDelegate.swift" : {
+    "const-values" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/AppDelegate.swiftconstvalues",
+    "dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/AppDelegate.d",
+    "diagnostics" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/AppDelegate.dia",
+    "index-unit-output-path" : "/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/AppDelegate.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/AppDelegate.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/AppDelegate.o",
+    "swift-dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/AppDelegate.swiftdeps",
+    "swiftmodule" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/AppDelegate~partial.swiftmodule"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Utils/BindingExtensions.swift" : {
+    "const-values" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/BindingExtensions.swiftconstvalues",
+    "dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/BindingExtensions.d",
+    "diagnostics" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/BindingExtensions.dia",
+    "index-unit-output-path" : "/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/BindingExtensions.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/BindingExtensions.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/BindingExtensions.o",
+    "swift-dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/BindingExtensions.swiftdeps",
+    "swiftmodule" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/BindingExtensions~partial.swiftmodule"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Utils/ColorManager.swift" : {
+    "const-values" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/ColorManager.swiftconstvalues",
+    "dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/ColorManager.d",
+    "diagnostics" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/ColorManager.dia",
+    "index-unit-output-path" : "/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/ColorManager.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/ColorManager.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/ColorManager.o",
+    "swift-dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/ColorManager.swiftdeps",
+    "swiftmodule" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/ColorManager~partial.swiftmodule"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Utils/FilterSettingsManager.swift" : {
+    "const-values" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/FilterSettingsManager.swiftconstvalues",
+    "dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/FilterSettingsManager.d",
+    "diagnostics" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/FilterSettingsManager.dia",
+    "index-unit-output-path" : "/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/FilterSettingsManager.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/FilterSettingsManager.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/FilterSettingsManager.o",
+    "swift-dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/FilterSettingsManager.swiftdeps",
+    "swiftmodule" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/FilterSettingsManager~partial.swiftmodule"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Utils/HapticManager.swift" : {
+    "const-values" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/HapticManager.swiftconstvalues",
+    "dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/HapticManager.d",
+    "diagnostics" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/HapticManager.dia",
+    "index-unit-output-path" : "/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/HapticManager.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/HapticManager.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/HapticManager.o",
+    "swift-dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/HapticManager.swiftdeps",
+    "swiftmodule" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/HapticManager~partial.swiftmodule"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Utils/PrivacyManager.swift" : {
+    "const-values" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/PrivacyManager.swiftconstvalues",
+    "dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/PrivacyManager.d",
+    "diagnostics" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/PrivacyManager.dia",
+    "index-unit-output-path" : "/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/PrivacyManager.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/PrivacyManager.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/PrivacyManager.o",
+    "swift-dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/PrivacyManager.swiftdeps",
+    "swiftmodule" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/PrivacyManager~partial.swiftmodule"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Utils/SortingUtils.swift" : {
+    "const-values" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/SortingUtils.swiftconstvalues",
+    "dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/SortingUtils.d",
+    "diagnostics" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/SortingUtils.dia",
+    "index-unit-output-path" : "/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/SortingUtils.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/SortingUtils.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/SortingUtils.o",
+    "swift-dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/SortingUtils.swiftdeps",
+    "swiftmodule" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/SortingUtils~partial.swiftmodule"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/AddInfinityBottleView.swift" : {
+    "const-values" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/AddInfinityBottleView.swiftconstvalues",
+    "dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/AddInfinityBottleView.d",
+    "diagnostics" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/AddInfinityBottleView.dia",
+    "index-unit-output-path" : "/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/AddInfinityBottleView.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/AddInfinityBottleView.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/AddInfinityBottleView.o",
+    "swift-dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/AddInfinityBottleView.swiftdeps",
+    "swiftmodule" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/AddInfinityBottleView~partial.swiftmodule"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/AddJournalEntryView.swift" : {
+    "const-values" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/AddJournalEntryView.swiftconstvalues",
+    "dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/AddJournalEntryView.d",
+    "diagnostics" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/AddJournalEntryView.dia",
+    "index-unit-output-path" : "/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/AddJournalEntryView.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/AddJournalEntryView.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/AddJournalEntryView.o",
+    "swift-dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/AddJournalEntryView.swiftdeps",
+    "swiftmodule" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/AddJournalEntryView~partial.swiftmodule"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/AddWhiskeyToWishlistView.swift" : {
+    "const-values" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/AddWhiskeyToWishlistView.swiftconstvalues",
+    "dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/AddWhiskeyToWishlistView.d",
+    "diagnostics" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/AddWhiskeyToWishlistView.dia",
+    "index-unit-output-path" : "/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/AddWhiskeyToWishlistView.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/AddWhiskeyToWishlistView.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/AddWhiskeyToWishlistView.o",
+    "swift-dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/AddWhiskeyToWishlistView.swiftdeps",
+    "swiftmodule" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/AddWhiskeyToWishlistView~partial.swiftmodule"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/AddWhiskeyView.swift" : {
+    "const-values" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/AddWhiskeyView.swiftconstvalues",
+    "dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/AddWhiskeyView.d",
+    "diagnostics" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/AddWhiskeyView.dia",
+    "index-unit-output-path" : "/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/AddWhiskeyView.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/AddWhiskeyView.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/AddWhiskeyView.o",
+    "swift-dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/AddWhiskeyView.swiftdeps",
+    "swiftmodule" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/AddWhiskeyView~partial.swiftmodule"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/CSVFileSaver.swift" : {
+    "const-values" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/CSVFileSaver.swiftconstvalues",
+    "dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/CSVFileSaver.d",
+    "diagnostics" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/CSVFileSaver.dia",
+    "index-unit-output-path" : "/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/CSVFileSaver.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/CSVFileSaver.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/CSVFileSaver.o",
+    "swift-dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/CSVFileSaver.swiftdeps",
+    "swiftmodule" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/CSVFileSaver~partial.swiftmodule"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/CSVSaver.swift" : {
+    "const-values" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/CSVSaver.swiftconstvalues",
+    "dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/CSVSaver.d",
+    "diagnostics" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/CSVSaver.dia",
+    "index-unit-output-path" : "/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/CSVSaver.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/CSVSaver.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/CSVSaver.o",
+    "swift-dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/CSVSaver.swiftdeps",
+    "swiftmodule" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/CSVSaver~partial.swiftmodule"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/CollectionView.swift" : {
+    "const-values" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/CollectionView.swiftconstvalues",
+    "dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/CollectionView.d",
+    "diagnostics" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/CollectionView.dia",
+    "index-unit-output-path" : "/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/CollectionView.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/CollectionView.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/CollectionView.o",
+    "swift-dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/CollectionView.swiftdeps",
+    "swiftmodule" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/CollectionView~partial.swiftmodule"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/Components/FloatingAddButton.swift" : {
+    "const-values" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/FloatingAddButton.swiftconstvalues",
+    "dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/FloatingAddButton.d",
+    "diagnostics" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/FloatingAddButton.dia",
+    "index-unit-output-path" : "/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/FloatingAddButton.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/FloatingAddButton.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/FloatingAddButton.o",
+    "swift-dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/FloatingAddButton.swiftdeps",
+    "swiftmodule" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/FloatingAddButton~partial.swiftmodule"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/Components/ThreeWayToggle.swift" : {
+    "const-values" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/ThreeWayToggle.swiftconstvalues",
+    "dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/ThreeWayToggle.d",
+    "diagnostics" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/ThreeWayToggle.dia",
+    "index-unit-output-path" : "/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/ThreeWayToggle.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/ThreeWayToggle.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/ThreeWayToggle.o",
+    "swift-dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/ThreeWayToggle.swiftdeps",
+    "swiftmodule" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/ThreeWayToggle~partial.swiftmodule"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/ContentView.swift" : {
+    "const-values" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/ContentView.swiftconstvalues",
+    "dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/ContentView.d",
+    "diagnostics" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/ContentView.dia",
+    "index-unit-output-path" : "/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/ContentView.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/ContentView.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/ContentView.o",
+    "swift-dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/ContentView.swiftdeps",
+    "swiftmodule" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/ContentView~partial.swiftmodule"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/EditInfinityBottleView.swift" : {
+    "const-values" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/EditInfinityBottleView.swiftconstvalues",
+    "dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/EditInfinityBottleView.d",
+    "diagnostics" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/EditInfinityBottleView.dia",
+    "index-unit-output-path" : "/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/EditInfinityBottleView.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/EditInfinityBottleView.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/EditInfinityBottleView.o",
+    "swift-dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/EditInfinityBottleView.swiftdeps",
+    "swiftmodule" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/EditInfinityBottleView~partial.swiftmodule"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/EditWishlistItemView.swift" : {
+    "const-values" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/EditWishlistItemView.swiftconstvalues",
+    "dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/EditWishlistItemView.d",
+    "diagnostics" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/EditWishlistItemView.dia",
+    "index-unit-output-path" : "/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/EditWishlistItemView.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/EditWishlistItemView.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/EditWishlistItemView.o",
+    "swift-dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/EditWishlistItemView.swiftdeps",
+    "swiftmodule" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/EditWishlistItemView~partial.swiftmodule"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/InfinityBottleDetailView.swift" : {
+    "const-values" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/InfinityBottleDetailView.swiftconstvalues",
+    "dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/InfinityBottleDetailView.d",
+    "diagnostics" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/InfinityBottleDetailView.dia",
+    "index-unit-output-path" : "/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/InfinityBottleDetailView.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/InfinityBottleDetailView.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/InfinityBottleDetailView.o",
+    "swift-dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/InfinityBottleDetailView.swiftdeps",
+    "swiftmodule" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/InfinityBottleDetailView~partial.swiftmodule"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/InfinityBottleRowView.swift" : {
+    "const-values" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/InfinityBottleRowView.swiftconstvalues",
+    "dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/InfinityBottleRowView.d",
+    "diagnostics" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/InfinityBottleRowView.dia",
+    "index-unit-output-path" : "/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/InfinityBottleRowView.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/InfinityBottleRowView.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/InfinityBottleRowView.o",
+    "swift-dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/InfinityBottleRowView.swiftdeps",
+    "swiftmodule" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/InfinityBottleRowView~partial.swiftmodule"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/JournalEntryDetailView.swift" : {
+    "const-values" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/JournalEntryDetailView.swiftconstvalues",
+    "dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/JournalEntryDetailView.d",
+    "diagnostics" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/JournalEntryDetailView.dia",
+    "index-unit-output-path" : "/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/JournalEntryDetailView.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/JournalEntryDetailView.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/JournalEntryDetailView.o",
+    "swift-dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/JournalEntryDetailView.swiftdeps",
+    "swiftmodule" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/JournalEntryDetailView~partial.swiftmodule"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/JournalEntryRowView.swift" : {
+    "const-values" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/JournalEntryRowView.swiftconstvalues",
+    "dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/JournalEntryRowView.d",
+    "diagnostics" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/JournalEntryRowView.dia",
+    "index-unit-output-path" : "/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/JournalEntryRowView.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/JournalEntryRowView.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/JournalEntryRowView.o",
+    "swift-dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/JournalEntryRowView.swiftdeps",
+    "swiftmodule" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/JournalEntryRowView~partial.swiftmodule"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/JournalView.swift" : {
+    "const-values" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/JournalView.swiftconstvalues",
+    "dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/JournalView.d",
+    "diagnostics" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/JournalView.dia",
+    "index-unit-output-path" : "/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/JournalView.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/JournalView.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/JournalView.o",
+    "swift-dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/JournalView.swiftdeps",
+    "swiftmodule" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/JournalView~partial.swiftmodule"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/NavigationStateManager.swift" : {
+    "const-values" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/NavigationStateManager.swiftconstvalues",
+    "dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/NavigationStateManager.d",
+    "diagnostics" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/NavigationStateManager.dia",
+    "index-unit-output-path" : "/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/NavigationStateManager.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/NavigationStateManager.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/NavigationStateManager.o",
+    "swift-dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/NavigationStateManager.swiftdeps",
+    "swiftmodule" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/NavigationStateManager~partial.swiftmodule"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/OnboardingView.swift" : {
+    "const-values" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/OnboardingView.swiftconstvalues",
+    "dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/OnboardingView.d",
+    "diagnostics" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/OnboardingView.dia",
+    "index-unit-output-path" : "/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/OnboardingView.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/OnboardingView.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/OnboardingView.o",
+    "swift-dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/OnboardingView.swiftdeps",
+    "swiftmodule" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/OnboardingView~partial.swiftmodule"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/SettingsView.swift" : {
+    "const-values" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/SettingsView.swiftconstvalues",
+    "dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/SettingsView.d",
+    "diagnostics" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/SettingsView.dia",
+    "index-unit-output-path" : "/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/SettingsView.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/SettingsView.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/SettingsView.o",
+    "swift-dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/SettingsView.swiftdeps",
+    "swiftmodule" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/SettingsView~partial.swiftmodule"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/StatDetailView.swift" : {
+    "const-values" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/StatDetailView.swiftconstvalues",
+    "dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/StatDetailView.d",
+    "diagnostics" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/StatDetailView.dia",
+    "index-unit-output-path" : "/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/StatDetailView.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/StatDetailView.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/StatDetailView.o",
+    "swift-dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/StatDetailView.swiftdeps",
+    "swiftmodule" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/StatDetailView~partial.swiftmodule"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/StatisticsView.swift" : {
+    "const-values" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/StatisticsView.swiftconstvalues",
+    "dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/StatisticsView.d",
+    "diagnostics" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/StatisticsView.dia",
+    "index-unit-output-path" : "/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/StatisticsView.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/StatisticsView.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/StatisticsView.o",
+    "swift-dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/StatisticsView.swiftdeps",
+    "swiftmodule" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/StatisticsView~partial.swiftmodule"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/WebContent/SavedWebContentView.swift" : {
+    "const-values" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/SavedWebContentView.swiftconstvalues",
+    "dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/SavedWebContentView.d",
+    "diagnostics" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/SavedWebContentView.dia",
+    "index-unit-output-path" : "/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/SavedWebContentView.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/SavedWebContentView.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/SavedWebContentView.o",
+    "swift-dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/SavedWebContentView.swiftdeps",
+    "swiftmodule" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/SavedWebContentView~partial.swiftmodule"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/WebContent/WebReaderView.swift" : {
+    "const-values" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/WebReaderView.swiftconstvalues",
+    "dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/WebReaderView.d",
+    "diagnostics" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/WebReaderView.dia",
+    "index-unit-output-path" : "/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/WebReaderView.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/WebReaderView.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/WebReaderView.o",
+    "swift-dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/WebReaderView.swiftdeps",
+    "swiftmodule" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/WebReaderView~partial.swiftmodule"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/WebContent/WebSearchView.swift" : {
+    "const-values" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/WebSearchView.swiftconstvalues",
+    "dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/WebSearchView.d",
+    "diagnostics" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/WebSearchView.dia",
+    "index-unit-output-path" : "/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/WebSearchView.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/WebSearchView.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/WebSearchView.o",
+    "swift-dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/WebSearchView.swiftdeps",
+    "swiftmodule" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/WebSearchView~partial.swiftmodule"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/WhiskeyDetailView.swift" : {
+    "const-values" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/WhiskeyDetailView.swiftconstvalues",
+    "dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/WhiskeyDetailView.d",
+    "diagnostics" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/WhiskeyDetailView.dia",
+    "index-unit-output-path" : "/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/WhiskeyDetailView.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/WhiskeyDetailView.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/WhiskeyDetailView.o",
+    "swift-dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/WhiskeyDetailView.swiftdeps",
+    "swiftmodule" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/WhiskeyDetailView~partial.swiftmodule"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/WhiskeyRowView.swift" : {
+    "const-values" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/WhiskeyRowView.swiftconstvalues",
+    "dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/WhiskeyRowView.d",
+    "diagnostics" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/WhiskeyRowView.dia",
+    "index-unit-output-path" : "/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/WhiskeyRowView.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/WhiskeyRowView.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/WhiskeyRowView.o",
+    "swift-dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/WhiskeyRowView.swiftdeps",
+    "swiftmodule" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/WhiskeyRowView~partial.swiftmodule"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/WishlistRowView.swift" : {
+    "const-values" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/WishlistRowView.swiftconstvalues",
+    "dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/WishlistRowView.d",
+    "diagnostics" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/WishlistRowView.dia",
+    "index-unit-output-path" : "/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/WishlistRowView.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/WishlistRowView.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/WishlistRowView.o",
+    "swift-dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/WishlistRowView.swiftdeps",
+    "swiftmodule" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/WishlistRowView~partial.swiftmodule"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/WishlistView.swift" : {
+    "const-values" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/WishlistView.swiftconstvalues",
+    "dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/WishlistView.d",
+    "diagnostics" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/WishlistView.dia",
+    "index-unit-output-path" : "/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/WishlistView.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/WishlistView.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/WishlistView.o",
+    "swift-dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/WishlistView.swiftdeps",
+    "swiftmodule" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/WishlistView~partial.swiftmodule"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/DerivedSources/CoreDataGenerated/BarrelBook/BarrelBook+CoreDataModel.swift" : {
+    "const-values" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/BarrelBook+CoreDataModel.swiftconstvalues",
+    "dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/BarrelBook+CoreDataModel.d",
+    "diagnostics" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/BarrelBook+CoreDataModel.dia",
+    "index-unit-output-path" : "/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/BarrelBook+CoreDataModel.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/BarrelBook+CoreDataModel.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/BarrelBook+CoreDataModel.o",
+    "swift-dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/BarrelBook+CoreDataModel.swiftdeps",
+    "swiftmodule" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/BarrelBook+CoreDataModel~partial.swiftmodule"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/DerivedSources/CoreDataGenerated/BarrelBook/BottleAddition+CoreDataClass.swift" : {
+    "const-values" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/BottleAddition+CoreDataClass.swiftconstvalues",
+    "dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/BottleAddition+CoreDataClass.d",
+    "diagnostics" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/BottleAddition+CoreDataClass.dia",
+    "index-unit-output-path" : "/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/BottleAddition+CoreDataClass.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/BottleAddition+CoreDataClass.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/BottleAddition+CoreDataClass.o",
+    "swift-dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/BottleAddition+CoreDataClass.swiftdeps",
+    "swiftmodule" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/BottleAddition+CoreDataClass~partial.swiftmodule"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/DerivedSources/CoreDataGenerated/BarrelBook/BottleAddition+CoreDataProperties.swift" : {
+    "const-values" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/BottleAddition+CoreDataProperties.swiftconstvalues",
+    "dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/BottleAddition+CoreDataProperties.d",
+    "diagnostics" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/BottleAddition+CoreDataProperties.dia",
+    "index-unit-output-path" : "/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/BottleAddition+CoreDataProperties.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/BottleAddition+CoreDataProperties.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/BottleAddition+CoreDataProperties.o",
+    "swift-dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/BottleAddition+CoreDataProperties.swiftdeps",
+    "swiftmodule" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/BottleAddition+CoreDataProperties~partial.swiftmodule"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/DerivedSources/CoreDataGenerated/BarrelBook/BottleTasting+CoreDataClass.swift" : {
+    "const-values" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/BottleTasting+CoreDataClass.swiftconstvalues",
+    "dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/BottleTasting+CoreDataClass.d",
+    "diagnostics" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/BottleTasting+CoreDataClass.dia",
+    "index-unit-output-path" : "/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/BottleTasting+CoreDataClass.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/BottleTasting+CoreDataClass.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/BottleTasting+CoreDataClass.o",
+    "swift-dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/BottleTasting+CoreDataClass.swiftdeps",
+    "swiftmodule" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/BottleTasting+CoreDataClass~partial.swiftmodule"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/DerivedSources/CoreDataGenerated/BarrelBook/BottleTasting+CoreDataProperties.swift" : {
+    "const-values" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/BottleTasting+CoreDataProperties.swiftconstvalues",
+    "dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/BottleTasting+CoreDataProperties.d",
+    "diagnostics" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/BottleTasting+CoreDataProperties.dia",
+    "index-unit-output-path" : "/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/BottleTasting+CoreDataProperties.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/BottleTasting+CoreDataProperties.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/BottleTasting+CoreDataProperties.o",
+    "swift-dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/BottleTasting+CoreDataProperties.swiftdeps",
+    "swiftmodule" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/BottleTasting+CoreDataProperties~partial.swiftmodule"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/DerivedSources/CoreDataGenerated/BarrelBook/InfinityBottle+CoreDataClass.swift" : {
+    "const-values" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/InfinityBottle+CoreDataClass.swiftconstvalues",
+    "dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/InfinityBottle+CoreDataClass.d",
+    "diagnostics" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/InfinityBottle+CoreDataClass.dia",
+    "index-unit-output-path" : "/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/InfinityBottle+CoreDataClass.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/InfinityBottle+CoreDataClass.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/InfinityBottle+CoreDataClass.o",
+    "swift-dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/InfinityBottle+CoreDataClass.swiftdeps",
+    "swiftmodule" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/InfinityBottle+CoreDataClass~partial.swiftmodule"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/DerivedSources/CoreDataGenerated/BarrelBook/InfinityBottle+CoreDataProperties.swift" : {
+    "const-values" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/InfinityBottle+CoreDataProperties.swiftconstvalues",
+    "dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/InfinityBottle+CoreDataProperties.d",
+    "diagnostics" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/InfinityBottle+CoreDataProperties.dia",
+    "index-unit-output-path" : "/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/InfinityBottle+CoreDataProperties.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/InfinityBottle+CoreDataProperties.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/InfinityBottle+CoreDataProperties.o",
+    "swift-dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/InfinityBottle+CoreDataProperties.swiftdeps",
+    "swiftmodule" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/InfinityBottle+CoreDataProperties~partial.swiftmodule"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/DerivedSources/CoreDataGenerated/BarrelBook/JournalCustomField+CoreDataClass.swift" : {
+    "const-values" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/JournalCustomField+CoreDataClass.swiftconstvalues",
+    "dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/JournalCustomField+CoreDataClass.d",
+    "diagnostics" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/JournalCustomField+CoreDataClass.dia",
+    "index-unit-output-path" : "/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/JournalCustomField+CoreDataClass.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/JournalCustomField+CoreDataClass.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/JournalCustomField+CoreDataClass.o",
+    "swift-dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/JournalCustomField+CoreDataClass.swiftdeps",
+    "swiftmodule" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/JournalCustomField+CoreDataClass~partial.swiftmodule"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/DerivedSources/CoreDataGenerated/BarrelBook/JournalCustomField+CoreDataProperties.swift" : {
+    "const-values" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/JournalCustomField+CoreDataProperties.swiftconstvalues",
+    "dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/JournalCustomField+CoreDataProperties.d",
+    "diagnostics" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/JournalCustomField+CoreDataProperties.dia",
+    "index-unit-output-path" : "/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/JournalCustomField+CoreDataProperties.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/JournalCustomField+CoreDataProperties.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/JournalCustomField+CoreDataProperties.o",
+    "swift-dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/JournalCustomField+CoreDataProperties.swiftdeps",
+    "swiftmodule" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/JournalCustomField+CoreDataProperties~partial.swiftmodule"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/DerivedSources/CoreDataGenerated/BarrelBook/JournalEntry+CoreDataClass.swift" : {
+    "const-values" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/JournalEntry+CoreDataClass.swiftconstvalues",
+    "dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/JournalEntry+CoreDataClass.d",
+    "diagnostics" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/JournalEntry+CoreDataClass.dia",
+    "index-unit-output-path" : "/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/JournalEntry+CoreDataClass.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/JournalEntry+CoreDataClass.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/JournalEntry+CoreDataClass.o",
+    "swift-dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/JournalEntry+CoreDataClass.swiftdeps",
+    "swiftmodule" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/JournalEntry+CoreDataClass~partial.swiftmodule"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/DerivedSources/CoreDataGenerated/BarrelBook/JournalEntry+CoreDataProperties.swift" : {
+    "const-values" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/JournalEntry+CoreDataProperties.swiftconstvalues",
+    "dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/JournalEntry+CoreDataProperties.d",
+    "diagnostics" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/JournalEntry+CoreDataProperties.dia",
+    "index-unit-output-path" : "/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/JournalEntry+CoreDataProperties.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/JournalEntry+CoreDataProperties.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/JournalEntry+CoreDataProperties.o",
+    "swift-dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/JournalEntry+CoreDataProperties.swiftdeps",
+    "swiftmodule" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/JournalEntry+CoreDataProperties~partial.swiftmodule"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/DerivedSources/CoreDataGenerated/BarrelBook/WebContent+CoreDataClass.swift" : {
+    "const-values" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/WebContent+CoreDataClass.swiftconstvalues",
+    "dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/WebContent+CoreDataClass.d",
+    "diagnostics" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/WebContent+CoreDataClass.dia",
+    "index-unit-output-path" : "/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/WebContent+CoreDataClass.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/WebContent+CoreDataClass.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/WebContent+CoreDataClass.o",
+    "swift-dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/WebContent+CoreDataClass.swiftdeps",
+    "swiftmodule" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/WebContent+CoreDataClass~partial.swiftmodule"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/DerivedSources/CoreDataGenerated/BarrelBook/WebContent+CoreDataProperties.swift" : {
+    "const-values" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/WebContent+CoreDataProperties.swiftconstvalues",
+    "dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/WebContent+CoreDataProperties.d",
+    "diagnostics" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/WebContent+CoreDataProperties.dia",
+    "index-unit-output-path" : "/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/WebContent+CoreDataProperties.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/WebContent+CoreDataProperties.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/WebContent+CoreDataProperties.o",
+    "swift-dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/WebContent+CoreDataProperties.swiftdeps",
+    "swiftmodule" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/WebContent+CoreDataProperties~partial.swiftmodule"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/DerivedSources/CoreDataGenerated/BarrelBook/Whiskey+CoreDataClass.swift" : {
+    "const-values" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/Whiskey+CoreDataClass.swiftconstvalues",
+    "dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/Whiskey+CoreDataClass.d",
+    "diagnostics" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/Whiskey+CoreDataClass.dia",
+    "index-unit-output-path" : "/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/Whiskey+CoreDataClass.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/Whiskey+CoreDataClass.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/Whiskey+CoreDataClass.o",
+    "swift-dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/Whiskey+CoreDataClass.swiftdeps",
+    "swiftmodule" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/Whiskey+CoreDataClass~partial.swiftmodule"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/DerivedSources/CoreDataGenerated/BarrelBook/Whiskey+CoreDataProperties.swift" : {
+    "const-values" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/Whiskey+CoreDataProperties.swiftconstvalues",
+    "dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/Whiskey+CoreDataProperties.d",
+    "diagnostics" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/Whiskey+CoreDataProperties.dia",
+    "index-unit-output-path" : "/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/Whiskey+CoreDataProperties.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/Whiskey+CoreDataProperties.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/Whiskey+CoreDataProperties.o",
+    "swift-dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/Whiskey+CoreDataProperties.swiftdeps",
+    "swiftmodule" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/Whiskey+CoreDataProperties~partial.swiftmodule"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/DerivedSources/CoreDataGenerated/BarrelBook/WhiskeyCustomField+CoreDataClass.swift" : {
+    "const-values" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/WhiskeyCustomField+CoreDataClass.swiftconstvalues",
+    "dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/WhiskeyCustomField+CoreDataClass.d",
+    "diagnostics" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/WhiskeyCustomField+CoreDataClass.dia",
+    "index-unit-output-path" : "/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/WhiskeyCustomField+CoreDataClass.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/WhiskeyCustomField+CoreDataClass.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/WhiskeyCustomField+CoreDataClass.o",
+    "swift-dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/WhiskeyCustomField+CoreDataClass.swiftdeps",
+    "swiftmodule" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/WhiskeyCustomField+CoreDataClass~partial.swiftmodule"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/DerivedSources/CoreDataGenerated/BarrelBook/WhiskeyCustomField+CoreDataProperties.swift" : {
+    "const-values" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/WhiskeyCustomField+CoreDataProperties.swiftconstvalues",
+    "dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/WhiskeyCustomField+CoreDataProperties.d",
+    "diagnostics" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/WhiskeyCustomField+CoreDataProperties.dia",
+    "index-unit-output-path" : "/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/WhiskeyCustomField+CoreDataProperties.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/WhiskeyCustomField+CoreDataProperties.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/WhiskeyCustomField+CoreDataProperties.o",
+    "swift-dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/WhiskeyCustomField+CoreDataProperties.swiftdeps",
+    "swiftmodule" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/WhiskeyCustomField+CoreDataProperties~partial.swiftmodule"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/DerivedSources/GeneratedAssetSymbols.swift" : {
+    "const-values" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/GeneratedAssetSymbols.swiftconstvalues",
+    "dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/GeneratedAssetSymbols.d",
+    "diagnostics" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/GeneratedAssetSymbols.dia",
+    "index-unit-output-path" : "/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/GeneratedAssetSymbols.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/GeneratedAssetSymbols.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/GeneratedAssetSymbols.o",
+    "swift-dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/GeneratedAssetSymbols.swiftdeps",
+    "swiftmodule" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/GeneratedAssetSymbols~partial.swiftmodule"
+  }
+}

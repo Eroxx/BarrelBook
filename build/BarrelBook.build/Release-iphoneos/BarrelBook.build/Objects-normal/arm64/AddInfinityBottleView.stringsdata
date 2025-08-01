@@ -1,0 +1,88 @@
+{
+  "source": "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/AddInfinityBottleView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "New Infinity Bottle",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 66
+        }
+      },
+      {
+        "comment": "",
+        "key": "Bottle Information",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 19
+        }
+      },
+      {
+        "comment": "",
+        "key": "Optional",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 29
+        }
+      },
+      {
+        "comment": "",
+        "key": "Name",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 20
+        }
+      },
+      {
+        "comment": "",
+        "key": "Type",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 22
+        }
+      },
+      {
+        "comment": "",
+        "key": "Notes",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 56
+        }
+      },
+      {
+        "comment": "",
+        "key": "Tap to add a photo",
+        "location": {
+          "startingColumn": 46,
+          "startingLine": 45
+        }
+      },
+      {
+        "comment": "",
+        "key": "Add whiskeys to your infinity bottle after creating it. Volume and proof will be calculated automatically based on the whiskeys you add.",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 61
+        }
+      },
+      {
+        "comment": "",
+        "key": "Cancel",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 70
+        }
+      },
+      {
+        "comment": "",
+        "key": "Save",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 77
+        }
+      }
+    ]
+  },
+  "version": 1
+}

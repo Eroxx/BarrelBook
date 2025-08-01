@@ -1,0 +1,536 @@
+{
+  "source": "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/InfinityBottleDetailView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "",
+        "location": {
+          "startingColumn": 29,
+          "startingLine": 231
+        }
+      },
+      {
+        "comment": "",
+        "key": "View",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 132
+        }
+      },
+      {
+        "comment": "",
+        "key": "Created:",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 87
+        }
+      },
+      {
+        "comment": "",
+        "key": "Proof:",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 94
+        }
+      },
+      {
+        "comment": "",
+        "key": "Total Volume:",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 101
+        }
+      },
+      {
+        "comment": "",
+        "key": "%.1f oz",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 103
+        }
+      },
+      {
+        "comment": "",
+        "key": "Additions:",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 108
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 110
+        }
+      },
+      {
+        "comment": "",
+        "key": "Notes",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 120
+        }
+      },
+      {
+        "comment": "",
+        "key": "Additions",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 133
+        }
+      },
+      {
+        "comment": "",
+        "key": "Tastings",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 134
+        }
+      },
+      {
+        "comment": "",
+        "key": "Whiskey Additions",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 144
+        }
+      },
+      {
+        "comment": "",
+        "key": "Add",
+        "location": {
+          "startingColumn": 39,
+          "startingLine": 151
+        }
+      },
+      {
+        "comment": "",
+        "key": "No whiskeys added yet",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 159
+        }
+      },
+      {
+        "comment": "",
+        "key": "Tap the + button to add your first whiskey",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 162
+        }
+      },
+      {
+        "comment": "",
+        "key": "Delete",
+        "location": {
+          "startingColumn": 51,
+          "startingLine": 176
+        }
+      },
+      {
+        "comment": "",
+        "key": "Tasting Notes",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 191
+        }
+      },
+      {
+        "comment": "",
+        "key": "Add",
+        "location": {
+          "startingColumn": 39,
+          "startingLine": 198
+        }
+      },
+      {
+        "comment": "",
+        "key": "No tasting notes yet",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 206
+        }
+      },
+      {
+        "comment": "",
+        "key": "Tap the + button to record your first tasting",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 209
+        }
+      },
+      {
+        "comment": "",
+        "key": "Edit Bottle",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 239
+        }
+      },
+      {
+        "comment": "",
+        "key": "Delete Bottle",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 249
+        }
+      },
+      {
+        "comment": "",
+        "key": "%.2f oz",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 309
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 315
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@ proof",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 318
+        }
+      },
+      {
+        "comment": "",
+        "key": "Nose: %@",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 361
+        }
+      },
+      {
+        "comment": "",
+        "key": "Palate: %@",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 366
+        }
+      },
+      {
+        "comment": "",
+        "key": "Finish: %@",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 371
+        }
+      },
+      {
+        "comment": "",
+        "key": "Add Whiskey",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 464
+        }
+      },
+      {
+        "comment": "",
+        "key": "Whiskey",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 405
+        }
+      },
+      {
+        "comment": "",
+        "key": "Amount (oz)",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 439
+        }
+      },
+      {
+        "comment": "",
+        "key": "Notes (Optional)",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 459
+        }
+      },
+      {
+        "comment": "",
+        "key": "Select Whiskey",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 406
+        }
+      },
+      {
+        "comment": "",
+        "key": "Select a whiskey...",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 407
+        }
+      },
+      {
+        "comment": "",
+        "key": "Proof",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 416
+        }
+      },
+      {
+        "comment": "",
+        "key": "Distillery",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 423
+        }
+      },
+      {
+        "comment": "",
+        "key": "Type",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 431
+        }
+      },
+      {
+        "comment": "",
+        "key": "%.2f oz",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 453
+        }
+      },
+      {
+        "comment": "",
+        "key": "0 oz",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 442
+        }
+      },
+      {
+        "comment": "",
+        "key": "6.8 oz",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 446
+        }
+      },
+      {
+        "comment": "",
+        "key": "Notes about this addition",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 460
+        }
+      },
+      {
+        "comment": "",
+        "key": "Cancel",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 468
+        }
+      },
+      {
+        "comment": "",
+        "key": "Add",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 475
+        }
+      },
+      {
+        "comment": "",
+        "key": "New Tasting Entry",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 639
+        }
+      },
+      {
+        "comment": "",
+        "key": "Basic Info",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 555
+        }
+      },
+      {
+        "comment": "",
+        "key": "Tasting Notes",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 570
+        }
+      },
+      {
+        "comment": "",
+        "key": "Additional Details",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 581
+        }
+      },
+      {
+        "comment": "",
+        "key": "Infinity Bottle",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 609
+        }
+      },
+      {
+        "comment": "",
+        "key": "Date",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 556
+        }
+      },
+      {
+        "comment": "",
+        "key": "Overall Rating",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 559
+        }
+      },
+      {
+        "comment": "",
+        "key": "Nose",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 571
+        }
+      },
+      {
+        "comment": "",
+        "key": "Palate",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 573
+        }
+      },
+      {
+        "comment": "",
+        "key": "Finish",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 575
+        }
+      },
+      {
+        "comment": "",
+        "key": "Review",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 577
+        }
+      },
+      {
+        "comment": "",
+        "key": "Custom Serving Method",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 602
+        }
+      },
+      {
+        "comment": "",
+        "key": "Setting",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 605
+        }
+      },
+      {
+        "comment": "",
+        "key": "Serving Method:",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 583
+        }
+      },
+      {
+        "comment": "",
+        "key": "",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 586
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@ %@",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 588
+        }
+      },
+      {
+        "comment": "",
+        "key": "Bottle:",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 611
+        }
+      },
+      {
+        "comment": "",
+        "key": "Type:",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 618
+        }
+      },
+      {
+        "comment": "",
+        "key": "Current Proof:",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 625
+        }
+      },
+      {
+        "comment": "",
+        "key": "Total Volume:",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 632
+        }
+      },
+      {
+        "comment": "",
+        "key": "%.1f oz",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 634
+        }
+      },
+      {
+        "comment": "",
+        "key": "Cancel",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 642
+        }
+      },
+      {
+        "comment": "",
+        "key": "Save",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 648
+        }
+      }
+    ]
+  },
+  "version": 1
+}

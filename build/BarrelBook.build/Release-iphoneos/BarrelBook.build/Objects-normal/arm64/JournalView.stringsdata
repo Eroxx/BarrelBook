@@ -1,0 +1,152 @@
+{
+  "source": "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/JournalView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 180
+        }
+      },
+      {
+        "comment": "",
+        "key": "View Mode",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 158
+        }
+      },
+      {
+        "comment": "",
+        "key": "Search journal...",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 130
+        }
+      },
+      {
+        "comment": "",
+        "key": "Tastings",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 184
+        }
+      },
+      {
+        "comment": "",
+        "key": "Filter & Sort",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 260
+        }
+      },
+      {
+        "comment": "",
+        "key": "Rating Range",
+        "location": {
+          "startingColumn": 46,
+          "startingLine": 210
+        }
+      },
+      {
+        "comment": "",
+        "key": "Serving Method",
+        "location": {
+          "startingColumn": 46,
+          "startingLine": 215
+        }
+      },
+      {
+        "comment": "",
+        "key": "Sort By",
+        "location": {
+          "startingColumn": 46,
+          "startingLine": 236
+        }
+      },
+      {
+        "comment": "",
+        "key": "Sort By",
+        "location": {
+          "startingColumn": 36,
+          "startingLine": 237
+        }
+      },
+      {
+        "comment": "",
+        "key": "Reset Filters",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 254
+        }
+      },
+      {
+        "comment": "",
+        "key": "Done",
+        "location": {
+          "startingColumn": 36,
+          "startingLine": 264
+        }
+      },
+      {
+        "comment": "",
+        "key": "Edit",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 290
+        }
+      },
+      {
+        "comment": "",
+        "key": "Delete",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 298
+        }
+      },
+      {
+        "comment": "",
+        "key": "No entries on %@",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 323
+        }
+      },
+      {
+        "comment": "",
+        "key": "Add Entry",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 330
+        }
+      },
+      {
+        "comment": "",
+        "key": "Edit",
+        "location": {
+          "startingColumn": 39,
+          "startingLine": 350
+        }
+      },
+      {
+        "comment": "",
+        "key": "Delete",
+        "location": {
+          "startingColumn": 39,
+          "startingLine": 358
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 499
+        }
+      }
+    ]
+  },
+  "version": 1
+}

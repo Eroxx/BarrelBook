@@ -1,0 +1,32 @@
+{
+  "source": "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/JournalEntryRowView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "∞ %@",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 10
+        }
+      },
+      {
+        "comment": "",
+        "key": "Unknown Entry",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 16
+        }
+      },
+      {
+        "comment": "",
+        "key": "Infinity Bottle • %.1f proof",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 42
+        }
+      }
+    ]
+  },
+  "version": 1
+}

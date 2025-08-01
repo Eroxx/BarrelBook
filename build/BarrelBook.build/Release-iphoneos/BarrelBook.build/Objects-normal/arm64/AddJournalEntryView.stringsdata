@@ -1,0 +1,176 @@
+{
+  "source": "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/AddJournalEntryView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "New Tasting Entry",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 130
+        }
+      },
+      {
+        "comment": "",
+        "key": "Whiskey Selection",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 62
+        }
+      },
+      {
+        "comment": "",
+        "key": "Basic Info",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 77
+        }
+      },
+      {
+        "comment": "",
+        "key": "Tasting Notes",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 92
+        }
+      },
+      {
+        "comment": "",
+        "key": "Additional Details",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 103
+        }
+      },
+      {
+        "comment": "",
+        "key": "Date",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 78
+        }
+      },
+      {
+        "comment": "",
+        "key": "Overall Rating",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 81
+        }
+      },
+      {
+        "comment": "",
+        "key": "Nose",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 93
+        }
+      },
+      {
+        "comment": "",
+        "key": "Palate",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 95
+        }
+      },
+      {
+        "comment": "",
+        "key": "Finish",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 97
+        }
+      },
+      {
+        "comment": "",
+        "key": "Review",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 99
+        }
+      },
+      {
+        "comment": "",
+        "key": "Custom Serving Method",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 124
+        }
+      },
+      {
+        "comment": "",
+        "key": "Setting",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 127
+        }
+      },
+      {
+        "comment": "",
+        "key": "Serving Method:",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 105
+        }
+      },
+      {
+        "comment": "",
+        "key": "",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 108
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@ %@",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 110
+        }
+      },
+      {
+        "comment": "",
+        "key": "Cancel",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 133
+        }
+      },
+      {
+        "comment": "",
+        "key": "Save",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 139
+        }
+      },
+      {
+        "comment": "",
+        "key": "Search whiskeys",
+        "location": {
+          "startingColumn": 56,
+          "startingLine": 261
+        }
+      },
+      {
+        "comment": "",
+        "key": "Select Whiskey",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 296
+        }
+      },
+      {
+        "comment": "",
+        "key": "Cancel",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 300
+        }
+      }
+    ]
+  },
+  "version": 1
+}

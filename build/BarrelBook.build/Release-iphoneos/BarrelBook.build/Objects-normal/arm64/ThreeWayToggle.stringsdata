@@ -1,0 +1,40 @@
+{
+  "source": "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/Components/ThreeWayToggle.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "All",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 38
+        }
+      },
+      {
+        "comment": "",
+        "key": "Yes",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 42
+        }
+      },
+      {
+        "comment": "",
+        "key": "No",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 47
+        }
+      },
+      {
+        "comment": "",
+        "key": "OK",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 67
+        }
+      }
+    ]
+  },
+  "version": 1
+}

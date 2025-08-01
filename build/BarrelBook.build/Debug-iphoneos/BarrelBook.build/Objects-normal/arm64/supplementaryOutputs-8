@@ -1,0 +1,24 @@
+"/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/ContentView.swift":
+  const-values: "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/ContentView.swiftconstvalues"
+  dependencies: "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/ContentView.d"
+  diagnostics: "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/ContentView.dia"
+  object: "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/ContentView.o"
+  swift-dependencies: "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/ContentView.swiftdeps"
+"/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Utils/AppColorScheme.swift":
+  diagnostics: "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/AppColorScheme.dia"
+  const-values: "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/AppColorScheme.swiftconstvalues"
+  swift-dependencies: "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/AppColorScheme.swiftdeps"
+  object: "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/AppColorScheme.o"
+  dependencies: "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/AppColorScheme.d"
+"/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/AddInfinityBottleView.swift":
+  dependencies: "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/AddInfinityBottleView.d"
+  swift-dependencies: "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/AddInfinityBottleView.swiftdeps"
+  const-values: "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/AddInfinityBottleView.swiftconstvalues"
+  object: "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/AddInfinityBottleView.o"
+  diagnostics: "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/AddInfinityBottleView.dia"
+"/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/WebContent/SavedWebContentView.swift":
+  const-values: "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/SavedWebContentView.swiftconstvalues"
+  object: "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/SavedWebContentView.o"
+  dependencies: "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/SavedWebContentView.d"
+  swift-dependencies: "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/SavedWebContentView.swiftdeps"
+  diagnostics: "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/SavedWebContentView.dia"

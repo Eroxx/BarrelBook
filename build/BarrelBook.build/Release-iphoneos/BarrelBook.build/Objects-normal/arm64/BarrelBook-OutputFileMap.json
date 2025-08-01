@@ -1,0 +1,325 @@
+{
+  "" : {
+    "const-values" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/BarrelBook-master.swiftconstvalues",
+    "dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/BarrelBook-master.d",
+    "diagnostics" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/BarrelBook-master.dia",
+    "emit-module-dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/BarrelBook-master-emit-module.d",
+    "emit-module-diagnostics" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/BarrelBook-master-emit-module.dia",
+    "swift-dependencies" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/BarrelBook-master.swiftdeps"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/BarrelBookApp.swift" : {
+    "index-unit-output-path" : "/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/BarrelBookApp.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/BarrelBookApp.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/BarrelBookApp.o"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Models/CoreDataModelExtensions.swift" : {
+    "index-unit-output-path" : "/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/CoreDataModelExtensions.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/CoreDataModelExtensions.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/CoreDataModelExtensions.o"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Models/SecureValueTransformer.swift" : {
+    "index-unit-output-path" : "/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/SecureValueTransformer.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/SecureValueTransformer.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/SecureValueTransformer.o"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Models/Whiskey+Extensions.swift" : {
+    "index-unit-output-path" : "/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/Whiskey+Extensions.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/Whiskey+Extensions.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/Whiskey+Extensions.o"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Models/WhiskeyStatus.swift" : {
+    "index-unit-output-path" : "/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/WhiskeyStatus.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/WhiskeyStatus.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/WhiskeyStatus.o"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Services/CSVService.swift" : {
+    "index-unit-output-path" : "/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/CSVService.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/CSVService.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/CSVService.o"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Services/CSVSyncService.swift" : {
+    "index-unit-output-path" : "/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/CSVSyncService.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/CSVSyncService.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/CSVSyncService.o"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Services/MarkdownExtractor.swift" : {
+    "index-unit-output-path" : "/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/MarkdownExtractor.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/MarkdownExtractor.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/MarkdownExtractor.o"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Services/MarkdownRenderer.swift" : {
+    "index-unit-output-path" : "/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/MarkdownRenderer.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/MarkdownRenderer.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/MarkdownRenderer.o"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Services/ReadabilityExtractor.swift" : {
+    "index-unit-output-path" : "/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/ReadabilityExtractor.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/ReadabilityExtractor.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/ReadabilityExtractor.o"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Utils/AppColorScheme.swift" : {
+    "index-unit-output-path" : "/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/AppColorScheme.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/AppColorScheme.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/AppColorScheme.o"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Utils/AppDelegate.swift" : {
+    "index-unit-output-path" : "/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/AppDelegate.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/AppDelegate.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/AppDelegate.o"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Utils/BindingExtensions.swift" : {
+    "index-unit-output-path" : "/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/BindingExtensions.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/BindingExtensions.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/BindingExtensions.o"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Utils/ColorManager.swift" : {
+    "index-unit-output-path" : "/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/ColorManager.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/ColorManager.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/ColorManager.o"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Utils/FilterSettingsManager.swift" : {
+    "index-unit-output-path" : "/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/FilterSettingsManager.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/FilterSettingsManager.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/FilterSettingsManager.o"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Utils/HapticManager.swift" : {
+    "index-unit-output-path" : "/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/HapticManager.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/HapticManager.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/HapticManager.o"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Utils/PrivacyManager.swift" : {
+    "index-unit-output-path" : "/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/PrivacyManager.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/PrivacyManager.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/PrivacyManager.o"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Utils/SortingUtils.swift" : {
+    "index-unit-output-path" : "/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/SortingUtils.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/SortingUtils.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/SortingUtils.o"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/AddInfinityBottleView.swift" : {
+    "index-unit-output-path" : "/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/AddInfinityBottleView.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/AddInfinityBottleView.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/AddInfinityBottleView.o"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/AddJournalEntryView.swift" : {
+    "index-unit-output-path" : "/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/AddJournalEntryView.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/AddJournalEntryView.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/AddJournalEntryView.o"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/AddWhiskeyToWishlistView.swift" : {
+    "index-unit-output-path" : "/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/AddWhiskeyToWishlistView.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/AddWhiskeyToWishlistView.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/AddWhiskeyToWishlistView.o"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/AddWhiskeyView.swift" : {
+    "index-unit-output-path" : "/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/AddWhiskeyView.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/AddWhiskeyView.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/AddWhiskeyView.o"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/CSVFileSaver.swift" : {
+    "index-unit-output-path" : "/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/CSVFileSaver.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/CSVFileSaver.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/CSVFileSaver.o"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/CSVSaver.swift" : {
+    "index-unit-output-path" : "/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/CSVSaver.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/CSVSaver.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/CSVSaver.o"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/CollectionView.swift" : {
+    "index-unit-output-path" : "/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/CollectionView.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/CollectionView.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/CollectionView.o"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/Components/FloatingAddButton.swift" : {
+    "index-unit-output-path" : "/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/FloatingAddButton.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/FloatingAddButton.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/FloatingAddButton.o"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/Components/ThreeWayToggle.swift" : {
+    "index-unit-output-path" : "/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/ThreeWayToggle.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/ThreeWayToggle.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/ThreeWayToggle.o"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/ContentView.swift" : {
+    "index-unit-output-path" : "/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/ContentView.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/ContentView.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/ContentView.o"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/EditInfinityBottleView.swift" : {
+    "index-unit-output-path" : "/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/EditInfinityBottleView.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/EditInfinityBottleView.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/EditInfinityBottleView.o"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/EditWishlistItemView.swift" : {
+    "index-unit-output-path" : "/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/EditWishlistItemView.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/EditWishlistItemView.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/EditWishlistItemView.o"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/InfinityBottleDetailView.swift" : {
+    "index-unit-output-path" : "/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/InfinityBottleDetailView.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/InfinityBottleDetailView.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/InfinityBottleDetailView.o"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/InfinityBottleRowView.swift" : {
+    "index-unit-output-path" : "/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/InfinityBottleRowView.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/InfinityBottleRowView.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/InfinityBottleRowView.o"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/JournalEntryDetailView.swift" : {
+    "index-unit-output-path" : "/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/JournalEntryDetailView.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/JournalEntryDetailView.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/JournalEntryDetailView.o"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/JournalEntryRowView.swift" : {
+    "index-unit-output-path" : "/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/JournalEntryRowView.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/JournalEntryRowView.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/JournalEntryRowView.o"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/JournalView.swift" : {
+    "index-unit-output-path" : "/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/JournalView.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/JournalView.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/JournalView.o"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/OnboardingView.swift" : {
+    "index-unit-output-path" : "/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/OnboardingView.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/OnboardingView.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/OnboardingView.o"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/SettingsView.swift" : {
+    "index-unit-output-path" : "/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/SettingsView.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/SettingsView.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/SettingsView.o"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/StatisticsView.swift" : {
+    "index-unit-output-path" : "/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/StatisticsView.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/StatisticsView.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/StatisticsView.o"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/WebContent/SavedWebContentView.swift" : {
+    "index-unit-output-path" : "/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/SavedWebContentView.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/SavedWebContentView.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/SavedWebContentView.o"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/WebContent/WebReaderView.swift" : {
+    "index-unit-output-path" : "/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/WebReaderView.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/WebReaderView.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/WebReaderView.o"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/WebContent/WebSearchView.swift" : {
+    "index-unit-output-path" : "/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/WebSearchView.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/WebSearchView.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/WebSearchView.o"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/WhiskeyDetailView.swift" : {
+    "index-unit-output-path" : "/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/WhiskeyDetailView.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/WhiskeyDetailView.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/WhiskeyDetailView.o"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/WhiskeyRowView.swift" : {
+    "index-unit-output-path" : "/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/WhiskeyRowView.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/WhiskeyRowView.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/WhiskeyRowView.o"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/WishlistRowView.swift" : {
+    "index-unit-output-path" : "/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/WishlistRowView.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/WishlistRowView.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/WishlistRowView.o"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/WishlistView.swift" : {
+    "index-unit-output-path" : "/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/WishlistView.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/WishlistView.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/WishlistView.o"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/DerivedSources/CoreDataGenerated/BarrelBook/BarrelBook+CoreDataModel.swift" : {
+    "index-unit-output-path" : "/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/BarrelBook+CoreDataModel.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/BarrelBook+CoreDataModel.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/BarrelBook+CoreDataModel.o"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/DerivedSources/CoreDataGenerated/BarrelBook/BottleAddition+CoreDataClass.swift" : {
+    "index-unit-output-path" : "/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/BottleAddition+CoreDataClass.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/BottleAddition+CoreDataClass.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/BottleAddition+CoreDataClass.o"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/DerivedSources/CoreDataGenerated/BarrelBook/BottleAddition+CoreDataProperties.swift" : {
+    "index-unit-output-path" : "/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/BottleAddition+CoreDataProperties.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/BottleAddition+CoreDataProperties.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/BottleAddition+CoreDataProperties.o"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/DerivedSources/CoreDataGenerated/BarrelBook/BottleTasting+CoreDataClass.swift" : {
+    "index-unit-output-path" : "/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/BottleTasting+CoreDataClass.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/BottleTasting+CoreDataClass.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/BottleTasting+CoreDataClass.o"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/DerivedSources/CoreDataGenerated/BarrelBook/BottleTasting+CoreDataProperties.swift" : {
+    "index-unit-output-path" : "/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/BottleTasting+CoreDataProperties.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/BottleTasting+CoreDataProperties.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/BottleTasting+CoreDataProperties.o"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/DerivedSources/CoreDataGenerated/BarrelBook/InfinityBottle+CoreDataClass.swift" : {
+    "index-unit-output-path" : "/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/InfinityBottle+CoreDataClass.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/InfinityBottle+CoreDataClass.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/InfinityBottle+CoreDataClass.o"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/DerivedSources/CoreDataGenerated/BarrelBook/InfinityBottle+CoreDataProperties.swift" : {
+    "index-unit-output-path" : "/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/InfinityBottle+CoreDataProperties.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/InfinityBottle+CoreDataProperties.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/InfinityBottle+CoreDataProperties.o"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/DerivedSources/CoreDataGenerated/BarrelBook/JournalCustomField+CoreDataClass.swift" : {
+    "index-unit-output-path" : "/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/JournalCustomField+CoreDataClass.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/JournalCustomField+CoreDataClass.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/JournalCustomField+CoreDataClass.o"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/DerivedSources/CoreDataGenerated/BarrelBook/JournalCustomField+CoreDataProperties.swift" : {
+    "index-unit-output-path" : "/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/JournalCustomField+CoreDataProperties.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/JournalCustomField+CoreDataProperties.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/JournalCustomField+CoreDataProperties.o"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/DerivedSources/CoreDataGenerated/BarrelBook/JournalEntry+CoreDataClass.swift" : {
+    "index-unit-output-path" : "/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/JournalEntry+CoreDataClass.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/JournalEntry+CoreDataClass.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/JournalEntry+CoreDataClass.o"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/DerivedSources/CoreDataGenerated/BarrelBook/JournalEntry+CoreDataProperties.swift" : {
+    "index-unit-output-path" : "/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/JournalEntry+CoreDataProperties.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/JournalEntry+CoreDataProperties.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/JournalEntry+CoreDataProperties.o"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/DerivedSources/CoreDataGenerated/BarrelBook/WebContent+CoreDataClass.swift" : {
+    "index-unit-output-path" : "/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/WebContent+CoreDataClass.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/WebContent+CoreDataClass.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/WebContent+CoreDataClass.o"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/DerivedSources/CoreDataGenerated/BarrelBook/WebContent+CoreDataProperties.swift" : {
+    "index-unit-output-path" : "/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/WebContent+CoreDataProperties.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/WebContent+CoreDataProperties.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/WebContent+CoreDataProperties.o"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/DerivedSources/CoreDataGenerated/BarrelBook/Whiskey+CoreDataClass.swift" : {
+    "index-unit-output-path" : "/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/Whiskey+CoreDataClass.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/Whiskey+CoreDataClass.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/Whiskey+CoreDataClass.o"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/DerivedSources/CoreDataGenerated/BarrelBook/Whiskey+CoreDataProperties.swift" : {
+    "index-unit-output-path" : "/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/Whiskey+CoreDataProperties.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/Whiskey+CoreDataProperties.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/Whiskey+CoreDataProperties.o"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/DerivedSources/CoreDataGenerated/BarrelBook/WhiskeyCustomField+CoreDataClass.swift" : {
+    "index-unit-output-path" : "/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/WhiskeyCustomField+CoreDataClass.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/WhiskeyCustomField+CoreDataClass.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/WhiskeyCustomField+CoreDataClass.o"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/DerivedSources/CoreDataGenerated/BarrelBook/WhiskeyCustomField+CoreDataProperties.swift" : {
+    "index-unit-output-path" : "/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/WhiskeyCustomField+CoreDataProperties.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/WhiskeyCustomField+CoreDataProperties.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/WhiskeyCustomField+CoreDataProperties.o"
+  },
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/DerivedSources/GeneratedAssetSymbols.swift" : {
+    "index-unit-output-path" : "/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/GeneratedAssetSymbols.o",
+    "llvm-bc" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/GeneratedAssetSymbols.bc",
+    "object" : "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/Objects-normal/arm64/GeneratedAssetSymbols.o"
+  }
+}

@@ -1,0 +1,192 @@
+{
+  "source": "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/ContentView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Home",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 110
+        }
+      },
+      {
+        "comment": "",
+        "key": "Collection",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 116
+        }
+      },
+      {
+        "comment": "",
+        "key": "Wishlist",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 122
+        }
+      },
+      {
+        "comment": "",
+        "key": "Tastings",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 128
+        }
+      },
+      {
+        "comment": "",
+        "key": "Statistics",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 134
+        }
+      },
+      {
+        "comment": "",
+        "key": "BarrelBook",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 277
+        }
+      },
+      {
+        "comment": "",
+        "key": "No recent activity",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 508
+        }
+      },
+      {
+        "comment": "",
+        "key": "Recent Activity",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 489
+        }
+      },
+      {
+        "comment": "",
+        "key": "See All",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 496
+        }
+      },
+      {
+        "comment": "",
+        "key": "Quick Stats",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 613
+        }
+      },
+      {
+        "comment": "",
+        "key": "See All",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 627
+        }
+      },
+      {
+        "comment": "",
+        "key": "Collection:",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 639
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld bottles",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 645
+        }
+      },
+      {
+        "comment": "",
+        "key": "Total Value:",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 651
+        }
+      },
+      {
+        "comment": "",
+        "key": "•",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 657
+        }
+      },
+      {
+        "comment": "",
+        "key": "Avg PPP:",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 663
+        }
+      },
+      {
+        "comment": "",
+        "key": "Tasted:",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 675
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld bottles",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 681
+        }
+      },
+      {
+        "comment": "",
+        "key": "Wishlist:",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 687
+        }
+      },
+      {
+        "comment": "",
+        "key": "Recent Activity",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 880
+        }
+      },
+      {
+        "comment": "",
+        "key": "Time Range",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 822
+        }
+      },
+      {
+        "comment": "",
+        "key": "No activity in this time period",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 851
+        }
+      },
+      {
+        "comment": "",
+        "key": "Hidden",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 1072
+        }
+      }
+    ]
+  },
+  "version": 1
+}

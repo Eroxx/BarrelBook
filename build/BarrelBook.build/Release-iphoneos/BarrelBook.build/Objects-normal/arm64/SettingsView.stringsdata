@@ -1,0 +1,384 @@
+{
+  "source": "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/SettingsView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Settings",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 381
+        }
+      },
+      {
+        "comment": "",
+        "key": "Error",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 390
+        }
+      },
+      {
+        "comment": "",
+        "key": "Success",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 395
+        }
+      },
+      {
+        "comment": "",
+        "key": "Sync Complete",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 400
+        }
+      },
+      {
+        "comment": "",
+        "key": "CSV Template",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 409
+        }
+      },
+      {
+        "comment": "",
+        "key": "Create Sync File",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 419
+        }
+      },
+      {
+        "comment": "",
+        "key": "Appearance",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 62
+        }
+      },
+      {
+        "comment": "",
+        "key": "Data Management",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 277
+        }
+      },
+      {
+        "comment": "",
+        "key": "Help",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 344
+        }
+      },
+      {
+        "comment": "",
+        "key": "About",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 354
+        }
+      },
+      {
+        "comment": "",
+        "key": "PRIVACY",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 364
+        }
+      },
+      {
+        "comment": "",
+        "key": "Appearance",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 63
+        }
+      },
+      {
+        "comment": "",
+        "key": "Light",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 69
+        }
+      },
+      {
+        "comment": "",
+        "key": "Dark",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 70
+        }
+      },
+      {
+        "comment": "",
+        "key": "System",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 71
+        }
+      },
+      {
+        "comment": "",
+        "key": "TWO-WAY SYNC WITH SPREADSHEET",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 77
+        }
+      },
+      {
+        "comment": "",
+        "key": "Current sync file",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 87
+        }
+      },
+      {
+        "comment": "",
+        "key": "Last synced",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 96
+        }
+      },
+      {
+        "comment": "",
+        "key": "Syncing...",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 108
+        }
+      },
+      {
+        "comment": "",
+        "key": "Sync Now",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 116
+        }
+      },
+      {
+        "comment": "",
+        "key": "Stop Syncing",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 161
+        }
+      },
+      {
+        "comment": "",
+        "key": "Setting up sync...",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 173
+        }
+      },
+      {
+        "comment": "",
+        "key": "Start Here: Sample Spreadsheet w/ Readme",
+        "location": {
+          "startingColumn": 43,
+          "startingLine": 194
+        }
+      },
+      {
+        "comment": "",
+        "key": "Sync with Existing File",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 228
+        }
+      },
+      {
+        "comment": "",
+        "key": "Create Sync File in iCloud Drive",
+        "location": {
+          "startingColumn": 43,
+          "startingLine": 261
+        }
+      },
+      {
+        "comment": "",
+        "key": "Import CSV",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 290
+        }
+      },
+      {
+        "comment": "",
+        "key": "Export CSV",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 312
+        }
+      },
+      {
+        "comment": "",
+        "key": "Processing CSV...",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 334
+        }
+      },
+      {
+        "comment": "",
+        "key": "Replay Tutorial",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 350
+        }
+      },
+      {
+        "comment": "",
+        "key": "Version",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 356
+        }
+      },
+      {
+        "comment": "",
+        "key": "Prices will be hidden throughout the app. Tap the lock icon to temporarily view a price.",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 375
+        }
+      },
+      {
+        "comment": "",
+        "key": "Hide Prices",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 367
+        }
+      },
+      {
+        "comment": "",
+        "key": "Done",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 384
+        }
+      },
+      {
+        "comment": "",
+        "key": "OK",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 391
+        }
+      },
+      {
+        "comment": "",
+        "key": "OK",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 396
+        }
+      },
+      {
+        "comment": "",
+        "key": "OK",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 401
+        }
+      },
+      {
+        "comment": "",
+        "key": "Sync completed",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 406
+        }
+      },
+      {
+        "comment": "",
+        "key": "Added: %lld\nUpdated: %lld\nDeleted: %lld\nConflicts: %lld",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 404
+        }
+      },
+      {
+        "comment": "",
+        "key": "Cancel",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 410
+        }
+      },
+      {
+        "comment": "",
+        "key": "Create Template",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 411
+        }
+      },
+      {
+        "comment": "",
+        "key": "This will export a sample CSV along with a user-friendly guide.",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 415
+        }
+      },
+      {
+        "comment": "",
+        "key": "This will create a zip file containing a template CSV file and a README with instructions. The CSV shows the correct format for importing whiskey data. You can extract and edit the CSV file in any spreadsheet application.",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 417
+        }
+      },
+      {
+        "comment": "",
+        "key": "Cancel",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 420
+        }
+      },
+      {
+        "comment": "",
+        "key": "Continue",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 421
+        }
+      },
+      {
+        "comment": "",
+        "key": "Create Sync File",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 426
+        }
+      },
+      {
+        "comment": "",
+        "key": "This will create a CSV file that you can save to Dropbox, iCloud, or another cloud storage. You can then edit this file and sync changes back.",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 428
+        }
+      },
+      {
+        "comment": "",
+        "key": "Loading...",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 2128
+        }
+      }
+    ]
+  },
+  "version": 1
+}

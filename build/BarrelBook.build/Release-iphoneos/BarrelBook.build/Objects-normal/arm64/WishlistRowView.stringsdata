@@ -1,0 +1,40 @@
+{
+  "source": "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/WishlistRowView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Find at: %@",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 53
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld proof",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 31
+        }
+      },
+      {
+        "comment": "",
+        "key": "•",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 36
+        }
+      },
+      {
+        "comment": "",
+        "key": "Target: $%lld",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 40
+        }
+      }
+    ]
+  },
+  "version": 1
+}

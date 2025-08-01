@@ -1,0 +1,24 @@
+"/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/NavigationStateManager.swift":
+  const-values: "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/NavigationStateManager.swiftconstvalues"
+  swift-dependencies: "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/NavigationStateManager.swiftdeps"
+  dependencies: "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/NavigationStateManager.d"
+  object: "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/NavigationStateManager.o"
+  diagnostics: "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/NavigationStateManager.dia"
+"/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/JournalEntryDetailView.swift":
+  dependencies: "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/JournalEntryDetailView.d"
+  swift-dependencies: "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/JournalEntryDetailView.swiftdeps"
+  const-values: "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/JournalEntryDetailView.swiftconstvalues"
+  diagnostics: "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/JournalEntryDetailView.dia"
+  object: "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/JournalEntryDetailView.o"
+"/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Services/ReadabilityExtractor.swift":
+  swift-dependencies: "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/ReadabilityExtractor.swiftdeps"
+  dependencies: "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/ReadabilityExtractor.d"
+  object: "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/ReadabilityExtractor.o"
+  const-values: "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/ReadabilityExtractor.swiftconstvalues"
+  diagnostics: "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/ReadabilityExtractor.dia"
+"/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Models/SecureValueTransformer.swift":
+  swift-dependencies: "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/SecureValueTransformer.swiftdeps"
+  diagnostics: "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/SecureValueTransformer.dia"
+  const-values: "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/SecureValueTransformer.swiftconstvalues"
+  dependencies: "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/SecureValueTransformer.d"
+  object: "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Debug-iphoneos/BarrelBook.build/Objects-normal/arm64/SecureValueTransformer.o"

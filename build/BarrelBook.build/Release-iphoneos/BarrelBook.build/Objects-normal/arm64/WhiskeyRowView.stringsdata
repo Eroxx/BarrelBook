@@ -1,0 +1,40 @@
+{
+  "source": "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/WhiskeyRowView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "%lld PROOF",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 52
+        }
+      },
+      {
+        "comment": "",
+        "key": "•",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 69
+        }
+      },
+      {
+        "comment": "",
+        "key": "•",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 77
+        }
+      },
+      {
+        "comment": "",
+        "key": "Hidden",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 205
+        }
+      }
+    ]
+  },
+  "version": 1
+}

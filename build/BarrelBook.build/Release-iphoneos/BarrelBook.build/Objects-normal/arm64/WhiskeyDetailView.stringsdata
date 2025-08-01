@@ -1,0 +1,664 @@
+{
+  "source": "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/WhiskeyDetailView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "",
+        "location": {
+          "startingColumn": 29,
+          "startingLine": 79
+        }
+      },
+      {
+        "comment": "",
+        "key": "Are you sure you want to delete %@?",
+        "location": {
+          "startingColumn": 13,
+          "startingLine": 156
+        }
+      },
+      {
+        "comment": "",
+        "key": "Save Notes",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 85
+        }
+      },
+      {
+        "comment": "",
+        "key": "Cancel",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 89
+        }
+      },
+      {
+        "comment": "",
+        "key": "Edit Notes",
+        "location": {
+          "startingColumn": 39,
+          "startingLine": 94
+        }
+      },
+      {
+        "comment": "",
+        "key": "Add Notes",
+        "location": {
+          "startingColumn": 39,
+          "startingLine": 98
+        }
+      },
+      {
+        "comment": "",
+        "key": "Add Tasting",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 105
+        }
+      },
+      {
+        "comment": "",
+        "key": "Delete Whiskey",
+        "location": {
+          "startingColumn": 39,
+          "startingLine": 112
+        }
+      },
+      {
+        "comment": "",
+        "key": "Delete",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 160
+        }
+      },
+      {
+        "comment": "",
+        "key": "WISHLIST",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 259
+        }
+      },
+      {
+        "comment": "",
+        "key": "Edit",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 318
+        }
+      },
+      {
+        "comment": "",
+        "key": "Finish",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 338
+        }
+      },
+      {
+        "comment": "",
+        "key": "Dead Bottle",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 358
+        }
+      },
+      {
+        "comment": "",
+        "key": "Price",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 373
+        }
+      },
+      {
+        "comment": "",
+        "key": "Open?",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 389
+        }
+      },
+      {
+        "comment": "",
+        "key": "",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 392
+        }
+      },
+      {
+        "comment": "",
+        "key": "No bottle notes yet",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 485
+        }
+      },
+      {
+        "comment": "",
+        "key": "Add Bottle Notes",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 493
+        }
+      },
+      {
+        "comment": "",
+        "key": "No tastings yet",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 521
+        }
+      },
+      {
+        "comment": "",
+        "key": "Add Tasting",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 528
+        }
+      },
+      {
+        "comment": "",
+        "key": "\"%@\"",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 561
+        }
+      },
+      {
+        "comment": "",
+        "key": "Target Price",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 593
+        }
+      },
+      {
+        "comment": "",
+        "key": "Priority",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 603
+        }
+      },
+      {
+        "comment": "",
+        "key": "Notes",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 623
+        }
+      },
+      {
+        "comment": "",
+        "key": "Add to Collection",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 636
+        }
+      },
+      {
+        "comment": "",
+        "key": "Saved Articles",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 691
+        }
+      },
+      {
+        "comment": "",
+        "key": "Search Web for Reviews",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 674
+        }
+      },
+      {
+        "comment": "",
+        "key": "Edit Whiskey",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 897
+        }
+      },
+      {
+        "comment": "",
+        "key": "Basic Info",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 855
+        }
+      },
+      {
+        "comment": "",
+        "key": "Inventory Info",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 867
+        }
+      },
+      {
+        "comment": "",
+        "key": "Bottle Notes",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 882
+        }
+      },
+      {
+        "comment": "",
+        "key": "Special Attributes",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 887
+        }
+      },
+      {
+        "comment": "",
+        "key": "Name",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 856
+        }
+      },
+      {
+        "comment": "",
+        "key": "Type",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 857
+        }
+      },
+      {
+        "comment": "",
+        "key": "Distillery",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 858
+        }
+      },
+      {
+        "comment": "",
+        "key": "Age Statement",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 859
+        }
+      },
+      {
+        "comment": "",
+        "key": "Proof",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 860
+        }
+      },
+      {
+        "comment": "",
+        "key": "Finish",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 862
+        }
+      },
+      {
+        "comment": "",
+        "key": "Price",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 863
+        }
+      },
+      {
+        "comment": "",
+        "key": "Dead Bottle?",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 878
+        }
+      },
+      {
+        "comment": "",
+        "key": "Open",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 879
+        }
+      },
+      {
+        "comment": "",
+        "key": "Number of Bottles:",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 869
+        }
+      },
+      {
+        "comment": "",
+        "key": "1",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 872
+        }
+      },
+      {
+        "comment": "",
+        "key": "Notes about this bottle",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 883
+        }
+      },
+      {
+        "comment": "",
+        "key": "Bottled in Bond",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 888
+        }
+      },
+      {
+        "comment": "",
+        "key": "Single Barrel",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 889
+        }
+      },
+      {
+        "comment": "",
+        "key": "Store Pick",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 890
+        }
+      },
+      {
+        "comment": "",
+        "key": "Store Name",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 893
+        }
+      },
+      {
+        "comment": "",
+        "key": "Cancel",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 900
+        }
+      },
+      {
+        "comment": "",
+        "key": "Save",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 905
+        }
+      },
+      {
+        "comment": "",
+        "key": "Hidden",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 1035
+        }
+      },
+      {
+        "comment": "",
+        "key": "$%@",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 1050
+        }
+      },
+      {
+        "comment": "",
+        "key": "Edit Review",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 1142
+        }
+      },
+      {
+        "comment": "",
+        "key": "Error",
+        "location": {
+          "startingColumn": 16,
+          "startingLine": 1158
+        }
+      },
+      {
+        "comment": "",
+        "key": "Review Details",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 1109
+        }
+      },
+      {
+        "comment": "",
+        "key": "Content",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 1130
+        }
+      },
+      {
+        "comment": "",
+        "key": "Debug Info",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 1136
+        }
+      },
+      {
+        "comment": "",
+        "key": "Title",
+        "location": {
+          "startingColumn": 27,
+          "startingLine": 1110
+        }
+      },
+      {
+        "comment": "",
+        "key": "Source",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 1114
+        }
+      },
+      {
+        "comment": "",
+        "key": "Saved on",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 1123
+        }
+      },
+      {
+        "comment": "",
+        "key": "Content ID: %@",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 1137
+        }
+      },
+      {
+        "comment": "",
+        "key": "Cancel",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 1146
+        }
+      },
+      {
+        "comment": "",
+        "key": "Save",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 1152
+        }
+      },
+      {
+        "comment": "",
+        "key": "OK",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 1159
+        }
+      },
+      {
+        "comment": "",
+        "key": "Content ID: %@",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 1270
+        }
+      },
+      {
+        "comment": "",
+        "key": "Loading content...",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 1269
+        }
+      },
+      {
+        "comment": "",
+        "key": "Error Loading Content",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 1281
+        }
+      },
+      {
+        "comment": "",
+        "key": "Close",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 1289
+        }
+      },
+      {
+        "comment": "",
+        "key": "Saved on %@",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 1308
+        }
+      },
+      {
+        "comment": "",
+        "key": "Source: %@",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 1304
+        }
+      },
+      {
+        "comment": "",
+        "key": "Edit",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 1325
+        }
+      },
+      {
+        "comment": "",
+        "key": "Edit Review",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 1606
+        }
+      },
+      {
+        "comment": "",
+        "key": "Error",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 1625
+        }
+      },
+      {
+        "comment": "",
+        "key": "Review Details",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 1570
+        }
+      },
+      {
+        "comment": "",
+        "key": "Content",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 1589
+        }
+      },
+      {
+        "comment": "",
+        "key": "Title",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 1571
+        }
+      },
+      {
+        "comment": "",
+        "key": "Source",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 1575
+        }
+      },
+      {
+        "comment": "",
+        "key": "Saved on",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 1583
+        }
+      },
+      {
+        "comment": "",
+        "key": "Cancel",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 1610
+        }
+      },
+      {
+        "comment": "",
+        "key": "Save",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 1616
+        }
+      },
+      {
+        "comment": "",
+        "key": "OK",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 1626
+        }
+      },
+      {
+        "comment": "",
+        "key": "Loading...",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 1637
+        }
+      }
+    ]
+  },
+  "version": 1
+}

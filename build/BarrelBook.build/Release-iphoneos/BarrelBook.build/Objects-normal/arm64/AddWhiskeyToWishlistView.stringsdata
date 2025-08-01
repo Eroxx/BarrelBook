@@ -1,0 +1,184 @@
+{
+  "source": "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/AddWhiskeyToWishlistView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Add to Wishlist",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 78
+        }
+      },
+      {
+        "comment": "",
+        "key": "Basic Info",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 25
+        }
+      },
+      {
+        "comment": "",
+        "key": "Wishlist Details",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 35
+        }
+      },
+      {
+        "comment": "",
+        "key": "Special Attributes",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 68
+        }
+      },
+      {
+        "comment": "",
+        "key": "Name",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 26
+        }
+      },
+      {
+        "comment": "",
+        "key": "Type",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 27
+        }
+      },
+      {
+        "comment": "",
+        "key": "Distillery",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 28
+        }
+      },
+      {
+        "comment": "",
+        "key": "Age Statement",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 29
+        }
+      },
+      {
+        "comment": "",
+        "key": "Proof",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 30
+        }
+      },
+      {
+        "comment": "",
+        "key": "Finish",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 32
+        }
+      },
+      {
+        "comment": "",
+        "key": "Target Price",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 36
+        }
+      },
+      {
+        "comment": "",
+        "key": "Where to Find",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 57
+        }
+      },
+      {
+        "comment": "",
+        "key": "Priority:",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 40
+        }
+      },
+      {
+        "comment": "",
+        "key": "Priority",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 42
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 49
+        }
+      },
+      {
+        "comment": "",
+        "key": "Notes",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 60
+        }
+      },
+      {
+        "comment": "",
+        "key": "Bottled in Bond",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 69
+        }
+      },
+      {
+        "comment": "",
+        "key": "Single Barrel",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 70
+        }
+      },
+      {
+        "comment": "",
+        "key": "Store Pick",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 71
+        }
+      },
+      {
+        "comment": "",
+        "key": "Store Name",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 74
+        }
+      },
+      {
+        "comment": "",
+        "key": "Cancel",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 81
+        }
+      },
+      {
+        "comment": "",
+        "key": "Save",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 87
+        }
+      }
+    ]
+  },
+  "version": 1
+}

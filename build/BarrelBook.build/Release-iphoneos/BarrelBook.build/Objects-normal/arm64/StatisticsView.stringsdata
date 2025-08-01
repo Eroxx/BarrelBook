@@ -1,0 +1,480 @@
+{
+  "source": "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/StatisticsView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "%lld",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 308
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld/%lld (%lld%%)",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 330
+        }
+      },
+      {
+        "comment": "",
+        "key": "No type data available",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 400
+        }
+      },
+      {
+        "comment": "",
+        "key": "Coverage by Type",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 370
+        }
+      },
+      {
+        "comment": "",
+        "key": "Expand All",
+        "location": {
+          "startingColumn": 27,
+          "startingLine": 380
+        }
+      },
+      {
+        "comment": "",
+        "key": "Collapse All",
+        "location": {
+          "startingColumn": 27,
+          "startingLine": 391
+        }
+      },
+      {
+        "comment": "",
+        "key": "",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 621
+        }
+      },
+      {
+        "comment": "",
+        "key": "Statistics",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 626
+        }
+      },
+      {
+        "comment": "",
+        "key": "Special Attributes",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 772
+        }
+      },
+      {
+        "comment": "",
+        "key": "Top Distilleries",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 839
+        }
+      },
+      {
+        "comment": "",
+        "key": "Unique",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 717
+        }
+      },
+      {
+        "comment": "",
+        "key": "Bottles",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 720
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 725
+        }
+      },
+      {
+        "comment": "",
+        "key": "Total",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 734
+        }
+      },
+      {
+        "comment": "",
+        "key": "Inventory",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 737
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 742
+        }
+      },
+      {
+        "comment": "",
+        "key": "Collection",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 751
+        }
+      },
+      {
+        "comment": "",
+        "key": "Value",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 754
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 859
+        }
+      },
+      {
+        "comment": "",
+        "key": "No matching whiskeys found",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 1056
+        }
+      },
+      {
+        "comment": "",
+        "key": "There are no matching whiskeys in the 'Other' category.",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 1061
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld bottle%@",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 1083
+        }
+      },
+      {
+        "comment": "",
+        "key": "No type data available",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 1310
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 1329
+        }
+      },
+      {
+        "comment": "",
+        "key": "Proof Distribution",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 1372
+        }
+      },
+      {
+        "comment": "",
+        "key": "No proof data available",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 1437
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 1407
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 1426
+        }
+      },
+      {
+        "comment": "",
+        "key": "Price Distribution",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 1490
+        }
+      },
+      {
+        "comment": "",
+        "key": "No price data available",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 1555
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 1525
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 1544
+        }
+      },
+      {
+        "comment": "",
+        "key": "Top Distilleries",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 1656
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 1669
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld of %lld bottles tasted",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 1779
+        }
+      },
+      {
+        "comment": "",
+        "key": "No whiskeys in collection",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 1790
+        }
+      },
+      {
+        "comment": "",
+        "key": "Coverage by Type",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 1813
+        }
+      },
+      {
+        "comment": "",
+        "key": "Collapse All",
+        "location": {
+          "startingColumn": 80,
+          "startingLine": 1819
+        }
+      },
+      {
+        "comment": "",
+        "key": "Expand All",
+        "location": {
+          "startingColumn": 97,
+          "startingLine": 1819
+        }
+      },
+      {
+        "comment": "",
+        "key": "ATTRIBUTES:",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 1896
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld%%",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 2501
+        }
+      },
+      {
+        "comment": "",
+        "key": "Tasted",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 2505
+        }
+      },
+      {
+        "comment": "",
+        "key": "View Tasted",
+        "location": {
+          "startingColumn": 23,
+          "startingLine": 2528
+        }
+      },
+      {
+        "comment": "",
+        "key": "View Untasted",
+        "location": {
+          "startingColumn": 23,
+          "startingLine": 2546
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld/%lld",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 2583
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld/%lld",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 2639
+        }
+      },
+      {
+        "comment": "",
+        "key": "+ %lld more untasted",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 2703
+        }
+      },
+      {
+        "comment": "",
+        "key": "Recommendations to Taste",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 2669
+        }
+      },
+      {
+        "comment": "",
+        "key": "View All",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 2681
+        }
+      },
+      {
+        "comment": "",
+        "key": "Add Tasting",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 2734
+        }
+      },
+      {
+        "comment": "",
+        "key": "Average Price by Type",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 2812
+        }
+      },
+      {
+        "comment": "",
+        "key": "Avg",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 2758
+        }
+      },
+      {
+        "comment": "",
+        "key": "Price",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 2761
+        }
+      },
+      {
+        "comment": "",
+        "key": "Collection",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 2775
+        }
+      },
+      {
+        "comment": "",
+        "key": "Value",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 2778
+        }
+      },
+      {
+        "comment": "",
+        "key": "Avg",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 2792
+        }
+      },
+      {
+        "comment": "",
+        "key": "PPP",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 2795
+        }
+      },
+      {
+        "comment": "",
+        "key": "Search whiskeys",
+        "location": {
+          "startingColumn": 48,
+          "startingLine": 2951
+        }
+      },
+      {
+        "comment": "",
+        "key": "No matching whiskeys found",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 2927
+        }
+      }
+    ]
+  },
+  "version": 1
+}

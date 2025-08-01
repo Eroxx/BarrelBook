@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>colors</key>
+	<array>
+		<dict>
+			<key>catalogPath</key>
+			<string>/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Assets.xcassets</string>
+			<key>objcSymbol</key>
+			<string>ACColorNamePriceHigh</string>
+			<key>relativePath</key>
+			<string>./Colors/PriceHigh.colorset</string>
+			<key>swiftSymbol</key>
+			<string>priceHigh</string>
+		</dict>
+		<dict>
+			<key>catalogPath</key>
+			<string>/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Assets.xcassets</string>
+			<key>objcSymbol</key>
+			<string>ACColorNamePriceLow</string>
+			<key>relativePath</key>
+			<string>./Colors/PriceLow.colorset</string>
+			<key>swiftSymbol</key>
+			<string>priceLow</string>
+		</dict>
+		<dict>
+			<key>catalogPath</key>
+			<string>/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Assets.xcassets</string>
+			<key>objcSymbol</key>
+			<string>ACColorNamePriceMedium</string>
+			<key>relativePath</key>
+			<string>./Colors/PriceMedium.colorset</string>
+			<key>swiftSymbol</key>
+			<string>priceMedium</string>
+		</dict>
+		<dict>
+			<key>catalogPath</key>
+			<string>/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Assets.xcassets</string>
+			<key>objcSymbol</key>
+			<string>ACColorNamePricePremium</string>
+			<key>relativePath</key>
+			<string>./Colors/PricePremium.colorset</string>
+			<key>swiftSymbol</key>
+			<string>pricePremium</string>
+		</dict>
+		<dict>
+			<key>catalogPath</key>
+			<string>/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Assets.xcassets</string>
+			<key>objcSymbol</key>
+			<string>ACColorNamePrimaryBrandColor</string>
+			<key>relativePath</key>
+			<string>./Colors/PrimaryBrandColor.colorset</string>
+			<key>swiftSymbol</key>
+			<string>primaryBrand</string>
+		</dict>
+		<dict>
+			<key>catalogPath</key>
+			<string>/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Assets.xcassets</string>
+			<key>objcSymbol</key>
+			<string>ACColorNameProgressHigh</string>
+			<key>relativePath</key>
+			<string>./Colors/ProgressHigh.colorset</string>
+			<key>swiftSymbol</key>
+			<string>progressHigh</string>
+		</dict>
+		<dict>
+			<key>catalogPath</key>
+			<string>/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Assets.xcassets</string>
+			<key>objcSymbol</key>
+			<string>ACColorNameProgressLow</string>
+			<key>relativePath</key>
+			<string>./Colors/ProgressLow.colorset</string>
+			<key>swiftSymbol</key>
+			<string>progressLow</string>
+		</dict>
+		<dict>
+			<key>catalogPath</key>
+			<string>/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Assets.xcassets</string>
+			<key>objcSymbol</key>
+			<string>ACColorNameProgressMedium</string>
+			<key>relativePath</key>
+			<string>./Colors/ProgressMedium.colorset</string>
+			<key>swiftSymbol</key>
+			<string>progressMedium</string>
+		</dict>
+		<dict>
+			<key>catalogPath</key>
+			<string>/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Assets.xcassets</string>
+			<key>objcSymbol</key>
+			<string>ACColorNameRatingExceptional</string>
+			<key>relativePath</key>
+			<string>./Colors/RatingExceptional.colorset</string>
+			<key>swiftSymbol</key>
+			<string>ratingExceptional</string>
+		</dict>
+		<dict>
+			<key>catalogPath</key>
+			<string>/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Assets.xcassets</string>
+			<key>objcSymbol</key>
+			<string>ACColorNameRatingFair</string>
+			<key>relativePath</key>
+			<string>./Colors/RatingFair.colorset</string>
+			<key>swiftSymbol</key>
+			<string>ratingFair</string>
+		</dict>
+		<dict>
+			<key>catalogPath</key>
+			<string>/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Assets.xcassets</string>
+			<key>objcSymbol</key>
+			<string>ACColorNameRatingGood</string>
+			<key>relativePath</key>
+			<string>./Colors/RatingGood.colorset</string>
+			<key>swiftSymbol</key>
+			<string>ratingGood</string>
+		</dict>
+		<dict>
+			<key>catalogPath</key>
+			<string>/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Assets.xcassets</string>
+			<key>objcSymbol</key>
+			<string>ACColorNameRatingGreat</string>
+			<key>relativePath</key>
+			<string>./Colors/RatingGreat.colorset</string>
+			<key>swiftSymbol</key>
+			<string>ratingGreat</string>
+		</dict>
+		<dict>
+			<key>catalogPath</key>
+			<string>/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Assets.xcassets</string>
+			<key>objcSymbol</key>
+			<string>ACColorNameRatingPoor</string>
+			<key>relativePath</key>
+			<string>./Colors/RatingPoor.colorset</string>
+			<key>swiftSymbol</key>
+			<string>ratingPoor</string>
+		</dict>
+	</array>
+	<key>images</key>
+	<array/>
+	<key>symbols</key>
+	<array/>
+</dict>
+</plist>

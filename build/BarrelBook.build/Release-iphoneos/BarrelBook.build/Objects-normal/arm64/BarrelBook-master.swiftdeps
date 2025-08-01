@@ -1,0 +1,88 @@
+version: "Apple Swift version 6.1 (swiftlang-6.1.0.110.21 clang-1700.0.13.3)"
+options: "dbeb75ae1e079d40fd068964d11dd564fb86845456ae0b583fcd6f5ddaf693d0"
+build_start_time: [1744040624, 144203000]
+build_end_time: [1744040658, 357680000]
+inputs:
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/BarrelBookApp.swift": [1743785138, 941976460]
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Models/CoreDataModelExtensions.swift": [1743783225, 756401917]
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Models/SecureValueTransformer.swift": [1742324619, 544837163]
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Models/Whiskey+Extensions.swift": [1743785138, 959804813]
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Models/WhiskeyStatus.swift": [1742002791, 24886794]
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Services/CSVService.swift": [1744037176, 366547158]
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Services/CSVSyncService.swift": [1744037087, 783619177]
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Services/MarkdownExtractor.swift": [1743815283, 336555564]
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Services/MarkdownRenderer.swift": [1743815283, 330796821]
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Services/ReadabilityExtractor.swift": [1744036320, 521118763]
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Utils/AppColorScheme.swift": [1741986719, 0]
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Utils/AppDelegate.swift": [1742836500, 587438162]
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Utils/BindingExtensions.swift": [1741987015, 0]
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Utils/ColorManager.swift": [1741986881, 0]
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Utils/FilterSettingsManager.swift": [1742954176, 580251699]
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Utils/HapticManager.swift": [1742002791, 24971500]
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Utils/PrivacyManager.swift": [1742954176, 580269949]
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Utils/SortingUtils.swift": [1743173237, 5414442]
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/AddInfinityBottleView.swift": [1742324619, 559644276]
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/AddJournalEntryView.swift": [1744039984, 983860817]
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/AddWhiskeyToWishlistView.swift": [1742261133, 881202099]
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/AddWhiskeyView.swift": [1744030630, 169025578]
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/CSVFileSaver.swift": [1742355091, 350396788]
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/CSVSaver.swift": [1742355091, 351370657]
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/CollectionView.swift": [1743980331, 390881961]
+  ? "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/Components/FloatingAddButton.swift"
+  : [1742324619, 561378613]
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/Components/ThreeWayToggle.swift": [1742836500, 587328206]
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/ContentView.swift": [1744039995, 837573471]
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/EditInfinityBottleView.swift": [1742324619, 559844318]
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/EditWishlistItemView.swift": [1744030680, 676907482]
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/InfinityBottleDetailView.swift": [1744036320, 522084253]
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/InfinityBottleRowView.swift": [1744036320, 528697105]
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/JournalEntryDetailView.swift": [1743815283, 329067948]
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/JournalEntryRowView.swift": [1742324619, 559714276]
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/JournalView.swift": [1743815283, 329039281]
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/OnboardingView.swift": [1742249300, 639187804]
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/SettingsView.swift": [1744037261, 335113711]
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/StatisticsView.swift": [1744040080, 606039412]
+  ? "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/WebContent/SavedWebContentView.swift"
+  : [1743785138, 941993460]
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/WebContent/WebReaderView.swift": [1743821395, 374220845]
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/WebContent/WebSearchView.swift": [1743815283, 329217281]
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/WhiskeyDetailView.swift": [1744040601, 333842172]
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/WhiskeyRowView.swift": [1744031988, 611390980]
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/WishlistRowView.swift": [1742259785, 485214784]
+  "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/WishlistView.swift": [1742763706, 837485855]
+  ? "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/DerivedSources/CoreDataGenerated/BarrelBook/BarrelBook+CoreDataModel.swift"
+  : [1744040185, 365712989]
+  ? "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/DerivedSources/CoreDataGenerated/BarrelBook/BottleAddition+CoreDataClass.swift"
+  : [1744040185, 372212366]
+  ? "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/DerivedSources/CoreDataGenerated/BarrelBook/BottleAddition+CoreDataProperties.swift"
+  : [1744040185, 373098824]
+  ? "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/DerivedSources/CoreDataGenerated/BarrelBook/BottleTasting+CoreDataClass.swift"
+  : [1744040185, 376378242]
+  ? "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/DerivedSources/CoreDataGenerated/BarrelBook/BottleTasting+CoreDataProperties.swift"
+  : [1744040185, 377120117]
+  ? "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/DerivedSources/CoreDataGenerated/BarrelBook/InfinityBottle+CoreDataClass.swift"
+  : [1744040185, 373651991]
+  ? "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/DerivedSources/CoreDataGenerated/BarrelBook/InfinityBottle+CoreDataProperties.swift"
+  : [1744040185, 374196283]
+  ? "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/DerivedSources/CoreDataGenerated/BarrelBook/JournalCustomField+CoreDataClass.swift"
+  : [1744040185, 369182907]
+  ? "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/DerivedSources/CoreDataGenerated/BarrelBook/JournalCustomField+CoreDataProperties.swift"
+  : [1744040185, 369674115]
+  ? "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/DerivedSources/CoreDataGenerated/BarrelBook/JournalEntry+CoreDataClass.swift"
+  : [1744040185, 374978241]
+  ? "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/DerivedSources/CoreDataGenerated/BarrelBook/JournalEntry+CoreDataProperties.swift"
+  : [1744040185, 375479367]
+  ? "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/DerivedSources/CoreDataGenerated/BarrelBook/WebContent+CoreDataClass.swift"
+  : [1744040185, 366987365]
+  ? "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/DerivedSources/CoreDataGenerated/BarrelBook/WebContent+CoreDataProperties.swift"
+  : [1744040185, 367428073]
+  ? "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/DerivedSources/CoreDataGenerated/BarrelBook/Whiskey+CoreDataClass.swift"
+  : [1744040185, 371525907]
+  ? "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/DerivedSources/CoreDataGenerated/BarrelBook/Whiskey+CoreDataProperties.swift"
+  : [1744040185, 372167699]
+  ? "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/DerivedSources/CoreDataGenerated/BarrelBook/WhiskeyCustomField+CoreDataClass.swift"
+  : [1744040185, 368114573]
+  ? "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/DerivedSources/CoreDataGenerated/BarrelBook/WhiskeyCustomField+CoreDataProperties.swift"
+  : [1744040185, 368571823]
+  ? "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/build/BarrelBook.build/Release-iphoneos/BarrelBook.build/DerivedSources/GeneratedAssetSymbols.swift"
+  : [1744040624, 63325440]

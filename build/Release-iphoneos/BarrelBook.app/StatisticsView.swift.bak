@@ -1,0 +1,2945 @@
+import SwiftUI
+import CoreData
+import Charts
+
+// Define a filter type that can be passed to CollectionView
+struct WhiskeyFilter: Equatable {
+    enum FilterType {
+        case type(String)
+        case proof(Double, Double)
+        case attribute(String, Bool)
+        case distillery(String)
+        case finishType(String)
+        case subtype(String, String) // Parent type, subtype
+        case tastedStatus(Bool) // True for tasted, false for untasted
+        case price(Double, Double)
+    }
+    
+    let type: FilterType
+    let displayName: String
+    
+    static func == (lhs: WhiskeyFilter, rhs: WhiskeyFilter) -> Bool {
+        switch (lhs.type, rhs.type) {
+        case (.type(let lhs), .type(let rhs)):
+            return lhs == rhs
+        case (.proof(let lhsMin, let lhsMax), .proof(let rhsMin, let rhsMax)):
+            return lhsMin == rhsMin && lhsMax == rhsMax
+        case (.attribute(let lhsKey, let lhsValue), .attribute(let rhsKey, let rhsValue)):
+            return lhsKey == rhsKey && lhsValue == rhsValue
+        case (.distillery(let lhs), .distillery(let rhs)):
+            return lhs == rhs
+        case (.finishType(let lhs), .finishType(let rhs)):
+            return lhs == rhs
+        case (.subtype(let lhsParent, let lhsChild), .subtype(let rhsParent, let rhsChild)):
+            return lhsParent == rhsParent && lhsChild == rhsChild
+        case (.tastedStatus(let lhs), .tastedStatus(let rhs)):
+            return lhs == rhs
+        case (.price(let lhsMin, let lhsMax), .price(let rhsMin, let rhsMax)):
+            return lhsMin == rhsMin && lhsMax == rhsMax
+        default:
+            return false
+        }
+    }
+}
+
+// Category tree structure for hierarchical statistics
+struct CategoryNode: Identifiable {
+    let id = UUID()
+    let name: String
+    let count: Int
+    let tastedCount: Int
+    var children: [CategoryNode]?
+    var depth: Int
+    var nodeId: String // Using a stable ID for tracking expansion state
+    var isExpanded: Bool
+    
+    var coveragePercentage: Double {
+        return count > 0 ? Double(tastedCount) / Double(count) * 100 : 0
+    }
+    
+    init(name: String, count: Int, tastedCount: Int, children: [CategoryNode]? = nil, depth: Int, isExpanded: Bool) {
+        self.name = name
+        self.count = count
+        self.tastedCount = tastedCount
+        self.children = children
+        self.depth = depth
+        self.nodeId = "\(depth)_\(name)"
+        self.isExpanded = isExpanded
+    }
+}
+
+// Extension to extract useful data from Whiskey objects
+extension Whiskey {
+    // Derived property to determine finish type
+    var finishType: String? {
+        // Extract from finish field or name using pattern matching
+        if let finish = self.finish, !finish.isEmpty {
+            return finish
+        } else if let name = self.name?.lowercased() {
+            // Pattern matching for common finish mentions
+            if name.contains("port") { return "Port" }
+            if name.contains("sherry") { return "Sherry" }
+            if name.contains("madeira") { return "Madeira" }
+            if name.contains("rum") { return "Rum" }
+            if name.contains("cognac") { return "Cognac" }
+            // Can add more common finishes
+        }
+        return nil
+    }
+    
+    // Helper for whiskey subtypes
+    var subtypeCategory: String? {
+        if let _ = finishType { 
+            return "Finished" 
+        }
+        if self.isSiB { return "Single Barrel" }
+        if self.isBiB { return "Bottled in Bond" }
+        if self.isStorePick { return "Store Pick" }
+        return "Standard"
+    }
+}
+
+// Manager class to handle hierarchical data and state
+class StatisticsManager: ObservableObject {
+    @Published var categoryTree: [CategoryNode] = []
+    @Published var expansionState: [String: Bool] = [:]
+    
+    // Store references for refreshing the tree
+    var whiskeys: [Whiskey]?
+    var whiskeyIds: Set<NSManagedObjectID>?
+    
+    // Generate category tree from whiskeys
+    func generateCategoryTree(whiskeys: [Whiskey], whiskeyIds: Set<NSManagedObjectID>) {
+        // Store references for refreshing
+        self.whiskeys = whiskeys
+        self.whiskeyIds = whiskeyIds
+        
+        // Group whiskeys by primary type
+        var typeGroups: [String: [Whiskey]] = [:]
+        
+        for whiskey in whiskeys {
+            let type = whiskey.type ?? "Unspecified"
+            if typeGroups[type] == nil {
+                typeGroups[type] = []
+            }
+            typeGroups[type]?.append(whiskey)
+        }
+        
+        // Build tree
+        var rootNodes: [CategoryNode] = []
+        
+        for (type, typeWhiskeys) in typeGroups {
+            // Count tasted in this type
+            let tastedCount = typeWhiskeys.filter { whiskeyIds.contains($0.objectID) }.count
+            
+            // Group by subtype 
+            var subtypeGroups: [String: [Whiskey]] = [:]
+            for whiskey in typeWhiskeys {
+                let subtype = whiskey.subtypeCategory ?? "Standard"
+                if subtypeGroups[subtype] == nil {
+                    subtypeGroups[subtype] = []
+                }
+                subtypeGroups[subtype]?.append(whiskey)
+            }
+            
+            // Create subtype nodes
+            var subtypeNodes: [CategoryNode] = []
+            for (subtype, subtypeWhiskeys) in subtypeGroups {
+                let subtypeTastedCount = subtypeWhiskeys.filter { whiskeyIds.contains($0.objectID) }.count
+                
+                // For finishes, go one level deeper
+                var finishNodes: [CategoryNode]? = nil
+                if subtype == "Finished" {
+                    var finishGroups: [String: [Whiskey]] = [:]
+                    for whiskey in subtypeWhiskeys {
+                        if let finish = whiskey.finishType {
+                            if finishGroups[finish] == nil {
+                                finishGroups[finish] = []
+                            }
+                            finishGroups[finish]?.append(whiskey)
+                        }
+                    }
+                    
+                    if !finishGroups.isEmpty {
+                        finishNodes = finishGroups.map { finish, finishWhiskeys in
+                            let finishTastedCount = finishWhiskeys.filter { whiskeyIds.contains($0.objectID) }.count
+                            let nodeID = "2_\(finish)"
+                            let isExpanded = expansionState[nodeID] ?? shouldAutoExpand(name: finish, count: finishWhiskeys.count, tastedCount: finishTastedCount, depth: 2)
+                            
+                            return CategoryNode(
+                                name: finish,
+                                count: finishWhiskeys.count,
+                                tastedCount: finishTastedCount,
+                                children: nil,
+                                depth: 2,
+                                isExpanded: isExpanded
+                            )
+                        }.sorted { $0.count > $1.count }
+                    }
+                }
+                
+                // Create subtype node
+                let subtypeNodeID = "1_\(subtype)"
+                let isSubtypeExpanded = expansionState[subtypeNodeID] ?? shouldAutoExpand(name: subtype, count: subtypeWhiskeys.count, tastedCount: subtypeTastedCount, depth: 1)
+                
+                let subtypeNode = CategoryNode(
+                    name: subtype,
+                    count: subtypeWhiskeys.count,
+                    tastedCount: subtypeTastedCount,
+                    children: finishNodes,
+                    depth: 1,
+                    isExpanded: isSubtypeExpanded
+                )
+                subtypeNodes.append(subtypeNode)
+            }
+            
+            // Create type node with subtype children
+            let typeNodeID = "0_\(type)"
+            let isTypeExpanded = expansionState[typeNodeID] ?? shouldAutoExpand(name: type, count: typeWhiskeys.count, tastedCount: tastedCount, depth: 0)
+            
+            let typeNode = CategoryNode(
+                name: type,
+                count: typeWhiskeys.count,
+                tastedCount: tastedCount,
+                children: subtypeNodes.sorted { $0.count > $1.count },
+                depth: 0,
+                isExpanded: isTypeExpanded
+            )
+            
+            rootNodes.append(typeNode)
+        }
+        
+        categoryTree = rootNodes.sorted { $0.count > $1.count }
+    }
+    
+    // Logic to determine if a node should auto-expand
+    private func shouldAutoExpand(name: String, count: Int, tastedCount: Int, depth: Int) -> Bool {
+        let coverage = tastedCount > 0 ? Double(tastedCount) / Double(count) * 100 : 0
+        
+        // Primary types should always be expanded by default
+        if depth == 0 {
+            return true
+        }
+        
+        // Subtypes with low coverage should be expanded
+        if depth == 1 && coverage < 50 && count > 2 {
+            return true
+        }
+        
+        // Finishes should generally start collapsed
+        if depth == 2 {
+            return false
+        }
+        
+        return false
+    }
+    
+    // Toggle expansion state of a node
+    func toggleExpansion(for nodeID: String) {
+        // Update the expansion state dictionary
+        expansionState[nodeID] = !(expansionState[nodeID] ?? false)
+        
+        // Rebuild the tree with the updated expansion states
+        // This ensures the UI will refresh with the new state
+        if let lastTree = categoryTree.first {
+            objectWillChange.send()
+            updateNodeExpansion(in: &categoryTree, nodeID: nodeID)
+        }
+    }
+    
+    // Helper to update node expansion throughout the tree
+    private func updateNodeExpansion(in nodes: inout [CategoryNode], nodeID: String) {
+        for i in 0..<nodes.count {
+            if nodes[i].nodeId == nodeID {
+                // Update this node's expansion state
+                nodes[i] = CategoryNode(
+                    name: nodes[i].name,
+                    count: nodes[i].count,
+                    tastedCount: nodes[i].tastedCount,
+                    children: nodes[i].children,
+                    depth: nodes[i].depth,
+                    isExpanded: !(nodes[i].isExpanded)
+                )
+                return
+            }
+            
+            // Recursively check children
+            if var children = nodes[i].children {
+                updateNodeExpansion(in: &children, nodeID: nodeID)
+                nodes[i] = CategoryNode(
+                    name: nodes[i].name,
+                    count: nodes[i].count,
+                    tastedCount: nodes[i].tastedCount,
+                    children: children,
+                    depth: nodes[i].depth,
+                    isExpanded: nodes[i].isExpanded
+                )
+            }
+        }
+    }
+}
+
+// UI component for displaying a single category node
+struct CategoryView: View {
+    let node: CategoryNode
+    let onToggle: (String) -> Void
+    let onSelect: (CategoryNode) -> Void
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            // Header button (name and expand/collapse)
+            Button(action: {
+                onToggle(node.nodeId)
+            }) {
+                HStack {
+                    Text(node.name)
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                    
+                    Spacer()
+                    
+                    Text("\(node.count)")
+                        .foregroundColor(.secondary)
+                        .font(.caption)
+                    
+                    Image(systemName: node.isExpanded ? "chevron.up" : "chevron.down")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+                .contentShape(Rectangle()) // Make the entire row tappable
+                .padding(.vertical, 4)
+                .padding(.horizontal, 2)
+            }
+            .buttonStyle(PlainButtonStyle())
+            .padding(.leading, CGFloat(node.depth * 16))
+            
+            if node.isExpanded {
+                // Coverage bar
+                Button(action: { onSelect(node) }) {
+                    VStack(alignment: .leading, spacing: 4) {
+                        ProgressView(value: Double(node.tastedCount), total: Double(node.count))
+                            .progressViewStyle(LinearProgressViewStyle(tint: coverageColor(node.coveragePercentage)))
+                        
+                        Text("\(node.tastedCount)/\(node.count) (\(Int(node.coveragePercentage))%)")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                    .contentShape(Rectangle()) // Make the entire progress bar tappable
+                }
+                .padding(.leading, CGFloat(node.depth * 16 + 16))
+                .buttonStyle(PlainButtonStyle())
+                
+                // Render children if expanded
+                if let children = node.children, !children.isEmpty {
+                    ForEach(children) { child in
+                        CategoryView(node: child, onToggle: onToggle, onSelect: onSelect)
+                    }
+                }
+            }
+        }
+    }
+    
+    private func coverageColor(_ percentage: Double) -> Color {
+        if percentage < 30 {
+            return ColorManager.progressLow
+        } else if percentage < 70 {
+            return ColorManager.progressMedium
+        } else {
+            return ColorManager.progressHigh
+        }
+    }
+}
+
+// Main view for hierarchical category display
+struct HierarchicalCoverageView: View {
+    @ObservedObject var manager: StatisticsManager
+    @Binding var selectedFilter: WhiskeyFilter?
+    @Binding var showingFilteredView: Bool
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            // Title and Expand/Collapse Buttons
+            HStack {
+                Text("Coverage by Type")
+                    .font(.headline)
+                
+                Spacer()
+                
+                // Add collapse/expand all buttons
+                Button(action: {
+                    toggleAll(expanded: true)
+                }) {
+                    Label("Expand All", systemImage: "chevron.down")
+                        .font(.caption)
+                        .foregroundColor(.accentColor)
+                }
+                .buttonStyle(PlainButtonStyle())
+                .padding(.trailing, 8)
+                
+                Button(action: {
+                    toggleAll(expanded: false)
+                }) {
+                    Label("Collapse All", systemImage: "chevron.up")
+                        .font(.caption)
+                        .foregroundColor(.accentColor)
+                }
+                .buttonStyle(PlainButtonStyle())
+            }
+            .padding(.bottom, 4)
+            
+            if manager.categoryTree.isEmpty {
+                Text("No type data available")
+                    .foregroundColor(.secondary)
+                    .italic()
+            } else {
+                // Hierarchical tree view
+                ForEach(manager.categoryTree) { node in
+                    CategoryView(
+                        node: node,
+                        onToggle: { nodeID in
+                            manager.toggleExpansion(for: nodeID)
+                        },
+                        onSelect: { node in
+                            createFilter(from: node)
+                        }
+                    )
+                    .padding(.bottom, 4)
+                }
+            }
+        }
+    }
+    
+    // Helper to toggle all categories
+    private func toggleAll(expanded: Bool) {
+        // Set all top-level nodes (and their children) to the desired expansion state
+        for node in manager.categoryTree {
+            // Set the current node
+            manager.expansionState[node.nodeId] = expanded
+            
+            // Set all children recursively
+            if let children = node.children {
+                setChildrenExpansion(children: children, expanded: expanded)
+            }
+        }
+        
+        // Refresh the tree
+        if let whiskeys = manager.whiskeys, let whiskeyIds = manager.whiskeyIds {
+            manager.generateCategoryTree(whiskeys: whiskeys, whiskeyIds: whiskeyIds)
+        }
+    }
+    
+    // Helper to recursively set expansion state for children
+    private func setChildrenExpansion(children: [CategoryNode], expanded: Bool) {
+        for child in children {
+            manager.expansionState[child.nodeId] = expanded
+            
+            if let grandchildren = child.children {
+                setChildrenExpansion(children: grandchildren, expanded: expanded)
+            }
+        }
+    }
+    
+    private func createFilter(from node: CategoryNode) {
+        // Create appropriate filter based on node type and depth
+        switch node.depth {
+        case 0: // Top level - Type
+            if node.name == "Other" {
+                // For the "Other" category, don't create a direct filter
+                // as it would be confusing since it contains mixed types
+                return
+            } else {
+                selectedFilter = WhiskeyFilter(
+                    type: .type(node.name),
+                    displayName: "Type: \(node.name)"
+                )
+            }
+        case 1: // Second level - Subtype
+            if node.name == "Finished" {
+                // Special handling for finished whiskeys
+                selectedFilter = WhiskeyFilter(
+                    type: .attribute("finish", true), 
+                    displayName: "Finished Whiskeys"
+                )
+            } else if node.name == "Single Barrel" {
+                selectedFilter = WhiskeyFilter(
+                    type: .attribute("Single Barrel", true),
+                    displayName: "Single Barrel"
+                )
+            } else if node.name == "Bottled in Bond" {
+                selectedFilter = WhiskeyFilter(
+                    type: .attribute("Bottled in Bond", true),
+                    displayName: "Bottled in Bond"
+                )
+            } else if node.name == "Store Pick" {
+                selectedFilter = WhiskeyFilter(
+                    type: .attribute("Store Picks", true),
+                    displayName: "Store Picks"
+                )
+            }
+        case 2: // Third level - Finish type
+            // Special filter for specific finish type
+            selectedFilter = WhiskeyFilter(
+                type: .finishType(node.name),
+                displayName: "Finish: \(node.name)"
+            )
+        default:
+            break
+        }
+        
+        if selectedFilter != nil {
+            showingFilteredView = true
+        }
+    }
+}
+
+// Add this extension at the top of the file, before any struct definitions
+extension EnvironmentValues {
+    struct StatisticsNavigationResetKey: EnvironmentKey {
+        static let defaultValue: UUID = UUID()
+    }
+    
+    var statisticsNavigationReset: UUID {
+        get { self[StatisticsNavigationResetKey.self] }
+        set { self[StatisticsNavigationResetKey.self] = newValue }
+    }
+}
+
+struct StatisticsView: View {
+    @Environment(\.managedObjectContext) private var viewContext
+    @FetchRequest(
+        sortDescriptors: [NSSortDescriptor(keyPath: \Whiskey.name, ascending: true)],
+        animation: .default)
+    private var whiskeys: FetchedResults<Whiskey>
+    
+    @State private var selectedFilter: WhiskeyFilter?
+    @Binding var showingFilteredView: Bool
+    
+    init(showingFilteredView: Binding<Bool>) {
+        _showingFilteredView = showingFilteredView
+        
+        // Configure the navigation bar appearance for UIKit integration
+        let appearance = UINavigationBarAppearance()
+        appearance.configureWithDefaultBackground()
+        UINavigationBar.appearance().standardAppearance = appearance
+        UINavigationBar.appearance().compactAppearance = appearance
+        UINavigationBar.appearance().scrollEdgeAppearance = appearance
+    }
+    
+    var body: some View {
+        VStack(spacing: 0) {
+            // Navigation title for UIKit integration
+            Text("Statistics")
+                .font(.largeTitle)
+                .fontWeight(.bold)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal)
+                .padding(.top, 8)
+                .padding(.bottom, 8)
+                
+            ScrollView {
+                VStack(spacing: 20) {
+                    // Combined Collection Overview Card (overview + special attributes)
+                    StatCard(title: "Collection Overview") {
+                        CombinedCollectionStats(
+                            whiskeys: whiskeys, 
+                            onAttributeSelected: { attribute, value in
+                                selectedFilter = WhiskeyFilter(
+                                    type: .attribute(attribute, value),
+                                    displayName: attribute
+                                )
+                                showDetail()
+                            }, 
+                            onDistillerySelected: { distillery in
+                                selectedFilter = WhiskeyFilter(
+                                    type: .distillery(distillery),
+                                    displayName: "Distillery: \(distillery)"
+                                )
+                                showDetail()
+                            }
+                        )
+                    }
+                    
+                    // Collection Composition Card
+                    StatCard(title: "Collection Composition") {
+                        WhiskeyTypeStats(whiskeys: whiskeys, onTypeSelected: { type in
+                            selectedFilter = WhiskeyFilter(
+                                type: .type(type),
+                                displayName: "Type: \(type)"
+                            )
+                            showDetail()
+                        })
+                    }
+                    
+                    // Proof Analysis Card
+                    StatCard(title: "Proof Analysis") {
+                        ProofAnalysisStats(whiskeys: whiskeys, onProofRangeSelected: { min, max, label in
+                            selectedFilter = WhiskeyFilter(
+                                type: .proof(min, max),
+                                displayName: "Proof: \(label)"
+                            )
+                            showDetail()
+                        })
+                    }
+                    
+                    // Price Analysis Card
+                    StatCard(title: "Price Analysis") {
+                        PriceAnalysisStats(whiskeys: whiskeys, onPriceRangeSelected: { min, max, label in
+                            selectedFilter = WhiskeyFilter(
+                                type: .price(min, max),
+                                displayName: "Price: \(label)"
+                            )
+                            showDetail()
+                        })
+                    }
+                    
+                    // Tasting Coverage Card
+                    StatCard(title: "Tasting Coverage") {
+                        TastingCoverageStats(context: viewContext, whiskeys: whiskeys, selectedFilter: $selectedFilter, showingFilteredView: $showingFilteredView)
+                    }
+                }
+                .padding()
+            }
+            .background(
+                NavigationLink(
+                    destination: StatDetailView(
+                        title: selectedFilter?.displayName ?? "Details",
+                        whiskeys: Array(whiskeys),
+                        initialFilter: selectedFilter
+                    ),
+                    isActive: $showingFilteredView
+                ) {
+                    EmptyView()
+                }
+            )
+        }
+    }
+    
+    private func showDetail() {
+        // Set the flag to show the detail view
+        showingFilteredView = true
+    }
+}
+
+// New Combined Collection Overview + Special Attributes Stats
+struct CombinedCollectionStats: View {
+    let whiskeys: FetchedResults<Whiskey>
+    let onAttributeSelected: (String, Bool) -> Void
+    let onDistillerySelected: (String) -> Void
+    
+    var body: some View {
+        VStack(spacing: 16) {
+            // Primary metrics - like in HomeView
+            HStack(spacing: 20) {
+                VStack(spacing: 8) {
+                    Text("Unique")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    Text("Bottles")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    Divider()
+                        .frame(width: 60)
+                    Text("\(whiskeys.count)")
+                        .font(.title)
+                        .fontWeight(.bold)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.5)
+                }
+                .frame(maxWidth: .infinity)
+                
+                VStack(spacing: 8) {
+                    Text("Total")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    Text("Inventory")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    Divider()
+                        .frame(width: 60)
+                    Text("\(whiskeys.map { Int($0.numberOfBottles) }.reduce(0, +))")
+                        .font(.title)
+                        .fontWeight(.bold)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.5)
+                }
+                .frame(maxWidth: .infinity)
+                
+                VStack(spacing: 8) {
+                    Text("Collection")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    Text("Value")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    Divider()
+                        .frame(width: 60)
+                    Text(formatCurrency(calculateTotalValue()))
+                        .font(.title)
+                        .fontWeight(.bold)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.5)
+                }
+                .frame(maxWidth: .infinity)
+            }
+            
+            Divider()
+                .padding(.vertical, 8)
+            
+            // Special Attributes Section
+            Text("Special Attributes")
+                .font(.headline)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.bottom, 4)
+            
+            // Special attributes metrics row
+            HStack(spacing: 20) {
+                Button(action: {
+                    onAttributeSelected("Bottled in Bond", true)
+                }) {
+                    createAttributeBadge(
+                        value: "\(whiskeys.filter { $0.isBiB }.count)",
+                        label: "BiB",
+                        color: Color(red: 0.8, green: 0.6, blue: 0.3)
+                    )
+                }
+                .buttonStyle(PlainButtonStyle())
+                
+                Button(action: {
+                    onAttributeSelected("Single Barrel", true)
+                }) {
+                    createAttributeBadge(
+                        value: "\(whiskeys.filter { $0.isSiB }.count)",
+                        label: "SiB",
+                        color: .blue
+                    )
+                }
+                .buttonStyle(PlainButtonStyle())
+                
+                Button(action: {
+                    onAttributeSelected("Store Picks", true)
+                }) {
+                    createAttributeBadge(
+                        value: "\(whiskeys.filter { $0.isStorePick }.count)",
+                        label: "Store Picks",
+                        color: .purple
+                    )
+                }
+                .buttonStyle(PlainButtonStyle())
+                
+                Button(action: {
+                    onAttributeSelected("High Proof", true)
+                }) {
+                    createAttributeBadge(
+                        value: "\(whiskeys.filter { $0.proof > 100 }.count)",
+                        label: "High Proof",
+                        color: .orange
+                    )
+                }
+                .buttonStyle(PlainButtonStyle())
+            }
+            .padding(.bottom, 8)
+            
+            // Distillery breakdown if we have distillery data
+            let distilleryData = calculateDistilleryBreakdown()
+            if !distilleryData.isEmpty {
+                Divider()
+                    .padding(.vertical, 8)
+                
+                Text("Top Distilleries")
+                    .font(.headline)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.bottom, 4)
+                
+                // Distilleries in a grid layout for better use of space
+                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 8) {
+                    ForEach(distilleryData.prefix(6)) { item in
+                        Button(action: {
+                            onDistillerySelected(item.type)
+                        }) {
+                            HStack {
+                                Text(item.type)
+                                    .font(.subheadline)
+                                    .foregroundColor(.primary)
+                                    .lineLimit(1)
+                                
+                                Spacer()
+                                
+                                Text("\(item.count)")
+                                    .font(.subheadline)
+                                    .foregroundColor(.secondary)
+                            }
+                            .padding(.vertical, 4)
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    // Helper function to create attribute badges
+    private func createAttributeBadge(value: String, label: String, color: Color) -> some View {
+        VStack {
+            Text(value)
+                .font(.title3)
+                .fontWeight(.bold)
+            
+            Text(label)
+                .font(.caption)
+                .foregroundColor(color)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 8)
+        .background(color.opacity(0.1))
+        .cornerRadius(8)
+    }
+    
+    // Calculate total collection value
+    private func calculateTotalValue() -> Double {
+        return whiskeys.map { $0.price * Double($0.numberOfBottles) }.reduce(0, +)
+    }
+    
+    // Format currency values
+    private func formatCurrency(_ value: Double) -> String {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .currency
+        formatter.maximumFractionDigits = 0
+        return formatter.string(from: NSNumber(value: value)) ?? "$0"
+    }
+    
+    // Calculate distillery breakdown
+    private func calculateDistilleryBreakdown() -> [TypeCount] {
+        var distilleryCounts: [String: Int] = [:]
+        
+        for whiskey in whiskeys {
+            if let distillery = whiskey.distillery, !distillery.isEmpty {
+                distilleryCounts[distillery, default: 0] += 1
+            }
+        }
+        
+        return distilleryCounts.map { TypeCount(type: $0.key, count: $0.value) }
+            .sorted { $0.count > $1.count }
+    }
+}
+
+struct FilteredCollectionView: View {
+    let filter: WhiskeyFilter?
+    @Environment(\.managedObjectContext) private var viewContext
+    @FetchRequest private var whiskeys: FetchedResults<Whiskey>
+    @State private var displayTitle: String = ""
+    @State private var topTypes: [String] = [] // Store top types for filtering
+    
+    init(filter: WhiskeyFilter?) {
+        self.filter = filter
+        
+        // Create a basic predicate without trying to access self properties
+        let predicate: NSPredicate?
+        
+        if let filter = filter {
+            switch filter.type {
+            case .type(let type):
+                predicate = NSPredicate(format: "type == %@", type)
+            case .proof(let min, let max):
+                if max == Double.infinity {
+                    predicate = NSPredicate(format: "proof >= %f", min)
+                } else {
+                    predicate = NSPredicate(format: "proof >= %f AND proof < %f", min, max)
+                }
+            case .attribute(let attribute, let value):
+                // For "Other Types" attributes, use a permissive predicate
+                if attribute.hasSuffix("in Other Types") {
+                    // Use a predicate that will fetch ALL whiskeys
+                    // We'll filter them manually in the view
+                    predicate = nil // No predicate = fetch all
+                } else if attribute == "finish" {
+                    predicate = NSPredicate(format: "finish != nil AND finish != ''")
+                } else {
+                    // Handle regular attribute filters
+                    switch attribute {
+                    case "Bottled in Bond":
+                        predicate = NSPredicate(format: "isBiB == %@", NSNumber(value: value))
+                    case "Single Barrel":
+                        predicate = NSPredicate(format: "isSiB == %@", NSNumber(value: value))
+                    case "Store Picks", "Store Pick":
+                        predicate = NSPredicate(format: "isStorePick == %@", NSNumber(value: value))
+                    default:
+                        predicate = nil
+                    }
+                }
+            case .distillery(let distillery):
+                predicate = NSPredicate(format: "distillery == %@", distillery)
+            case .finishType(let finishType):
+                let finishPredicate = NSPredicate(format: "finish CONTAINS[cd] %@", finishType)
+                let namePredicate = NSPredicate(format: "name CONTAINS[cd] %@", finishType)
+                predicate = NSCompoundPredicate(orPredicateWithSubpredicates: [
+                    finishPredicate, namePredicate
+                ])
+            case .subtype(let parent, let child):
+                if child == "Finished" {
+                    predicate = NSPredicate(format: "type == %@ AND (finish != nil AND finish != '')", parent)
+                } else if child == "Single Barrel" {
+                    predicate = NSPredicate(format: "type == %@ AND isSiB == %@", parent, NSNumber(value: true))
+                } else if child == "Bottled in Bond" {
+                    predicate = NSPredicate(format: "type == %@ AND isBiB == %@", parent, NSNumber(value: true))
+                } else if child == "Store Pick" {
+                    predicate = NSPredicate(format: "type == %@ AND isStorePick == %@", parent, NSNumber(value: true))
+                } else {
+                    predicate = NSPredicate(format: "type == %@ AND isSiB == %@ AND isBiB == %@ AND isStorePick == %@ AND (finish == nil OR finish == '')", 
+                                          parent, 
+                                          NSNumber(value: false), 
+                                          NSNumber(value: false),
+                                          NSNumber(value: false))
+                }
+            case .tastedStatus(let isTasted):
+                if isTasted {
+                    predicate = NSPredicate(format: "SUBQUERY(journalEntries, $entry, $entry != nil).@count > 0")
+                } else {
+                    predicate = NSPredicate(format: "SUBQUERY(journalEntries, $entry, $entry != nil).@count == 0")
+                }
+            case .price(let min, let max):
+                if max == Double.infinity {
+                    predicate = NSPredicate(format: "price >= %f", min)
+                } else {
+                    predicate = NSPredicate(format: "price >= %f AND price < %f", min, max)
+                }
+            }
+        } else {
+            predicate = nil
+        }
+        
+        // Initialize FetchRequest with our basic predicate
+        _whiskeys = FetchRequest<Whiskey>(
+            sortDescriptors: [NSSortDescriptor(keyPath: \Whiskey.name, ascending: true)],
+            predicate: predicate,
+            animation: .default
+        )
+    }
+    
+    // After initialization, we use this to check if we're filtering for "Other" types
+    private var isOtherTypesFilter: Bool {
+        if case .attribute(let attribute, _) = filter?.type {
+            return attribute.hasSuffix("in Other Types")
+        }
+        return false
+    }
+    
+    var body: some View {
+        Group {
+            if filteredWhiskeys.isEmpty {
+                VStack(spacing: 20) {
+                    Text("No matching whiskeys found")
+                        .font(.headline)
+                        .foregroundColor(.secondary)
+                    
+                    if isOtherTypesFilter {
+                        Text("There are no matching whiskeys in the 'Other' category.")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal)
+                    }
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background(Color(UIColor.systemGroupedBackground))
+            } else {
+                List {
+                    ForEach(filteredWhiskeys) { whiskey in
+                        NavigationLink(destination: WhiskeyDetailView(whiskey: whiskey)) {
+                            WhiskeyRowView(whiskey: whiskey)
+                        }
+                    }
+                }
+            }
+        }
+        .navigationTitle(filter?.displayName ?? "Filtered Collection")
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Text("\(filteredWhiskeys.count) bottle\(filteredWhiskeys.count == 1 ? "" : "s")")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+        }
+        .onAppear {
+            // Set the correct title
+            displayTitle = filter?.displayName ?? "Filtered Collection"
+            
+            // Update the filter for "Other Types" filters
+            if isOtherTypesFilter {
+                loadTopTypes()
+            }
+        }
+    }
+    
+    // This is our new filtered whiskeys list that handles the "Other" category
+    private var filteredWhiskeys: [Whiskey] {
+        if isOtherTypesFilter {
+            return getFilteredOtherTypesWhiskeys()
+        } else {
+            return Array(whiskeys)
+        }
+    }
+    
+    // This function loads the top whiskey types
+    private func loadTopTypes() {
+        topTypes = getTopTypes(count: 3)
+        
+        // Log what we're doing to help debug
+        print("Filtering for Other Types. Top types excluded: \(topTypes)")
+        
+        if case .attribute(let attribute, _) = filter?.type {
+            print("Attribute filter: \(attribute)")
+        }
+    }
+    
+    // Get top whiskey types by count
+    private func getTopTypes(count: Int) -> [String] {
+        let fetchRequest: NSFetchRequest<Whiskey> = Whiskey.fetchRequest()
+        
+        do {
+            let results = try viewContext.fetch(fetchRequest)
+            let typeCounts = Dictionary(grouping: results, by: { $0.type ?? "Unspecified" }).mapValues { $0.count }
+            return typeCounts.sorted { $0.value > $1.value }.prefix(count).map { $0.key }
+        } catch {
+            print("Error fetching whiskey types: \(error)")
+            return []
+        }
+    }
+    
+    // Handle the filtering for "Other Types" after initialization
+    private func getFilteredOtherTypesWhiskeys() -> [Whiskey] {
+        guard case .attribute(let attribute, _) = filter?.type, attribute.hasSuffix("in Other Types") else {
+            return Array(whiskeys)
+        }
+        
+        // Use the cached top types if we already have them
+        let typesToExclude = topTypes.isEmpty ? getTopTypes(count: 3) : topTypes
+        
+        // Filter the whiskeys manually:
+        let filtered = whiskeys.filter { whiskey in
+            // 1. It must NOT be one of the top types
+            guard let type = whiskey.type, !typesToExclude.contains(type) else {
+                return false
+            }
+            
+            // 2. It must match the attribute - we'll check each case
+            if attribute.hasPrefix("Finished Whiskeys in Other") {
+                return whiskey.finish != nil && !whiskey.finish!.isEmpty
+            } else if attribute.hasPrefix("Single Barrel in Other") {
+                return whiskey.isSiB
+            } else if attribute.hasPrefix("Bottled in Bond in Other") {
+                return whiskey.isBiB
+            } else if attribute.hasPrefix("Store Picks in Other") {
+                return whiskey.isStorePick
+            } else if attribute.hasPrefix("No Special Attributes in Other") {
+                // This is a new case for whiskeys with no special attributes
+                return (whiskey.finish == nil || whiskey.finish!.isEmpty) && 
+                       !whiskey.isSiB && 
+                       !whiskey.isBiB && 
+                       !whiskey.isStorePick
+            }
+            
+            // Default case
+            return true
+        }
+        
+        return filtered
+    }
+}
+
+// Reusable card component for statistics
+struct StatCard<Content: View>: View {
+    let title: String
+    let content: Content
+    
+    init(title: String, @ViewBuilder content: () -> Content) {
+        self.title = title
+        self.content = content()
+    }
+    
+    var body: some View {
+        VStack(alignment: .leading) {
+            Text(title)
+                .font(.headline)
+                .padding(.horizontal)
+                .padding(.top)
+            
+            Divider()
+                .padding(.horizontal)
+            
+            content
+                .padding()
+        }
+        .background(ColorManager.background)
+        .cornerRadius(12)
+        .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
+    }
+}
+
+// Collection Overview Statistics
+struct CollectionOverviewStats: View {
+    let whiskeys: FetchedResults<Whiskey>
+    
+    var body: some View {
+        VStack(spacing: 16) {
+            HStack(spacing: 20) {
+                StatCounter(
+                    value: "\(whiskeys.count)",
+                    label: "Unique Bottles"
+                )
+                
+                // Count whiskeys with journal entries as "opened"
+                StatCounter(
+                    value: "\(whiskeys.filter { ($0.journalEntries?.count ?? 0) > 0 }.count)",
+                    label: "Opened"
+                )
+                
+                StatCounter(
+                    value: "\(whiskeys.filter { $0.isFinished }.count)",
+                    label: "Finished"
+                )
+            }
+            
+            HStack(spacing: 20) {
+                StatCounter(
+                    value: "\(whiskeys.filter { $0.proof > 100 }.count)",
+                    label: "High Proof"
+                )
+                
+                StatCounter(
+                    value: "\(whiskeys.map { Int($0.numberOfBottles) }.reduce(0, +))",
+                    label: "Total Inventory"
+                )
+            }
+        }
+    }
+}
+
+// Whiskey Type Breakdown
+struct WhiskeyTypeStats: View {
+    let whiskeys: FetchedResults<Whiskey>
+    let onTypeSelected: (String) -> Void
+    
+    var body: some View {
+        let typeData = calculateTypeBreakdown()
+        
+        if typeData.isEmpty {
+            Text("No type data available")
+                .foregroundColor(.secondary)
+                .italic()
+        } else {
+            // Clean list of whiskey types
+            VStack(alignment: .leading, spacing: 12) {
+                ForEach(typeData) { item in
+                    Button(action: {
+                        onTypeSelected(item.type)
+                    }) {
+                        HStack {
+                            Circle()
+                                .fill(colorForIndex(typeData.firstIndex(where: { $0.id == item.id }) ?? 0))
+                                .frame(width: 12, height: 12)
+                            Text(item.type)
+                                .font(.subheadline)
+                                .foregroundColor(.primary)
+                            Spacer()
+                            Text("\(item.count)")
+                                .foregroundColor(.secondary)
+                                .font(.subheadline)
+                        }
+                        .padding(.vertical, 4)
+                    }
+                }
+            }
+        }
+    }
+    
+    private func calculateTypeBreakdown() -> [TypeCount] {
+        var typeCounts: [String: Int] = [:]
+        
+        for whiskey in whiskeys {
+            if let type = whiskey.type, !type.isEmpty {
+                typeCounts[type, default: 0] += 1
+            } else {
+                typeCounts["Unspecified", default: 0] += 1
+            }
+        }
+        
+        return typeCounts.map { TypeCount(type: $0.key, count: $0.value) }
+            .sorted { $0.count > $1.count }
+    }
+    
+    private func colorForIndex(_ index: Int) -> Color {
+        return ColorManager.chartColor(at: index)
+    }
+}
+
+// Proof Analysis
+struct ProofAnalysisStats: View {
+    let whiskeys: FetchedResults<Whiskey>
+    let onProofRangeSelected: (Double, Double, String) -> Void
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            // Proof Ranges
+            let proofRanges = calculateProofRanges()
+            
+            Text("Proof Distribution")
+                .font(.subheadline)
+                .foregroundColor(.secondary)
+                .padding(.top, 8)
+            
+            if #available(iOS 16.0, *), !proofRanges.isEmpty {
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack(alignment: .bottom, spacing: 4) {
+                        ForEach(proofRanges) { range in
+                            let maxCount = proofRanges.map(\.count).max() ?? 1
+                            let height = 150.0 * Double(range.count) / Double(maxCount)
+                            
+                            Button {
+                                onProofRangeSelected(range.min, range.max, range.label)
+                            } label: {
+                                VStack {
+                                    Rectangle()
+                                        .fill(ColorManager.priceLow.gradient)
+                                        .frame(height: height)
+                                    
+                                    Text(range.label)
+                                        .font(.caption)
+                                        .foregroundColor(.primary)
+                                }
+                            }
+                            .buttonStyle(PlainButtonStyle())
+                            .frame(maxWidth: .infinity)
+                        }
+                    }
+                    .frame(height: 180)
+                    
+                    HStack {
+                        ForEach(proofRanges) { range in
+                            Text("\(range.count)")
+                                .font(.caption2)
+                                .foregroundColor(.secondary)
+                                .frame(maxWidth: .infinity)
+                        }
+                    }
+                }
+            } else {
+                // Fallback for iOS 15 or empty data
+                VStack(alignment: .leading, spacing: 8) {
+                    ForEach(proofRanges) { range in
+                        Button(action: {
+                            onProofRangeSelected(range.min, range.max, range.label)
+                        }) {
+                            HStack {
+                                Text(range.label)
+                                    .foregroundColor(.primary)
+                                Spacer()
+                                Text("\(range.count)")
+                                    .foregroundColor(.secondary)
+                            }
+                            .padding(.vertical, 4)
+                        }
+                    }
+                }
+                
+                if proofRanges.isEmpty {
+                    Text("No proof data available")
+                        .foregroundColor(.secondary)
+                        .italic()
+                }
+            }
+        }
+    }
+    
+    private func calculateProofRanges() -> [ProofRange] {
+        let proofs = whiskeys.map { $0.proof }
+        let validProofs = proofs.filter { $0 > 0 }
+        if validProofs.isEmpty { return [] }
+        
+        // Define proof ranges with exact boundaries
+        let ranges: [(min: Double, max: Double, label: String)] = [
+            (0, 80, "Under 80°"),
+            (80, 90, "80-90°"),
+            (90, 100, "90-100°"),
+            (100, 110, "100-110°"),
+            (110, 120, "110-120°"),
+            (120, 200, "120+°")  // Use 200 as a reasonable upper bound instead of infinity
+        ]
+        
+        return ranges.map { range in
+            let count = validProofs.filter { proof in
+                // For the last range (120+), include all values >= 120
+                if range.min == 120 {
+                    return proof >= range.min
+                } else {
+                    return proof >= range.min && proof < range.max
+                }
+            }.count
+            
+            return ProofRange(
+                min: range.min,
+                max: range.max,
+                label: range.label,
+                count: count
+            )
+        }
+    }
+}
+
+// Price Analysis
+struct PriceAnalysisStats: View {
+    let whiskeys: FetchedResults<Whiskey>
+    let onPriceRangeSelected: (Double, Double, String) -> Void
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            // Price Ranges
+            let priceRanges = calculatePriceRanges()
+            
+            Text("Price Distribution")
+                .font(.subheadline)
+                .foregroundColor(.secondary)
+                .padding(.top, 8)
+            
+            if #available(iOS 16.0, *), !priceRanges.isEmpty {
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack(alignment: .bottom, spacing: 4) {
+                        ForEach(priceRanges) { range in
+                            let maxCount = priceRanges.map(\.count).max() ?? 1
+                            let height = 150.0 * Double(range.count) / Double(maxCount)
+                            
+                            Button {
+                                onPriceRangeSelected(range.min, range.max, range.label)
+                            } label: {
+                                VStack {
+                                    Rectangle()
+                                        .fill(ColorManager.priceLow.gradient)
+                                        .frame(height: height)
+                                    
+                                    Text(range.label)
+                                        .font(.caption)
+                                        .foregroundColor(.primary)
+                                }
+                            }
+                            .buttonStyle(PlainButtonStyle())
+                            .frame(maxWidth: .infinity)
+                        }
+                    }
+                    .frame(height: 180)
+                    
+                    HStack {
+                        ForEach(priceRanges) { range in
+                            Text("\(range.count)")
+                                .font(.caption2)
+                                .foregroundColor(.secondary)
+                                .frame(maxWidth: .infinity)
+                        }
+                    }
+                }
+            } else {
+                // Fallback for iOS 15 or empty data
+                VStack(alignment: .leading, spacing: 8) {
+                    ForEach(priceRanges) { range in
+                        Button(action: {
+                            onPriceRangeSelected(range.min, range.max, range.label)
+                        }) {
+                            HStack {
+                                Text(range.label)
+                                    .foregroundColor(.primary)
+                                Spacer()
+                                Text("\(range.count)")
+                                    .foregroundColor(.secondary)
+                            }
+                            .padding(.vertical, 4)
+                        }
+                    }
+                }
+                
+                if priceRanges.isEmpty {
+                    Text("No price data available")
+                        .foregroundColor(.secondary)
+                        .italic()
+                }
+            }
+        }
+    }
+    
+    private func calculatePriceRanges() -> [PriceRange] {
+        let prices = whiskeys.map { $0.price }
+        let validPrices = prices.filter { $0 > 0 }
+        if validPrices.isEmpty { return [] }
+        
+        // Define price ranges with exact boundaries
+        let ranges: [(min: Double, max: Double, label: String)] = [
+            (0, 30, "Under $30"),
+            (30, 50, "$30-$50"),
+            (50, 70, "$50-$70"),
+            (70, 100, "$70-$100"),
+            (100, 150, "$100-$150"),
+            (150, 1000, "$150+")  // Use 1000 as a reasonable upper bound instead of infinity
+        ]
+        
+        return ranges.map { range in
+            let count = validPrices.filter { price in
+                // For the last range ($150+), include all values >= 150
+                if range.min == 150 {
+                    return price >= range.min
+                } else {
+                    return price >= range.min && price < range.max
+                }
+            }.count
+            
+            return PriceRange(
+                min: range.min,
+                max: range.max,
+                label: range.label,
+                count: count
+            )
+        }
+    }
+}
+
+// Price range model
+struct PriceRange: Identifiable {
+    let id = UUID()
+    let min: Double
+    let max: Double
+    let label: String
+    let count: Int
+}
+
+// Special Attributes Stats
+struct SpecialAttributesStats: View {
+    let whiskeys: FetchedResults<Whiskey>
+    let onAttributeSelected: (String, Bool) -> Void
+    let onDistillerySelected: (String) -> Void
+    
+    var body: some View {
+        VStack(spacing: 16) {
+            HStack(spacing: 20) {
+                Button(action: {
+                    onAttributeSelected("Bottled in Bond", true)
+                }) {
+                    StatCounter(
+                        value: "\(whiskeys.filter { $0.isBiB }.count)",
+                        label: "Bottled in Bond"
+                    )
+                }
+                .buttonStyle(PlainButtonStyle())
+                
+                Button(action: {
+                    onAttributeSelected("Single Barrel", true)
+                }) {
+                    StatCounter(
+                        value: "\(whiskeys.filter { $0.isSiB }.count)",
+                        label: "Single Barrel"
+                    )
+                }
+                .buttonStyle(PlainButtonStyle())
+                
+                Button(action: {
+                    onAttributeSelected("Store Picks", true)
+                }) {
+                    StatCounter(
+                        value: "\(whiskeys.filter { $0.isStorePick }.count)",
+                        label: "Store Picks"
+                    )
+                }
+                .buttonStyle(PlainButtonStyle())
+            }
+            
+            // Distillery breakdown if we have distillery data
+            let distilleryData = calculateDistilleryBreakdown()
+            if !distilleryData.isEmpty {
+                Divider()
+                    .padding(.vertical)
+                
+                Text("Top Distilleries")
+                    .font(.headline)
+                    .padding(.bottom, 4)
+                
+                VStack(alignment: .leading, spacing: 8) {
+                    ForEach(distilleryData.prefix(5)) { item in
+                        Button(action: {
+                            onDistillerySelected(item.type)
+                        }) {
+                            HStack {
+                                Text(item.type)
+                                    .foregroundColor(.primary)
+                                Spacer()
+                                Text("\(item.count)")
+                                    .foregroundColor(.secondary)
+                            }
+                            .padding(.vertical, 4)
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    private func calculateDistilleryBreakdown() -> [TypeCount] {
+        var distilleryCounts: [String: Int] = [:]
+        
+        for whiskey in whiskeys {
+            if let distillery = whiskey.distillery, !distillery.isEmpty {
+                distilleryCounts[distillery, default: 0] += 1
+            }
+        }
+        
+        return distilleryCounts.map { TypeCount(type: $0.key, count: $0.value) }
+            .sorted { $0.count > $1.count }
+    }
+}
+
+// Reusable counter view
+struct StatCounter: View {
+    let value: String
+    let label: String
+    let systemImage: String?
+    
+    init(value: String, label: String, systemImage: String? = nil) {
+        self.value = value
+        self.label = label
+        self.systemImage = systemImage
+    }
+    
+    var body: some View {
+        VStack {
+            if let systemImage = systemImage {
+                Image(systemName: systemImage)
+                    .font(.system(size: 28))
+                    .foregroundColor(.accentColor)
+            }
+            
+            Text(value)
+                .font(.title)
+                .fontWeight(.bold)
+            
+            Text(label)
+                .font(.caption)
+                .foregroundColor(.secondary)
+        }
+        .frame(maxWidth: .infinity)
+    }
+}
+
+// Helper model structures
+struct TypeCount: Identifiable {
+    let id = UUID()
+    let type: String
+    let count: Int
+}
+
+struct ProofRange: Identifiable {
+    let id = UUID()
+    let min: Double
+    let max: Double
+    let label: String
+    let count: Int
+}
+
+struct SpecialCount: Identifiable {
+    let id = UUID()
+    let type: String
+    let count: Int
+}
+
+// Tasting Coverage Statistics
+struct TastingCoverageStats: View {
+    let context: NSManagedObjectContext
+    let whiskeys: FetchedResults<Whiskey>
+    
+    @StateObject private var statisticsManager = StatisticsManager()
+    @Binding var selectedFilter: WhiskeyFilter?
+    @Binding var showingFilteredView: Bool
+    
+    @State private var tastedWhiskeys: [Whiskey] = []
+    @State private var typeStatistics: [TypeStatistic] = []
+    @State private var expandedTypes: Set<String> = []
+    @State private var isLoading: Bool = true
+    
+    var body: some View {
+        VStack(spacing: 16) {
+            if isLoading {
+                ProgressView()
+                    .padding()
+            } else {
+                // Overall Coverage Progress
+                VStack {
+                    if !whiskeys.isEmpty {
+                        // Use the extracted progress circle component
+                        TastingProgressCircle(
+                            tastedCount: Double(tastedWhiskeys.count),
+                            totalCount: Double(whiskeys.count)
+                        )
+                        .padding(.bottom, 8)
+                        
+                        Text("\(tastedWhiskeys.count) of \(whiskeys.count) bottles tasted")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                        
+                        // Use the extracted action buttons component
+                        TastingActionButtons(
+                            selectedFilter: $selectedFilter,
+                            showingFilteredView: $showingFilteredView
+                        )
+                        .padding(.top, 8)
+                    } else {
+                        Text("No whiskeys in collection")
+                            .foregroundColor(.secondary)
+                            .italic()
+                    }
+                }
+                
+                typeStatisticsView
+            }
+        }
+        .onAppear {
+            loadTastingData()
+        }
+    }
+    
+    private var typeStatisticsView: some View {
+        Group {
+            if !typeStatistics.isEmpty {
+                Divider()
+                    .padding(.vertical, 4)
+                
+                VStack(alignment: .leading, spacing: 12) {
+                    // Header with expand/collapse all button
+                    HStack {
+                        Text("Coverage by Type")
+                            .font(.headline)
+                        
+                        Spacer()
+                        
+                        Button(action: toggleAllTypes) {
+                            Text(expandedTypes.count == typeStatistics.count ? "Collapse All" : "Expand All")
+                                .font(.caption)
+                                .foregroundColor(.accentColor)
+                        }
+                    }
+                    .padding(.bottom, 4)
+                    
+                    // Type rows
+                    ForEach(typeStatistics) { typeStat in
+                        typeRow(for: typeStat)
+                    }
+                }
+            }
+        }
+    }
+    
+    private func toggleAllTypes() {
+        if expandedTypes.count == typeStatistics.count {
+            expandedTypes.removeAll()
+        } else {
+            expandedTypes = Set(typeStatistics.map { $0.name })
+        }
+    }
+    
+    private func typeRow(for typeStat: TypeStatistic) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            // Type header row (collapsible)
+            Button(action: {
+                // ONLY toggle expansion, don't filter
+                toggleExpanded(typeStat.name)
+            }) {
+                TypeHeaderRow(
+                    typeStat: typeStat,
+                    isExpanded: isExpanded(typeStat.name)
+                )
+            }
+            .buttonStyle(PlainButtonStyle())
+            
+            // Subtype rows (when expanded)
+            if isExpanded(typeStat.name) && !typeStat.subtypes.isEmpty {
+                subtypeRows(for: typeStat)
+            }
+            
+            if typeStatistics.last?.id != typeStat.id {
+                Divider()
+                    .padding(.vertical, 4)
+            }
+        }
+    }
+    
+    private func subtypeRows(for typeStat: TypeStatistic) -> some View {
+        VStack(spacing: 8) {
+            // Add an "ATTRIBUTES:" header
+            Text("ATTRIBUTES:")
+                .font(.caption)
+                .foregroundColor(.secondary)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.top, 4)
+                .padding(.bottom, 2)
+                .padding(.leading, 16)
+            
+            ForEach(typeStat.subtypes) { subtype in
+                Button(action: {
+                    subtypeSelected(typeStat.name, subtype.name)
+                }) {
+                    SubtypeRow(subtype: subtype)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(PlainButtonStyle())
+                .padding(.leading, 4)
+            }
+        }
+        .padding(.leading, 4)
+        .padding(.vertical, 4)
+    }
+    
+    private func loadTastingData() {
+        isLoading = true
+        
+        DispatchQueue.global(qos: .userInitiated).async {
+            // Fetch all journal entries
+            let fetchRequest: NSFetchRequest<JournalEntry> = JournalEntry.fetchRequest()
+            
+            do {
+                let entries = try context.fetch(fetchRequest)
+                
+                // Get whiskeys that have journal entries
+                let whiskeyIds = self.getWhiskeyIdsFromEntries(entries)
+                
+                // Process whiskey data
+                let (tasted, typeStats) = self.processWhiskeyData(whiskeys: Array(whiskeys), whiskeyIds: whiskeyIds)
+                
+                // Determine which types to auto-expand
+                let expandedTypes = self.determineExpandedTypes(typeStats: typeStats)
+                
+                // Update UI on main thread
+                DispatchQueue.main.async {
+                    self.tastedWhiskeys = tasted
+                    self.typeStatistics = typeStats
+                    self.expandedTypes = expandedTypes
+                    self.isLoading = false
+                }
+            } catch {
+                print("Error fetching journal entries: \(error)")
+                DispatchQueue.main.async {
+                    self.isLoading = false
+                }
+            }
+        }
+    }
+    
+    // Helper function to extract whiskey IDs from journal entries
+    private func getWhiskeyIdsFromEntries(_ entries: [JournalEntry]) -> Set<NSManagedObjectID> {
+        var whiskeyIds = Set<NSManagedObjectID>()
+        for entry in entries {
+            if let whiskey = entry.whiskey {
+                whiskeyIds.insert(whiskey.objectID)
+            }
+        }
+        return whiskeyIds
+    }
+    
+    // Helper function to process whiskey data and generate statistics
+    private func processWhiskeyData(whiskeys: [Whiskey], whiskeyIds: Set<NSManagedObjectID>) -> (tasted: [Whiskey], typeStats: [TypeStatistic]) {
+        // Sort whiskeys into tasted
+        var tasted: [Whiskey] = []
+        
+        // Group whiskeys by type for type-level statistics
+        var typeMap: [String: (total: Int, tasted: Int, attributes: [String: (total: Int, tasted: Int)])] = [:]
+        
+        for whiskey in whiskeys {
+            // Get basic properties with safe unwrapping
+            let type = whiskey.type ?? "Unspecified"
+            let isTasted = whiskeyIds.contains(whiskey.objectID)
+            
+            // Add to tasted list
+            if isTasted {
+                tasted.append(whiskey)
+            }
+            
+            // Initialize type entry if needed
+            if typeMap[type] == nil {
+                typeMap[type] = (total: 0, tasted: 0, attributes: [:])
+            }
+            
+            // Increment type counts
+            typeMap[type]!.total += 1
+            if isTasted {
+                typeMap[type]!.tasted += 1
+            }
+            
+            // Now handle attributes - a whiskey can have multiple attributes
+            // Initialize attribute counters if needed
+            if typeMap[type]!.attributes["Finished"] == nil {
+                typeMap[type]!.attributes["Finished"] = (total: 0, tasted: 0)
+            }
+            if typeMap[type]!.attributes["Single Barrel"] == nil {
+                typeMap[type]!.attributes["Single Barrel"] = (total: 0, tasted: 0)
+            }
+            if typeMap[type]!.attributes["Bottled in Bond"] == nil {
+                typeMap[type]!.attributes["Bottled in Bond"] = (total: 0, tasted: 0)
+            }
+            if typeMap[type]!.attributes["Store Pick"] == nil {
+                typeMap[type]!.attributes["Store Pick"] = (total: 0, tasted: 0)
+            }
+            if typeMap[type]!.attributes["No Special Attributes"] == nil {
+                typeMap[type]!.attributes["No Special Attributes"] = (total: 0, tasted: 0)
+            }
+            
+            // Track if this whiskey has any special attributes
+            var hasSpecialAttributes = false
+            
+            // Check each attribute independently and update counts
+            if whiskey.finish != nil && !whiskey.finish!.isEmpty {
+                hasSpecialAttributes = true
+                typeMap[type]!.attributes["Finished"]!.total += 1
+                if isTasted {
+                    typeMap[type]!.attributes["Finished"]!.tasted += 1
+                }
+            }
+            
+            if whiskey.isSiB {
+                hasSpecialAttributes = true
+                typeMap[type]!.attributes["Single Barrel"]!.total += 1
+                if isTasted {
+                    typeMap[type]!.attributes["Single Barrel"]!.tasted += 1
+                }
+            }
+            
+            if whiskey.isBiB {
+                hasSpecialAttributes = true
+                typeMap[type]!.attributes["Bottled in Bond"]!.total += 1
+                if isTasted {
+                    typeMap[type]!.attributes["Bottled in Bond"]!.tasted += 1
+                }
+            }
+            
+            if whiskey.isStorePick {
+                hasSpecialAttributes = true
+                typeMap[type]!.attributes["Store Pick"]!.total += 1
+                if isTasted {
+                    typeMap[type]!.attributes["Store Pick"]!.tasted += 1
+                }
+            }
+            
+            // If no special attributes, count in the "No Special Attributes" category
+            if !hasSpecialAttributes {
+                typeMap[type]!.attributes["No Special Attributes"]!.total += 1
+                if isTasted {
+                    typeMap[type]!.attributes["No Special Attributes"]!.tasted += 1
+                }
+            }
+        }
+        
+        // Convert the map to an array of TypeStatistic objects
+        let typeStats = createTypeStatistics(from: typeMap, allWhiskeys: Array(whiskeys), tastedIds: whiskeyIds)
+        
+        return (tasted, typeStats)
+    }
+    
+    // Helper function to create TypeStatistic objects from the typeMap
+    private func createTypeStatistics(from typeMap: [String: (total: Int, tasted: Int, attributes: [String: (total: Int, tasted: Int)])], allWhiskeys: [Whiskey], tastedIds: Set<NSManagedObjectID>) -> [TypeStatistic] {
+        var typeStats: [TypeStatistic] = []
+        
+        // Get all types sorted by total count (descending)
+        let sortedTypes = typeMap.sorted { $0.value.total > $1.value.total }
+        
+        // Display top 3 types individually
+        let maxIndividualTypes = 3
+        let displayTypes = sortedTypes.prefix(min(maxIndividualTypes, sortedTypes.count))
+        
+        // Get the names of the top types
+        let topTypeNames = displayTypes.map { $0.key }
+        
+        // Create TypeStatistic objects for the top types
+        for (typeName, stats) in displayTypes {
+            var attributes: [SubtypeStatistic] = []
+            
+            // Convert attribute stats to SubtypeStatistic objects
+            for (attributeName, attrStats) in stats.attributes {
+                // Only include attributes that have bottles
+                if attrStats.total > 0 {
+                    let tastedCount = attrStats.tasted
+                    let totalCount = attrStats.total
+                    let percentage = totalCount > 0 ? Double(tastedCount) / Double(totalCount) * 100 : 0
+                    
+                    attributes.append(SubtypeStatistic(
+                        id: UUID(),
+                        name: attributeName,
+                        tastedCount: tastedCount,
+                        totalCount: totalCount,
+                        percentage: percentage
+                    ))
+                }
+            }
+            
+            // Sort attributes by total count (descending), but always put "No Special Attributes" last
+            attributes.sort { (a, b) -> Bool in
+                if a.name == "No Special Attributes" {
+                    return false
+                }
+                if b.name == "No Special Attributes" {
+                    return true
+                }
+                return a.totalCount > b.totalCount
+            }
+            
+            typeStats.append(TypeStatistic(
+                id: UUID(),
+                name: typeName,
+                tastedCount: stats.tasted,
+                totalCount: stats.total,
+                subtypes: attributes
+            ))
+        }
+        
+        // Create an "Other" category for remaining types if needed
+        if sortedTypes.count > maxIndividualTypes {
+            // Reset all counters for "Other" category
+            var otherTotalCount = 0
+            var otherTastedCount = 0
+            var otherAttributes: [String: (tasted: Int, total: Int)] = [
+                "Finished": (0, 0),
+                "Single Barrel": (0, 0),
+                "Bottled in Bond": (0, 0),
+                "Store Pick": (0, 0),
+                "No Special Attributes": (0, 0)
+            ]
+            
+            // Count whiskeys not in the top types
+            for whiskey in allWhiskeys {
+                // Skip whiskeys in the top types
+                guard let type = whiskey.type, !topTypeNames.contains(type) else {
+                    continue
+                }
+                
+                let isTasted = tastedIds.contains(whiskey.objectID)
+                
+                // Count for "Other" total
+                otherTotalCount += 1
+                if isTasted {
+                    otherTastedCount += 1
+                }
+                
+                // Track if this whiskey has any special attributes
+                var hasSpecialAttributes = false
+                
+                // Check each attribute independently
+                if whiskey.finish != nil && !whiskey.finish!.isEmpty {
+                    hasSpecialAttributes = true
+                    otherAttributes["Finished"]!.total += 1
+                    if isTasted {
+                        otherAttributes["Finished"]!.tasted += 1
+                    }
+                }
+                
+                if whiskey.isSiB {
+                    hasSpecialAttributes = true
+                    otherAttributes["Single Barrel"]!.total += 1
+                    if isTasted {
+                        otherAttributes["Single Barrel"]!.tasted += 1
+                    }
+                }
+                
+                if whiskey.isBiB {
+                    hasSpecialAttributes = true
+                    otherAttributes["Bottled in Bond"]!.total += 1
+                    if isTasted {
+                        otherAttributes["Bottled in Bond"]!.tasted += 1
+                    }
+                }
+                
+                if whiskey.isStorePick {
+                    hasSpecialAttributes = true
+                    otherAttributes["Store Pick"]!.total += 1
+                    if isTasted {
+                        otherAttributes["Store Pick"]!.tasted += 1
+                    }
+                }
+                
+                // If no special attributes, count in the "No Special Attributes" category
+                if !hasSpecialAttributes {
+                    otherAttributes["No Special Attributes"]!.total += 1
+                    if isTasted {
+                        otherAttributes["No Special Attributes"]!.tasted += 1
+                    }
+                }
+            }
+            
+            // Create SubtypeStatistic objects for the "Other" category
+            var otherAttributeStats: [SubtypeStatistic] = []
+            for (attributeName, stats) in otherAttributes {
+                // Only include attributes that have bottles
+                if stats.total > 0 {
+                    let percentage = Double(stats.tasted) / Double(stats.total) * 100
+                    otherAttributeStats.append(SubtypeStatistic(
+                        id: UUID(),
+                        name: attributeName,
+                        tastedCount: stats.tasted,
+                        totalCount: stats.total,
+                        percentage: percentage
+                    ))
+                }
+            }
+            
+            // Sort Other attributes by total count (descending), but put "No Special Attributes" last
+            otherAttributeStats.sort { (a, b) -> Bool in
+                if a.name == "No Special Attributes" {
+                    return false
+                }
+                if b.name == "No Special Attributes" {
+                    return true
+                }
+                return a.totalCount > b.totalCount
+            }
+            
+            // Add the "Other" category to typeStats
+            typeStats.append(TypeStatistic(
+                id: UUID(),
+                name: "Other",
+                tastedCount: otherTastedCount,
+                totalCount: otherTotalCount,
+                subtypes: otherAttributeStats
+            ))
+        }
+        
+        return typeStats
+    }
+    
+    // Helper function to generate diverse recommendations
+    private func generateDiverseRecommendations(untastedWhiskeys: [Whiskey]) -> [Whiskey] {
+        if untastedWhiskeys.isEmpty {
+            return []
+        }
+        
+        var diverseUntasted = [Whiskey]()
+        
+        // Group untasted whiskeys by type
+        var whiskeysGroupedByType: [String: [Whiskey]] = [:]
+        for whiskey in untastedWhiskeys {
+            let type = whiskey.type ?? "Unspecified"
+            if whiskeysGroupedByType[type] == nil {
+                whiskeysGroupedByType[type] = []
+            }
+            whiskeysGroupedByType[type]?.append(whiskey)
+        }
+        
+        // Get types sorted by number of untasted bottles (descending)
+        let typesSortedByCount = whiskeysGroupedByType.keys.sorted {
+            whiskeysGroupedByType[$0]?.count ?? 0 > whiskeysGroupedByType[$1]?.count ?? 0
+        }
+        
+        // Early return if no types
+        if typesSortedByCount.isEmpty {
+            return untastedWhiskeys.sorted { ($0.name ?? "") < ($1.name ?? "") }
+        }
+        
+        // Take one from each type until we have enough or run out of types
+        var typeIndex = 0
+        while diverseUntasted.count < untastedWhiskeys.count && typeIndex < typesSortedByCount.count {
+            let type = typesSortedByCount[typeIndex]
+            if let whiskeyGroup = whiskeysGroupedByType[type], !whiskeyGroup.isEmpty {
+                // Sort by proof within type to get variety
+                let sortedByProof = whiskeyGroup.sorted { $0.proof > $1.proof }
+                
+                // Get the bottle with highest proof from this type
+                if let whiskey = sortedByProof.first {
+                    diverseUntasted.append(whiskey)
+                    // Remove the selected whiskey from the group
+                    whiskeysGroupedByType[type] = Array(sortedByProof.dropFirst())
+                }
+            }
+            
+            // Move to next type or loop back to beginning
+            typeIndex = (typeIndex + 1) % typesSortedByCount.count
+            
+            // If we've gone through all types once, break if we have at least 3 recommendations
+            if typeIndex == 0 && diverseUntasted.count >= 3 {
+                break
+            }
+        }
+        
+        // Fallback to alphabetical sort if we couldn't create diverse recommendations
+        if diverseUntasted.isEmpty {
+            return untastedWhiskeys.sorted { ($0.name ?? "") < ($1.name ?? "") }
+        }
+        
+        return diverseUntasted
+    }
+    
+    // Helper function to determine which types should be auto-expanded
+    private func determineExpandedTypes(typeStats: [TypeStatistic]) -> Set<String> {
+        var expandedTypes = Set<String>()
+        
+        // Auto-expand top types
+        if typeStats.count > 0 {
+            expandedTypes.insert(typeStats[0].name)
+        }
+        if typeStats.count > 1 {
+            expandedTypes.insert(typeStats[1].name)
+        }
+        
+        // Always auto-expand "Other" category if it exists
+        if let otherStat = typeStats.first(where: { $0.name == "Other" }) {
+            expandedTypes.insert(otherStat.name)
+        }
+        
+        // Always auto-expand "Whiskey" category if it exists
+        if let whiskeyStat = typeStats.first(where: { $0.name == "Whiskey" }) {
+            expandedTypes.insert(whiskeyStat.name)
+        }
+        
+        return expandedTypes
+    }
+    
+    // Helper to check if a type is expanded
+    private func isExpanded(_ typeName: String) -> Bool {
+        return expandedTypes.contains(typeName)
+    }
+    
+    // Toggle expanded state for a type
+    private func toggleExpanded(_ typeName: String) {
+        if expandedTypes.contains(typeName) {
+            expandedTypes.remove(typeName)
+        } else {
+            expandedTypes.insert(typeName)
+        }
+    }
+    
+    // Handle subtype selection
+    private func subtypeSelected(_ typeName: String, _ subtypeName: String) {
+        // For the "Other" category, we need to filter by subtype AND limit to types in the "Other" category
+        if typeName == "Other" {
+            // Get the top 3 types that are displayed individually (not in "Other")
+            let topTypes = typeStatistics.filter { $0.name != "Other" }.prefix(3).map { $0.name }
+            
+            switch subtypeName {
+            case "Finished":
+                selectedFilter = WhiskeyFilter(
+                    type: .attribute("finish", true),
+                    displayName: "Finished Whiskeys in Other Types"
+                )
+            case "Single Barrel":
+                selectedFilter = WhiskeyFilter(
+                    type: .attribute("Single Barrel in Other Types", true),
+                    displayName: "Single Barrel in Other Types"
+                )
+            case "Bottled in Bond":
+                selectedFilter = WhiskeyFilter(
+                    type: .attribute("Bottled in Bond in Other Types", true),
+                    displayName: "Bottled in Bond in Other Types"
+                )
+            case "Store Pick":
+                selectedFilter = WhiskeyFilter(
+                    type: .attribute("Store Picks in Other Types", true),
+                    displayName: "Store Picks in Other Types"
+                )
+            case "No Special Attributes":
+                // For whiskeys with no special attributes in Other types
+                selectedFilter = WhiskeyFilter(
+                    type: .attribute("No Special Attributes in Other Types", true),
+                    displayName: "Regular Whiskeys in Other Types"
+                )
+            default:
+                // For standard subtypes in Other, we need to filter by subtype only
+                selectedFilter = WhiskeyFilter(
+                    type: .attribute(subtypeName + " in Other Types", true),
+                    displayName: subtypeName + " in Other Types"
+                )
+            }
+        } else {
+            // Based on subtype, create the appropriate filter
+            switch subtypeName {
+            case "Finished":
+                selectedFilter = WhiskeyFilter(
+                    type: .subtype(typeName, "Finished"),
+                    displayName: "Finished \(typeName)"
+                )
+            case "Single Barrel":
+                selectedFilter = WhiskeyFilter(
+                    type: .subtype(typeName, "Single Barrel"),
+                    displayName: "Single Barrel \(typeName)"
+                )
+            case "Bottled in Bond":
+                selectedFilter = WhiskeyFilter(
+                    type: .subtype(typeName, "Bottled in Bond"),
+                    displayName: "Bottled in Bond \(typeName)"
+                )
+            case "Store Pick":
+                selectedFilter = WhiskeyFilter(
+                    type: .subtype(typeName, "Store Pick"),
+                    displayName: "Store Pick \(typeName)"
+                )
+            case "No Special Attributes":
+                // For whiskeys with no special attributes, filter to exclude all special attributes
+                selectedFilter = WhiskeyFilter(
+                    type: .subtype(typeName, "Standard"),
+                    displayName: "Regular \(typeName) (No Special Attributes)"
+                )
+            default:
+                selectedFilter = WhiskeyFilter(
+                    type: .subtype(typeName, subtypeName),
+                    displayName: "\(subtypeName) \(typeName)"
+                )
+            }
+        }
+        
+        showingFilteredView = true
+    }
+    
+    private func coverageColor(_ percentage: Double) -> Color {
+        if percentage < 30 {
+            return ColorManager.progressLow
+        } else if percentage < 70 {
+            return ColorManager.progressMedium
+        } else {
+            return ColorManager.progressHigh
+        }
+    }
+}
+
+// Type statistics model
+struct TypeStatistic: Identifiable {
+    let id: UUID
+    let name: String
+    let tastedCount: Int
+    let totalCount: Int
+    let subtypes: [SubtypeStatistic]
+    
+    var percentage: Double {
+        totalCount > 0 ? Double(tastedCount) / Double(totalCount) * 100 : 0
+    }
+}
+
+// Subtype statistics model
+struct SubtypeStatistic: Identifiable {
+    let id: UUID
+    let name: String
+    let tastedCount: Int
+    let totalCount: Int
+    let percentage: Double
+}
+
+// Section header for grouping statistics
+struct StatisticsSectionHeader: View {
+    let title: String
+    let systemImage: String
+    
+    var body: some View {
+        HStack {
+            Image(systemName: systemImage)
+                .foregroundColor(.accentColor)
+                .font(.headline)
+            
+            Text(title)
+                .font(.title2)
+                .fontWeight(.bold)
+            
+            Spacer()
+        }
+        .padding(.horizontal, 4)
+        .padding(.vertical, 8)
+    }
+}
+
+// Around line 1103 - Find the TastingCoverageStats struct
+// Extract the complex progress circle into a separate view component
+struct TastingProgressCircle: View {
+    let tastedCount: Double
+    let totalCount: Double
+    
+    var percentage: Double {
+        return (tastedCount / totalCount) * 100
+    }
+    
+    var body: some View {
+        ZStack {
+            Circle()
+                .stroke(Color.gray.opacity(0.3), lineWidth: 10)
+                .frame(width: 120, height: 120)
+            
+            Circle()
+                .trim(from: 0, to: CGFloat(min(percentage / 100, 1.0)))
+                .stroke(Color.blue, style: StrokeStyle(lineWidth: 10, lineCap: .round))
+                .frame(width: 120, height: 120)
+                .rotationEffect(.degrees(-90))
+                .animation(.linear, value: percentage)
+            
+            VStack {
+                Text("\(Int(percentage))%")
+                    .font(.title)
+                    .fontWeight(.bold)
+                
+                Text("Tasted")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+        }
+    }
+}
+
+// Extract the action buttons into a separate view
+struct TastingActionButtons: View {
+    @Binding var selectedFilter: WhiskeyFilter?
+    @Binding var showingFilteredView: Bool
+    
+    var body: some View {
+        HStack(spacing: 16) {
+            Button(action: {
+                selectedFilter = WhiskeyFilter(
+                    type: .tastedStatus(true),
+                    displayName: "Tasted Bottles"
+                )
+                showingFilteredView = true
+            }) {
+                Label("View Tasted", systemImage: "checkmark.circle")
+                    .font(.subheadline)
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                    .background(Color.blue)
+                    .cornerRadius(8)
+            }
+            
+            Button(action: {
+                selectedFilter = WhiskeyFilter(
+                    type: .tastedStatus(false),
+                    displayName: "Untasted Bottles"
+                )
+                showingFilteredView = true
+            }) {
+                Label("View Untasted", systemImage: "circle")
+                    .font(.subheadline)
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                    .background(Color.orange)
+                    .cornerRadius(8)
+            }
+        }
+    }
+}
+
+// Extract type header row into a separate view
+struct TypeHeaderRow: View {
+    let typeStat: TypeStatistic
+    let isExpanded: Bool
+    
+    var body: some View {
+        HStack(spacing: 8) {
+            Image(systemName: isExpanded ? "chevron.down" : "chevron.right")
+                .foregroundColor(.secondary)
+                .font(.caption)
+                .frame(width: 16, height: 16)
+            
+            Text(typeStat.name)
+                .font(.subheadline)
+                .fontWeight(.semibold)
+            
+            Spacer()
+            
+            // Progress indicator
+            ProgressView(value: Double(typeStat.tastedCount), total: Double(typeStat.totalCount))
+                .progressViewStyle(LinearProgressViewStyle(tint: coverageColor(typeStat.percentage)))
+                .frame(width: 60, height: 6)
+                .padding(.trailing, 8)
+            
+            Text("\(typeStat.tastedCount)/\(typeStat.totalCount)")
+                .foregroundColor(.secondary)
+                .font(.footnote)
+        }
+        .padding(.vertical, 10)
+        .padding(.horizontal, 4)
+        .background(ColorManager.secondaryBackground.opacity(0.5))
+        .cornerRadius(6)
+    }
+    
+    private func coverageColor(_ percentage: Double) -> Color {
+        if percentage < 30 {
+            return ColorManager.progressLow
+        } else if percentage < 70 {
+            return ColorManager.progressMedium
+        } else {
+            return ColorManager.progressHigh
+        }
+    }
+}
+
+// Extract subtype row into a separate view
+struct SubtypeRow: View {
+    let subtype: SubtypeStatistic
+    
+    var body: some View {
+        HStack(alignment: .center) {
+            // Indentation
+            Rectangle()
+                .fill(Color.clear)
+                .frame(width: 16)
+            
+            // Connection line
+            VStack(alignment: .leading) {
+                Rectangle()
+                    .fill(Color.secondary.opacity(0.4))
+                    .frame(width: 1, height: 16)
+            }
+            .frame(width: 12, alignment: .leading)
+            
+            // Subtype name
+            Text(subtype.name)
+                .font(.subheadline)
+                .foregroundColor(.primary)
+                .frame(minWidth: 80, alignment: .leading)
+                .lineLimit(1)
+            
+            Spacer()
+            
+            // Progress bar
+            ProgressView(value: Double(subtype.tastedCount), total: Double(subtype.totalCount))
+                .progressViewStyle(LinearProgressViewStyle(tint: coverageColor(subtype.percentage)))
+                .frame(width: 50, height: 6)
+            
+            // Stats with spacing
+            Text("\(subtype.tastedCount)/\(subtype.totalCount)")
+                .font(.footnote)
+                .foregroundColor(.secondary)
+                .frame(width: 45, alignment: .trailing)
+                .padding(.leading, 8)
+        }
+        .padding(.vertical, 6)
+    }
+    
+    private func coverageColor(_ percentage: Double) -> Color {
+        if percentage < 30 {
+            return .red
+        } else if percentage < 70 {
+            return .orange
+        } else {
+            return .green
+        }
+    }
+}
+
+// Extract recommendations section into a separate view
+struct RecommendationsSection: View {
+    let untastedWhiskeys: [Whiskey]
+    @Binding var selectedFilter: WhiskeyFilter?
+    @Binding var showingFilteredView: Bool
+    
+    var body: some View {
+        VStack(spacing: 8) {
+            HStack {
+                Text("Recommendations to Taste")
+                    .font(.headline)
+                
+                Spacer()
+                
+                Button(action: {
+                    selectedFilter = WhiskeyFilter(
+                        type: .tastedStatus(false),
+                        displayName: "All Untasted Bottles"
+                    )
+                    showingFilteredView = true
+                }) {
+                    Text("View All")
+                        .font(.caption)
+                        .foregroundColor(.accentColor)
+                }
+            }
+            .padding(.bottom, 4)
+            
+            // Recommended untasted whiskeys
+            let maxRecommendations = 3
+            
+            // Convert to array first to avoid the ForEach with .prefix issue
+            let recommendationArray = Array(untastedWhiskeys.prefix(maxRecommendations))
+            
+            ForEach(recommendationArray) { whiskey in
+                RecommendationRow(whiskey: whiskey)
+            }
+            
+            // Remaining untasted count
+            let totalUntasted = untastedWhiskeys.count
+            let remainingCount = totalUntasted - maxRecommendations
+            
+            if remainingCount > 0 {
+                Text("+ \(remainingCount) more untasted")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    .padding(.top, 4)
+            }
+        }
+    }
+}
+
+// Extract recommendation row into a separate view
+struct RecommendationRow: View {
+    let whiskey: Whiskey
+    
+    var body: some View {
+        NavigationLink(destination: AddJournalEntryView(preSelectedWhiskey: whiskey)) {
+            HStack {
+                VStack(alignment: .leading) {
+                    Text(whiskey.name ?? "Unknown Whiskey")
+                        .font(.subheadline)
+                        .lineLimit(1)
+                        .foregroundColor(.primary)
+                    
+                    if let type = whiskey.type, !type.isEmpty {
+                        Text(type)
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                }
+                
+                Spacer()
+                
+                Text("Add Tasting")
+                    .font(.caption)
+                    .foregroundColor(.blue)
+            }
+            .padding(.vertical, 4)
+        }
+    }
+}
+
+struct StatisticsView_Previews: PreviewProvider {
+    static var previews: some View {
+        StatisticsView(showingFilteredView: .constant(false))
+    }
+}
+
+// Add the PriceOverviewStats struct after the PriceAnalysisStats
+
+struct PriceOverviewStats: View {
+    let whiskeys: FetchedResults<Whiskey>
+    
+    var body: some View {
+        VStack(spacing: 16) {
+            HStack(spacing: 20) {
+                VStack(spacing: 8) {
+                    Text("Avg")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    Text("Price")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    Divider()
+                        .frame(width: 60)
+                    Text(formatCurrency(averagePrice))
+                        .font(.title)
+                        .fontWeight(.bold)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.5)
+                }
+                .frame(maxWidth: .infinity)
+                
+                VStack(spacing: 8) {
+                    Text("Collection")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    Text("Value")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    Divider()
+                        .frame(width: 60)
+                    Text(formatCurrency(totalValue))
+                        .font(.title)
+                        .fontWeight(.bold)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.5)
+                }
+                .frame(maxWidth: .infinity)
+                
+                VStack(spacing: 8) {
+                    Text("Avg")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    Text("PPP")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    Divider()
+                        .frame(width: 60)
+                    Text(formatPricePerProof(averagePricePerProof))
+                        .font(.title)
+                        .fontWeight(.bold)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.5)
+                }
+                .frame(maxWidth: .infinity)
+            }
+            
+            Divider()
+                .padding(.vertical, 8)
+            
+            Text("Average Price by Type")
+                .font(.headline)
+                .padding(.bottom, 4)
+            
+            VStack(alignment: .leading, spacing: 8) {
+                ForEach(priceByTypeData.prefix(4)) { item in
+                    HStack {
+                        Text(item.type)
+                            .font(.subheadline)
+                        
+                        Spacer()
+                        
+                        Text(formatCurrency(item.averagePrice))
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                    }
+                    .padding(.vertical, 2)
+                }
+            }
+        }
+    }
+    
+    private var averagePrice: Double {
+        let validPrices = whiskeys.map { $0.price }.filter { $0 > 0 }
+        if validPrices.isEmpty { return 0 }
+        return validPrices.reduce(0, +) / Double(validPrices.count)
+    }
+    
+    private var totalValue: Double {
+        return whiskeys.map { $0.price * Double($0.numberOfBottles) }.reduce(0, +)
+    }
+    
+    private var averagePricePerProof: Double {
+        let validWhiskeys = whiskeys.filter { $0.price > 0 && $0.proof > 0 }
+        if validWhiskeys.isEmpty { return 0 }
+        
+        let totalPPP = validWhiskeys.reduce(0.0) { total, whiskey in
+            return total + (whiskey.price / whiskey.proof)
+        }
+        
+        return totalPPP / Double(validWhiskeys.count)
+    }
+    
+    private var priceByTypeData: [TypePriceData] {
+        var typeGroups: [String: [Double]] = [:]
+        
+        for whiskey in whiskeys {
+            if whiskey.price > 0, let type = whiskey.type, !type.isEmpty {
+                if typeGroups[type] == nil {
+                    typeGroups[type] = []
+                }
+                typeGroups[type]?.append(whiskey.price)
+            }
+        }
+        
+        return typeGroups.map { type, prices in
+            let average = prices.reduce(0, +) / Double(prices.count)
+            return TypePriceData(type: type, averagePrice: average, count: prices.count)
+        }.sorted { $0.count > $1.count }
+    }
+    
+    private func formatCurrency(_ value: Double) -> String {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .currency
+        formatter.maximumFractionDigits = 0
+        return formatter.string(from: NSNumber(value: value)) ?? "$0"
+    }
+    
+    private func formatPricePerProof(_ value: Double) -> String {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .currency
+        formatter.maximumFractionDigits = 2
+        return formatter.string(from: NSNumber(value: value)) ?? "$0.00"
+    }
+}
+
+struct TypePriceData: Identifiable {
+    let id = UUID()
+    let type: String
+    let averagePrice: Double
+    let count: Int
+}
+
+// Add this after the CombinedCollectionStats view implementation
+
+// Detail view shown when a statistics section is tapped
+struct StatDetailView: View {
+    @Environment(\.managedObjectContext) private var viewContext
+    @Environment(\.presentationMode) var presentationMode
+    
+    var title: String
+    var whiskeys: [Whiskey]
+    var initialFilter: WhiskeyFilter?
+    
+    @State private var showingFilterSheet = false
+    @State private var currentSort: SortOption = .nameAsc
+    @State private var filterOptions = FilterOptions()
+    
+    @State private var availableTypes: [String] = []
+    
+    // State variables for sliders
+    @State private var priceRange: ClosedRange<Double> = 0...500
+    @State private var proofRange: ClosedRange<Double> = 80...160
+    
+    // Calculate proof range
+    private var lowestProof: Double {
+        whiskeys.min(by: { $0.proof < $1.proof })?.proof ?? 80
+    }
+    
+    private var highestProof: Double {
+        whiskeys.max(by: { $0.proof < $1.proof })?.proof ?? 160
+    }
+    
+    // Initialize filter options with all available types when the view appears
+    private func initializeFilterOptions() {
+        // If filter options are already initialized with types, don't override
+        if filterOptions.selectedTypes.isEmpty {
+            filterOptions.selectedTypes = Set(availableTypes)
+        }
+    }
+    
+    var body: some View {
+        VStack {
+            // Active filter indicator
+            if initialFilter != nil {
+                Text(initialFilter?.displayName ?? "")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+                    .padding(.horizontal)
+                    .padding(.top, 8)
+            }
+            
+            List {
+                Section(header: Text("FILTERED BOTTLES: \(filteredAndSortedWhiskeys.count)")) {
+                    if filteredAndSortedWhiskeys.isEmpty {
+                        Text("No bottles match the current filters")
+                            .foregroundColor(.secondary)
+                            .italic()
+                            .padding(.vertical, 8)
+                    } else {
+                        ForEach(filteredAndSortedWhiskeys, id: \.self) { whiskey in
+                            WhiskeyRowView(whiskey: whiskey)
+                        }
+                    }
+                }
+            }
+        }
+        .navigationTitle(title)
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                HStack(spacing: 16) {
+                    Button {
+                        showingFilterSheet = true
+                    } label: {
+                        Image(systemName: "line.3.horizontal.decrease.circle")
+                    }
+                    
+                    Menu {
+                        ForEach(SortOption.allCases, id: \.self) { option in
+                            Button {
+                                currentSort = option
+                            } label: {
+                                HStack {
+                                    Text(option.rawValue)
+                                    if currentSort == option {
+                                        Image(systemName: "checkmark")
+                                    }
+                                }
+                            }
+                        }
+                    } label: {
+                        Image(systemName: "arrow.up.arrow.down")
+                    }
+                }
+            }
+        }
+        .sheet(isPresented: $showingFilterSheet) {
+            FilterView(
+                filterOptions: $filterOptions,
+                availableTypes: availableTypes,
+                showingWhiskeyCount: filteredAndSortedWhiskeys.count,
+                totalWhiskeyCount: whiskeys.count,
+                lowestProof: lowestProof,
+                highestProof: highestProof
+            )
+        }
+        .onAppear {
+            // Get available whiskey types for filtering
+            availableTypes = Array(Set(whiskeys.compactMap { $0.type })).sorted()
+            
+            // Apply initial filter if provided
+            if let filter = initialFilter {
+                applyInitialFilter(filter)
+            }
+            
+            // Initialize filter options to ensure all types are selected by default
+            initializeFilterOptions()
+        }
+    }
+    
+    // Apply the initial filter from the statistics view
+    private func applyInitialFilter(_ filter: WhiskeyFilter) {
+        switch filter.type {
+        case .type(let type):
+            filterOptions.selectedTypes = [type]
+        case .proof(let min, let max):
+            filterOptions.proofRange = min...max
+            // Update the proof range slider for visual feedback
+            DispatchQueue.main.async {
+                self.proofRange = min...max
+            }
+        case .attribute(let attr, let value):
+            switch attr {
+            case "Bottled in Bond":
+                filterOptions.isBiB = value
+            case "Single Barrel":
+                filterOptions.isSiB = value
+            case "Store Picks", "Store Pick":
+                filterOptions.isStorePick = value
+            default:
+                break
+            }
+        case .price(let min, let max):
+            filterOptions.customPriceRange = min...max
+            // Update the price range slider for visual feedback
+            DispatchQueue.main.async {
+                self.priceRange = min...(max == Double.infinity ? 500 : max)
+            }
+        case .tastedStatus(let isTasted):
+            // For tasted/untasted status, we'll need to filter in the filteredAndSortedWhiskeys computed property
+            // This is handled below
+            break
+        default:
+            break
+        }
+    }
+    
+    // Filtered and sorted whiskeys for display
+    private var filteredAndSortedWhiskeys: [Whiskey] {
+        let filtered = whiskeys.filter { whiskey in
+            // If no types are selected, filter out all whiskeys (instead of showing all)
+            // If types are selected, only show those types
+            let matchesType = !filterOptions.selectedTypes.isEmpty && 
+                (whiskey.type != nil && filterOptions.selectedTypes.contains(whiskey.type!))
+            
+            // Special attribute filtering
+            let matchesBiB: Bool
+            let matchesSiB: Bool
+            let matchesStorePick: Bool
+            let matchesHighProof: Bool
+            let matchesDistillery: Bool
+            
+            if let filter = initialFilter {
+                switch filter.type {
+                case .attribute(let attr, _):
+                    // When filtering by a specific attribute, only show whiskeys with that attribute
+                    switch attr {
+                    case "Bottled in Bond":
+                        matchesBiB = whiskey.isBiB
+                        matchesSiB = true
+                        matchesStorePick = true
+                        matchesHighProof = true
+                        matchesDistillery = true
+                    case "Single Barrel":
+                        matchesBiB = true
+                        matchesSiB = whiskey.isSiB
+                        matchesStorePick = true
+                        matchesHighProof = true
+                        matchesDistillery = true
+                    case "Store Picks", "Store Pick":
+                        matchesBiB = true
+                        matchesSiB = true
+                        matchesStorePick = whiskey.isStorePick
+                        matchesHighProof = true
+                        matchesDistillery = true
+                    case "High Proof":
+                        matchesBiB = true
+                        matchesSiB = true
+                        matchesStorePick = true
+                        matchesHighProof = whiskey.proof > 100
+                        matchesDistillery = true
+                    default:
+                        matchesBiB = true
+                        matchesSiB = true
+                        matchesStorePick = true
+                        matchesHighProof = true
+                        matchesDistillery = true
+                    }
+                case .distillery(let distillery):
+                    // Filter by distillery
+                    matchesBiB = true
+                    matchesSiB = true
+                    matchesStorePick = true
+                    matchesHighProof = true
+                    matchesDistillery = whiskey.distillery == distillery
+                default:
+                    matchesBiB = true
+                    matchesSiB = true
+                    matchesStorePick = true
+                    matchesHighProof = true
+                    matchesDistillery = true
+                }
+            } else {
+                // When not filtering by attributes, use the toggle states
+                matchesBiB = !whiskey.isBiB || filterOptions.isBiB
+                matchesSiB = !whiskey.isSiB || filterOptions.isSiB
+                matchesStorePick = !whiskey.isStorePick || filterOptions.isStorePick
+                matchesHighProof = true
+                matchesDistillery = true
+            }
+            
+            // Price range filtering
+            let priceRange = filterOptions.priceRangeOption.range
+            let matchesPriceRange: Bool
+            
+            if let customRange = filterOptions.customPriceRange {
+                // Use custom range if set
+                matchesPriceRange = whiskey.price >= customRange.lowerBound && 
+                    (customRange.upperBound == Double.infinity || whiskey.price <= customRange.upperBound)
+            } else {
+                // Use predefined range
+                matchesPriceRange = filterOptions.priceRangeOption == .all || 
+                    (whiskey.price >= priceRange.min && (priceRange.max == Double.infinity || whiskey.price <= priceRange.max))
+            }
+            
+            // Proof range filtering
+            let matchesProofRange: Bool
+            if let proofRange = filterOptions.proofRange {
+                matchesProofRange = whiskey.proof >= proofRange.lowerBound && whiskey.proof <= proofRange.upperBound
+            } else {
+                matchesProofRange = true
+            }
+            
+            // Check if we're filtering by tasted status
+            let matchesTastedStatus: Bool
+            if let filter = initialFilter, case let .tastedStatus(isTasted) = filter.type {
+                // Determine if the whiskey has been tasted (has journal entries)
+                let hasTasted = (whiskey.journalEntries?.count ?? 0) > 0
+                matchesTastedStatus = hasTasted == isTasted
+            } else {
+                matchesTastedStatus = true // No tasted status filter
+            }
+            
+            return matchesType && matchesBiB && matchesSiB && matchesStorePick && 
+                   matchesHighProof && matchesDistillery &&
+                   matchesPriceRange && matchesProofRange && matchesTastedStatus
+        }
+        
+        return filtered.sorted { first, second in
+            switch currentSort {
+            case .nameAsc:
+                return (first.name ?? "") < (second.name ?? "")
+            case .nameDesc:
+                return (first.name ?? "") > (second.name ?? "")
+            case .proofHigh:
+                return first.proof > second.proof
+            case .proofLow:
+                return first.proof < second.proof
+            case .priceHigh:
+                return first.price > second.price
+            case .priceLow:
+                return first.price < second.price
+            case .typeAsc:
+                return (first.type ?? "") < (second.type ?? "")
+            case .ageDesc:
+                return (first.age ?? "") > (second.age ?? "")
+            case .ageAsc:
+                return (first.age ?? "") < (second.age ?? "")
+            case .dateAdded:
+                // Fallback to name if dateAdded isn't available
+                return (first.name ?? "") < (second.name ?? "")
+            }
+        }
+    } 
+}

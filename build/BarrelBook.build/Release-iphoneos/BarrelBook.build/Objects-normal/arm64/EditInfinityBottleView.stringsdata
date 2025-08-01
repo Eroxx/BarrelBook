@@ -1,0 +1,96 @@
+{
+  "source": "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/EditInfinityBottleView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Edit Infinity Bottle",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 86
+        }
+      },
+      {
+        "comment": "",
+        "key": "Bottle Information",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 35
+        }
+      },
+      {
+        "comment": "",
+        "key": "Bottle Image",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 45
+        }
+      },
+      {
+        "comment": "",
+        "key": "Notes",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 81
+        }
+      },
+      {
+        "comment": "",
+        "key": "Name",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 36
+        }
+      },
+      {
+        "comment": "",
+        "key": "Type",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 38
+        }
+      },
+      {
+        "comment": "",
+        "key": "Remove Image",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 73
+        }
+      },
+      {
+        "comment": "",
+        "key": "Tap to add a photo",
+        "location": {
+          "startingColumn": 46,
+          "startingLine": 61
+        }
+      },
+      {
+        "comment": "",
+        "key": "Notes",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 82
+        }
+      },
+      {
+        "comment": "",
+        "key": "Cancel",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 90
+        }
+      },
+      {
+        "comment": "",
+        "key": "Save",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 97
+        }
+      }
+    ]
+  },
+  "version": 1
+}

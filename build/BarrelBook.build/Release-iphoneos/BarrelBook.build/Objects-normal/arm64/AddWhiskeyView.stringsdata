@@ -1,0 +1,192 @@
+{
+  "source": "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/AddWhiskeyView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Add Whiskey",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 68
+        }
+      },
+      {
+        "comment": "",
+        "key": "Basic Info",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 26
+        }
+      },
+      {
+        "comment": "",
+        "key": "Inventory Info",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 38
+        }
+      },
+      {
+        "comment": "",
+        "key": "Bottle Notes",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 53
+        }
+      },
+      {
+        "comment": "",
+        "key": "Special Attributes",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 58
+        }
+      },
+      {
+        "comment": "",
+        "key": "Name",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 27
+        }
+      },
+      {
+        "comment": "",
+        "key": "Type",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 28
+        }
+      },
+      {
+        "comment": "",
+        "key": "Distillery",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 29
+        }
+      },
+      {
+        "comment": "",
+        "key": "Age Statement",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 30
+        }
+      },
+      {
+        "comment": "",
+        "key": "Proof",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 31
+        }
+      },
+      {
+        "comment": "",
+        "key": "Finish",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 33
+        }
+      },
+      {
+        "comment": "",
+        "key": "Price",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 34
+        }
+      },
+      {
+        "comment": "",
+        "key": "Dead Bottle?",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 49
+        }
+      },
+      {
+        "comment": "",
+        "key": "Open",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 50
+        }
+      },
+      {
+        "comment": "",
+        "key": "Number of Bottles:",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 40
+        }
+      },
+      {
+        "comment": "",
+        "key": "1",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 43
+        }
+      },
+      {
+        "comment": "",
+        "key": "Notes about this bottle",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 54
+        }
+      },
+      {
+        "comment": "",
+        "key": "Bottled in Bond",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 59
+        }
+      },
+      {
+        "comment": "",
+        "key": "Single Barrel",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 60
+        }
+      },
+      {
+        "comment": "",
+        "key": "Store Pick",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 61
+        }
+      },
+      {
+        "comment": "",
+        "key": "Store Name",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 64
+        }
+      },
+      {
+        "comment": "",
+        "key": "Cancel",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 71
+        }
+      },
+      {
+        "comment": "",
+        "key": "Save",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 77
+        }
+      }
+    ]
+  },
+  "version": 1
+}

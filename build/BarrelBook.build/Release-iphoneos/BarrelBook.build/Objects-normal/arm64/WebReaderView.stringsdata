@@ -1,0 +1,144 @@
+{
+  "source": "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/WebContent/WebReaderView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Please wait while we extract the review from the webpage",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 33
+        }
+      },
+      {
+        "comment": "",
+        "key": "Extracting review content...",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 32
+        }
+      },
+      {
+        "comment": "",
+        "key": "Could not automatically extract the review",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 47
+        }
+      },
+      {
+        "comment": "",
+        "key": "This website may be using a complex layout or have other content that makes automatic extraction difficult.",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 50
+        }
+      },
+      {
+        "comment": "",
+        "key": "Try Extraction Again",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 64
+        }
+      },
+      {
+        "comment": "",
+        "key": "View in Embedded Browser",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 78
+        }
+      },
+      {
+        "comment": "",
+        "key": "Save Link Only",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 95
+        }
+      },
+      {
+        "comment": "",
+        "key": "Save Link to Review",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 110
+        }
+      },
+      {
+        "comment": "",
+        "key": "The following information will be saved:",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 119
+        }
+      },
+      {
+        "comment": "",
+        "key": "Note: This will save a link to the review rather than the full content.",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 130
+        }
+      },
+      {
+        "comment": "",
+        "key": "Save Link to Review",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 135
+        }
+      },
+      {
+        "comment": "",
+        "key": "Source:",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 124
+        }
+      },
+      {
+        "comment": "",
+        "key": "Review Extracted",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 151
+        }
+      },
+      {
+        "comment": "",
+        "key": "Source:",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 162
+        }
+      },
+      {
+        "comment": "",
+        "key": "Save Review",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 177
+        }
+      },
+      {
+        "comment": "",
+        "key": "Cancel",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 219
+        }
+      },
+      {
+        "comment": "",
+        "key": "Done",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 242
+        }
+      }
+    ]
+  },
+  "version": 1
+}

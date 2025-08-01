@@ -1,0 +1,216 @@
+{
+  "source": "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/EditWishlistItemView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Edit Wishlist Item",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 119
+        }
+      },
+      {
+        "comment": "",
+        "key": "Basic Info",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 46
+        }
+      },
+      {
+        "comment": "",
+        "key": "Bottle Notes",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 58
+        }
+      },
+      {
+        "comment": "",
+        "key": "Wishlist Details",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 63
+        }
+      },
+      {
+        "comment": "",
+        "key": "Special Attributes",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 93
+        }
+      },
+      {
+        "comment": "",
+        "key": "Name",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 47
+        }
+      },
+      {
+        "comment": "",
+        "key": "Type",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 48
+        }
+      },
+      {
+        "comment": "",
+        "key": "Distillery",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 49
+        }
+      },
+      {
+        "comment": "",
+        "key": "Age Statement",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 50
+        }
+      },
+      {
+        "comment": "",
+        "key": "Proof",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 51
+        }
+      },
+      {
+        "comment": "",
+        "key": "Finish",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 53
+        }
+      },
+      {
+        "comment": "",
+        "key": "Target Price",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 54
+        }
+      },
+      {
+        "comment": "",
+        "key": "Notes about this bottle",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 59
+        }
+      },
+      {
+        "comment": "",
+        "key": "Where to Find",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 82
+        }
+      },
+      {
+        "comment": "",
+        "key": "Priority:",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 65
+        }
+      },
+      {
+        "comment": "",
+        "key": "Priority",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 67
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld",
+        "location": {
+          "startingColumn": 42,
+          "startingLine": 74
+        }
+      },
+      {
+        "comment": "",
+        "key": "Notes",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 85
+        }
+      },
+      {
+        "comment": "",
+        "key": "Bottled in Bond",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 94
+        }
+      },
+      {
+        "comment": "",
+        "key": "Single Barrel",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 95
+        }
+      },
+      {
+        "comment": "",
+        "key": "Store Pick",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 96
+        }
+      },
+      {
+        "comment": "",
+        "key": "Store Name",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 99
+        }
+      },
+      {
+        "comment": "",
+        "key": "Add to Collection",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 110
+        }
+      },
+      {
+        "comment": "",
+        "key": "Cancel",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 122
+        }
+      },
+      {
+        "comment": "",
+        "key": "Save",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 128
+        }
+      },
+      {
+        "comment": "",
+        "key": "Preview unavailable",
+        "location": {
+          "startingColumn": 14,
+          "startingLine": 190
+        }
+      }
+    ]
+  },
+  "version": 1
+}

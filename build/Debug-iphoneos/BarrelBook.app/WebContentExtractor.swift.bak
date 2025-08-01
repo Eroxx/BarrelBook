@@ -1,0 +1,353 @@
+import Foundation
+import WebKit
+import Combine
+
+class WebContentExtractor {
+    static let shared = WebContentExtractor()
+    
+    // Store the website's document title
+    private var extractedTitle: String?
+    
+    // Extract content from a webpage using JavaScript
+    func extractContent(from webView: WKWebView) -> Future<ExtractedContent, Error> {
+        return Future { promise in
+            // First get the title of the page
+            webView.evaluateJavaScript("document.title") { (result, error) in
+                if let error = error {
+                    promise(.failure(error))
+                    return
+                }
+                
+                if let title = result as? String {
+                    self.extractedTitle = title
+                }
+                
+                // Now run the extracting script
+                let extractScript = self.getExtractionScript()
+                webView.evaluateJavaScript(extractScript) { (result, error) in
+                    if let error = error {
+                        promise(.failure(error))
+                        return
+                    }
+                    
+                    guard let htmlContent = result as? String else {
+                        promise(.failure(ExtractionError.invalidContent))
+                        return
+                    }
+                    
+                    // Convert HTML to Markdown
+                    let markdown = self.convertToMarkdown(html: htmlContent)
+                    
+                    // Get domain name
+                    var domain = ""
+                    if let url = webView.url?.host {
+                        domain = url.hasPrefix("www.") ? String(url.dropFirst(4)) : url
+                    }
+                    
+                    // Create the final extracted content
+                    let content = ExtractedContent(
+                        title: self.extractedTitle ?? "Web Content",
+                        content: markdown,
+                        sourceURL: webView.url?.absoluteString ?? "",
+                        sourceName: domain
+                    )
+                    
+                    promise(.success(content))
+                }
+            }
+        }
+    }
+    
+    // Convert HTML content to Markdown format
+    private func convertToMarkdown(html: String) -> String {
+        // Clean up the HTML first
+        var cleanHTML = html
+            .replacingOccurrences(of: "<div[^>]*>", with: "", options: .regularExpression)
+            .replacingOccurrences(of: "</div>", with: "\n")
+            .replacingOccurrences(of: "<br[^>]*>", with: "\n")
+            .replacingOccurrences(of: "<span[^>]*>", with: "", options: .regularExpression)
+            .replacingOccurrences(of: "</span>", with: "")
+        
+        // Basic HTML to Markdown conversion
+        var markdown = cleanHTML
+        
+        // Replace headings
+        for i in 1...6 {
+            let regex = try! NSRegularExpression(pattern: "<h\(i)[^>]*>(.*?)</h\(i)>", options: .dotMatchesLineSeparators)
+            let range = NSRange(location: 0, length: markdown.utf16.count)
+            var headingPrefix = ""
+            for _ in 1...i {
+                headingPrefix += "#"
+            }
+            markdown = regex.stringByReplacingMatches(in: markdown, options: [], range: range, withTemplate: "\n\(headingPrefix) $1\n\n")
+        }
+        
+        // Replace paragraphs
+        let pRegex = try! NSRegularExpression(pattern: "<p[^>]*>(.*?)</p>", options: .dotMatchesLineSeparators)
+        markdown = pRegex.stringByReplacingMatches(in: markdown, options: [], range: NSRange(location: 0, length: markdown.utf16.count), withTemplate: "\n$1\n\n")
+        
+        // Replace links
+        let linkRegex = try! NSRegularExpression(pattern: "<a\\s+[^>]*href=[\"|'](.*?)[\"|'][^>]*>(.*?)</a>", options: .dotMatchesLineSeparators)
+        markdown = linkRegex.stringByReplacingMatches(in: markdown, options: [], range: NSRange(location: 0, length: markdown.utf16.count), withTemplate: "[$2]($1)")
+        
+        // Replace images
+        let imgRegex = try! NSRegularExpression(pattern: "<img\\s+[^>]*src=[\"|'](.*?)[\"|'][^>]*>", options: .dotMatchesLineSeparators)
+        markdown = imgRegex.stringByReplacingMatches(in: markdown, options: [], range: NSRange(location: 0, length: markdown.utf16.count), withTemplate: "\n![Image]($1)\n")
+        
+        // Replace strong/bold
+        let boldRegex = try! NSRegularExpression(pattern: "<(b|strong)[^>]*>(.*?)</\\1>", options: .dotMatchesLineSeparators)
+        markdown = boldRegex.stringByReplacingMatches(in: markdown, options: [], range: NSRange(location: 0, length: markdown.utf16.count), withTemplate: "**$2**")
+        
+        // Replace emphasis/italic
+        let italicRegex = try! NSRegularExpression(pattern: "<(i|em)[^>]*>(.*?)</\\1>", options: .dotMatchesLineSeparators)
+        markdown = italicRegex.stringByReplacingMatches(in: markdown, options: [], range: NSRange(location: 0, length: markdown.utf16.count), withTemplate: "*$2*")
+        
+        // Replace unordered lists
+        let ulRegex = try! NSRegularExpression(pattern: "<ul[^>]*>(.*?)</ul>", options: .dotMatchesLineSeparators)
+        let processedUl = ulRegex.matches(in: markdown, options: [], range: NSRange(location: 0, length: markdown.utf16.count))
+        
+        for match in processedUl.reversed() {
+            if let range = Range(match.range, in: markdown) {
+                let ulContent = markdown[range]
+                let liRegex = try! NSRegularExpression(pattern: "<li[^>]*>(.*?)</li>", options: .dotMatchesLineSeparators)
+                let processedLi = liRegex.stringByReplacingMatches(
+                    in: String(ulContent),
+                    options: [],
+                    range: NSRange(location: 0, length: ulContent.utf16.count),
+                    withTemplate: "- $1\n"
+                )
+                markdown = markdown.replacingCharacters(in: range, with: "\n\n\(processedLi)\n\n")
+            }
+        }
+        
+        // Replace ordered lists
+        let olRegex = try! NSRegularExpression(pattern: "<ol[^>]*>(.*?)</ol>", options: .dotMatchesLineSeparators)
+        let processedOl = olRegex.matches(in: markdown, options: [], range: NSRange(location: 0, length: markdown.utf16.count))
+        
+        for match in processedOl.reversed() {
+            if let range = Range(match.range, in: markdown) {
+                let olContent = markdown[range]
+                let liRegex = try! NSRegularExpression(pattern: "<li[^>]*>(.*?)</li>", options: .dotMatchesLineSeparators)
+                let liMatches = liRegex.matches(in: String(olContent), options: [], range: NSRange(location: 0, length: olContent.utf16.count))
+                
+                var processedItems = ""
+                for (index, liMatch) in liMatches.enumerated() {
+                    if let liRange = Range(liMatch.range(at: 1), in: olContent) {
+                        let item = olContent[liRange]
+                        processedItems += "\(index + 1). \(item)\n"
+                    }
+                }
+                markdown = markdown.replacingCharacters(in: range, with: "\n\n\(processedItems)\n\n")
+            }
+        }
+        
+        // Replace individual list items that weren't caught
+        let liRegex = try! NSRegularExpression(pattern: "<li[^>]*>(.*?)</li>", options: .dotMatchesLineSeparators)
+        markdown = liRegex.stringByReplacingMatches(in: markdown, options: [], range: NSRange(location: 0, length: markdown.utf16.count), withTemplate: "- $1\n")
+        
+        // Replace blockquotes
+        let blockquoteRegex = try! NSRegularExpression(pattern: "<blockquote[^>]*>(.*?)</blockquote>", options: .dotMatchesLineSeparators)
+        let blockquoteMatches = blockquoteRegex.matches(in: markdown, options: [], range: NSRange(location: 0, length: markdown.utf16.count))
+        
+        for match in blockquoteMatches.reversed() {
+            if let range = Range(match.range, in: markdown),
+               let contentRange = Range(match.range(at: 1), in: markdown) {
+                let content = markdown[contentRange]
+                let lines = content.components(separatedBy: .newlines)
+                let quotedLines = lines.map { "> \($0)" }.joined(separator: "\n")
+                markdown = markdown.replacingCharacters(in: range, with: "\n\n\(quotedLines)\n\n")
+            }
+        }
+        
+        // Remove all remaining HTML tags
+        let tagRegex = try! NSRegularExpression(pattern: "<[^>]+>", options: [])
+        markdown = tagRegex.stringByReplacingMatches(in: markdown, options: [], range: NSRange(location: 0, length: markdown.utf16.count), withTemplate: "")
+        
+        // Fix common entity references
+        markdown = markdown
+            .replacingOccurrences(of: "&nbsp;", with: " ")
+            .replacingOccurrences(of: "&amp;", with: "&")
+            .replacingOccurrences(of: "&lt;", with: "<")
+            .replacingOccurrences(of: "&gt;", with: ">")
+            .replacingOccurrences(of: "&quot;", with: "\"")
+            .replacingOccurrences(of: "&apos;", with: "'")
+            .replacingOccurrences(of: "&ndash;", with: "–")
+            .replacingOccurrences(of: "&mdash;", with: "—")
+            .replacingOccurrences(of: "&deg;", with: "°")
+            .replacingOccurrences(of: "&reg;", with: "®")
+            .replacingOccurrences(of: "&copy;", with: "©")
+            .replacingOccurrences(of: "&trade;", with: "™")
+            .replacingOccurrences(of: "&#8211;", with: "–")
+            .replacingOccurrences(of: "&#8212;", with: "—")
+            .replacingOccurrences(of: "&#8216;", with: "'")
+            .replacingOccurrences(of: "&#8217;", with: "'")
+            .replacingOccurrences(of: "&#8220;", with: """)
+            .replacingOccurrences(of: "&#8221;", with: """)
+        
+        // Clean up excess whitespace
+        markdown = markdown
+            .replacingOccurrences(of: "\n{3,}", with: "\n\n", options: .regularExpression)
+            .replacingOccurrences(of: "  +", with: " ", options: .regularExpression)
+        
+        return markdown.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+    
+    // JavaScript to extract main content from a webpage
+    private func getExtractionScript() -> String {
+        return """
+(function() {
+    // Function to determine if an element is likely to be main content
+    function isContentElement(element) {
+        // Skip certain elements that are likely not main content
+        var tagName = element.tagName.toLowerCase();
+        if (['script', 'style', 'noscript', 'iframe', 'svg', 'form', 'footer', 'nav', 'header'].includes(tagName)) {
+            return false;
+        }
+        
+        // Check if it has certain classes/IDs indicating it's not content
+        var classId = (element.className + ' ' + element.id).toLowerCase();
+        var nonContentTerms = ['navigation', 'menu', 'sidebar', 'comment', 'footer', 'header', 'ad-', 'banner', 'cookie', 'popup', 'modal'];
+        for (var i = 0; i < nonContentTerms.length; i++) {
+            if (classId.includes(nonContentTerms[i])) {
+                return false;
+            }
+        }
+        
+        return true;
+    }
+    
+    // Function to find the main content element
+    function findMainContentElement() {
+        // Check for common content containers
+        var contentSelectors = [
+            'article',
+            'main',
+            '.post-content',
+            '.article-content',
+            '.entry-content',
+            '.post-body',
+            '.review-content',
+            '#content',
+            '.content',
+            '.post',
+            'div[itemprop="reviewBody"]',
+            'div[itemprop="articleBody"]'
+        ];
+        
+        for (var i = 0; i < contentSelectors.length; i++) {
+            var elements = document.querySelectorAll(contentSelectors[i]);
+            for (var j = 0; j < elements.length; j++) {
+                if (isContentElement(elements[j]) && elements[j].textContent.trim().length > 200) {
+                    return elements[j];
+                }
+            }
+        }
+        
+        // If no obvious container, look for the element with the most paragraphs
+        var paragraphs = document.querySelectorAll('p');
+        if (paragraphs.length > 0) {
+            // Group paragraphs by their common parent
+            var parentMap = {};
+            for (var i = 0; i < paragraphs.length; i++) {
+                var parent = paragraphs[i].parentNode;
+                if (isContentElement(parent)) {
+                    if (!parentMap[parent]) {
+                        parentMap[parent] = { element: parent, paragraphs: 0, textLength: 0 };
+                    }
+                    parentMap[parent].paragraphs += 1;
+                    parentMap[parent].textLength += paragraphs[i].textContent.trim().length;
+                }
+            }
+            
+            // Find the parent with the most text content
+            var bestParent = null;
+            var maxScore = 0;
+            for (var parent in parentMap) {
+                // Calculate a score based on paragraph count and text length
+                var score = parentMap[parent].paragraphs * 50 + parentMap[parent].textLength;
+                if (score > maxScore) {
+                    maxScore = score;
+                    bestParent = parentMap[parent].element;
+                }
+            }
+            
+            if (bestParent) {
+                return bestParent;
+            }
+        }
+        
+        // Fallback: look for any div with substantial text
+        var divs = document.querySelectorAll('div');
+        var bestDiv = null;
+        var maxLength = 500;  // Minimum threshold
+        
+        for (var i = 0; i < divs.length; i++) {
+            var div = divs[i];
+            if (isContentElement(div)) {
+                var text = div.textContent.trim();
+                var textLength = text.length;
+                // Only consider divs with substantial text
+                if (textLength > maxLength && div.querySelectorAll('p, h1, h2, h3').length > 2) {
+                    maxLength = textLength;
+                    bestDiv = div;
+                }
+            }
+        }
+        
+        if (bestDiv) {
+            return bestDiv;
+        }
+        
+        // Fallback to body
+        return document.body;
+    }
+    
+    var mainContent = findMainContentElement();
+    
+    // Clean up the content before returning
+    function cleanupContent(element) {
+        // Create a clone to work with
+        var clone = element.cloneNode(true);
+        
+        // Remove unwanted elements
+        var unwantedSelectors = [
+            'script', 'style', 'noscript', 
+            '.comments', '.comment-section', 
+            '.advertisement', '.ad', 
+            '.social-share', '.share-buttons',
+            'aside', '.sidebar', 'footer', 'header', 'nav',
+            '.related-posts', '.recommended', 
+            'form', '.subscription', '.newsletter'
+        ];
+        
+        unwantedSelectors.forEach(function(selector) {
+            var elements = clone.querySelectorAll(selector);
+            for (var i = 0; i < elements.length; i++) {
+                if (elements[i].parentNode) {
+                    elements[i].parentNode.removeChild(elements[i]);
+                }
+            }
+        });
+        
+        return clone.innerHTML;
+    }
+    
+    return cleanupContent(mainContent);
+})();
+"""
+    }
+}
+
+// Model for extracted content
+struct ExtractedContent {
+    let title: String
+    let content: String
+    let sourceURL: String
+    let sourceName: String
+}
+
+// Custom errors
+enum ExtractionError: Error {
+    case invalidContent
+    case extractionFailed
+} 

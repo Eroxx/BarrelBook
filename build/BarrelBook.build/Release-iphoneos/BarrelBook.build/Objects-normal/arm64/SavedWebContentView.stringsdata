@@ -1,0 +1,144 @@
+{
+  "source": "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/WebContent/SavedWebContentView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Saved Reviews",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 74
+        }
+      },
+      {
+        "comment": "",
+        "key": "No saved reviews yet",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 29
+        }
+      },
+      {
+        "comment": "",
+        "key": "Saved on %@",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 49
+        }
+      },
+      {
+        "comment": "",
+        "key": "Delete",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 60
+        }
+      },
+      {
+        "comment": "",
+        "key": "Edit",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 67
+        }
+      },
+      {
+        "comment": "",
+        "key": "Edit Review",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 144
+        }
+      },
+      {
+        "comment": "",
+        "key": "Review Details",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 118
+        }
+      },
+      {
+        "comment": "",
+        "key": "Content",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 139
+        }
+      },
+      {
+        "comment": "",
+        "key": "Title",
+        "location": {
+          "startingColumn": 27,
+          "startingLine": 119
+        }
+      },
+      {
+        "comment": "",
+        "key": "Source",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 123
+        }
+      },
+      {
+        "comment": "",
+        "key": "Saved on",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 132
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 134
+        }
+      },
+      {
+        "comment": "",
+        "key": "Cancel",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 148
+        }
+      },
+      {
+        "comment": "",
+        "key": "Save",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 154
+        }
+      },
+      {
+        "comment": "",
+        "key": "Review",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 231
+        }
+      },
+      {
+        "comment": "",
+        "key": "Saved on %@",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 207
+        }
+      },
+      {
+        "comment": "",
+        "key": "Source: %@",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 216
+        }
+      }
+    ]
+  },
+  "version": 1
+}

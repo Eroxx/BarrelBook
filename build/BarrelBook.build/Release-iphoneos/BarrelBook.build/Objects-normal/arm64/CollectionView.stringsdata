@@ -1,0 +1,352 @@
+{
+  "source": "/Users/ericlinder/Library/CloudStorage/Dropbox/Downloads from Chrome/BarrelBook/BarrelBook/Views/CollectionView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Search whiskeys (try: sib, bib, sp)",
+        "location": {
+          "startingColumn": 80,
+          "startingLine": 408
+        }
+      },
+      {
+        "comment": "",
+        "key": "Search infinity bottles",
+        "location": {
+          "startingColumn": 120,
+          "startingLine": 408
+        }
+      },
+      {
+        "comment": "",
+        "key": "Collection",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 438
+        }
+      },
+      {
+        "comment": "",
+        "key": "Delete All Whiskeys",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 524
+        }
+      },
+      {
+        "comment": "",
+        "key": "View Mode",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 337
+        }
+      },
+      {
+        "comment": "",
+        "key": "Whiskeys",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 338
+        }
+      },
+      {
+        "comment": "",
+        "key": "Infinity Bottles",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 339
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld bottles",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 352
+        }
+      },
+      {
+        "comment": "",
+        "key": "•",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 354
+        }
+      },
+      {
+        "comment": "",
+        "key": "Collection",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 442
+        }
+      },
+      {
+        "comment": "",
+        "key": "Delete All Whiskeys",
+        "location": {
+          "startingColumn": 43,
+          "startingLine": 489
+        }
+      },
+      {
+        "comment": "",
+        "key": "Delete All",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 525
+        }
+      },
+      {
+        "comment": "",
+        "key": "Cancel",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 528
+        }
+      },
+      {
+        "comment": "",
+        "key": "Are you sure you want to delete all whiskeys? This action cannot be undone.",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 530
+        }
+      },
+      {
+        "comment": "",
+        "key": "No Infinity Bottles",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 764
+        }
+      },
+      {
+        "comment": "",
+        "key": "Tap the + button to create your first infinity bottle",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 767
+        }
+      },
+      {
+        "comment": "",
+        "key": "Filter",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 1194
+        }
+      },
+      {
+        "comment": "",
+        "key": "FILTER CONTROLS",
+        "location": {
+          "startingColumn": 25,
+          "startingLine": 863
+        }
+      },
+      {
+        "comment": "",
+        "key": "Type",
+        "location": {
+          "startingColumn": 25,
+          "startingLine": 988
+        }
+      },
+      {
+        "comment": "",
+        "key": "Proof Range",
+        "location": {
+          "startingColumn": 25,
+          "startingLine": 1006
+        }
+      },
+      {
+        "comment": "",
+        "key": "Price Range",
+        "location": {
+          "startingColumn": 25,
+          "startingLine": 1048
+        }
+      },
+      {
+        "comment": "",
+        "key": "Reset All Filters",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 901
+        }
+      },
+      {
+        "comment": "",
+        "key": "Show All",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 939
+        }
+      },
+      {
+        "comment": "",
+        "key": "Hide Special Designations",
+        "location": {
+          "startingColumn": 38,
+          "startingLine": 973
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld°",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 1008
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld whiskeys",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 1011
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld°",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 1017
+        }
+      },
+      {
+        "comment": "",
+        "key": "$%lld",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 1050
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld whiskeys",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 1053
+        }
+      },
+      {
+        "comment": "",
+        "key": "$500+",
+        "location": {
+          "startingColumn": 61,
+          "startingLine": 1059
+        }
+      },
+      {
+        "comment": "",
+        "key": "$%lld",
+        "location": {
+          "startingColumn": 71,
+          "startingLine": 1059
+        }
+      },
+      {
+        "comment": "",
+        "key": "Special Designations",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 1112
+        }
+      },
+      {
+        "comment": "",
+        "key": "Tap to cycle between: All (show everything) → Yes (only show bottles with this attribute) → No (only show bottles without this attribute)",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 1113
+        }
+      },
+      {
+        "comment": "",
+        "key": "Showing %lld of %lld whiskeys",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 1186
+        }
+      },
+      {
+        "comment": "",
+        "key": "Reset",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 1198
+        }
+      },
+      {
+        "comment": "",
+        "key": "Done",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 1237
+        }
+      },
+      {
+        "comment": "",
+        "key": "Search: %@",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 1609
+        }
+      },
+      {
+        "comment": "",
+        "key": "Search collection...",
+        "location": {
+          "startingColumn": 27,
+          "startingLine": 1546
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld results",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 1566
+        }
+      },
+      {
+        "comment": "",
+        "key": "•",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 1571
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld bottles",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 1575
+        }
+      },
+      {
+        "comment": "",
+        "key": "•",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 1579
+        }
+      },
+      {
+        "comment": "",
+        "key": "No results found",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 1595
+        }
+      }
+    ]
+  },
+  "version": 1
+}
