@@ -24,4 +24,4 @@ BarrelBook is designed for personal whiskey collection management. Users are res
 ## 8. Limitation of Liability
 The app is provided "as is" without warranties. We are not responsible for any data loss or damages arising from use of the app.
 
-Last updated: [Current Date]
+Last updated: [08/04/2025]
