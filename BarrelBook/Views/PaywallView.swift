@@ -14,25 +14,17 @@ struct PaywallView: View {
     var body: some View {
         NavigationView {
             ScrollView {
-                VStack(spacing: 24) {
-                    // Header
+                VStack(spacing: 28) {
                     headerSection
-                    
-                    // Features
                     featuresSection
-                    
-                    // Subscription offer
                     subscriptionSection
-                    
-                    // Purchase buttons
                     purchaseSection
-                    
-                    // Legal text
                     legalSection
                 }
-                .padding()
+                .padding(.horizontal, 20)
+                .padding(.vertical, 24)
             }
-            .navigationTitle("BarrelBook Subscription")
+            .navigationTitle("Premium")
             .navigationBarTitleDisplayMode(.large)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
@@ -73,146 +65,143 @@ struct PaywallView: View {
     }
     
     private var headerSection: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: 20) {
             Image(systemName: "crown.fill")
-                .font(.system(size: 64))
-                .foregroundColor(.yellow)
+                .font(.system(size: 56))
+                .foregroundStyle(
+                    LinearGradient(
+                        colors: [Color.yellow, Color.orange.opacity(0.9)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+                .shadow(color: .orange.opacity(0.3), radius: 8, x: 0, y: 4)
             
-            Text("Unlock Your Complete")
-                .font(.title)
-                .fontWeight(.bold)
-                .multilineTextAlignment(.center)
+            VStack(spacing: 8) {
+                Text("Unlock Your Complete")
+                    .font(.title2)
+                    .fontWeight(.semibold)
+                    .foregroundColor(.primary)
+                
+                Text("Whiskey Experience")
+                    .font(.title)
+                    .fontWeight(.bold)
+                    .foregroundColor(ColorManager.primaryBrandColor)
+            }
+            .multilineTextAlignment(.center)
             
-            Text("Whiskey Collection Experience")
-                .font(.title)
-                .fontWeight(.bold)
-                .foregroundColor(ColorManager.primaryBrandColor)
-                .multilineTextAlignment(.center)
-            
-            Text("Start your 7-day free trial today")
-                .font(.title3)
+            Text("One-time purchase · \(subscriptionManager.currentSubscription?.priceFormatted ?? "$7.99") · Unlock forever")
+                .font(.subheadline)
                 .foregroundColor(.secondary)
-                .multilineTextAlignment(.center)
         }
+        .padding(.vertical, 8)
     }
     
     private var featuresSection: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text("Premium Features")
-                .font(.title2)
-                .fontWeight(.bold)
+        VStack(alignment: .leading, spacing: 20) {
+            Text("Everything you need to track and enjoy your collection")
+                .font(.subheadline)
+                .foregroundColor(.secondary)
+                .frame(maxWidth: .infinity, alignment: .center)
             
-            FeatureRow(
-                icon: "square.grid.2x2.fill",
-                title: "Unlimited Collection",
-                description: "Add unlimited whiskeys to your collection"
-            )
-            
-            FeatureRow(
-                icon: "book.fill",
-                title: "Unlimited Tastings",
-                description: "Record unlimited tasting notes and journal entries"
-            )
-            
-            FeatureRow(
-                icon: "heart.fill",
-                title: "Unlimited Wishlist",
-                description: "Save unlimited whiskeys to your wishlist"
-            )
-            
-            FeatureRow(
-                icon: "chart.bar.fill",
-                title: "Advanced Analytics",
-                description: "Access detailed statistics and insights"
-            )
-            
-            FeatureRow(
-                icon: "square.and.arrow.up.fill",
-                title: "Export & Backup",
-                description: "Export your collection data and create backups"
-            )
+            VStack(spacing: 0) {
+                FeatureRow(
+                    icon: "square.grid.2x2.fill",
+                    title: "Unlimited Collection",
+                    description: "Add as many bottles as you own"
+                )
+                .padding(.vertical, 6)
+                
+                Divider()
+                    .padding(.leading, 44)
+                
+                FeatureRow(
+                    icon: "book.fill",
+                    title: "Unlimited Tastings",
+                    description: "Journal every pour with notes and ratings"
+                )
+                .padding(.vertical, 6)
+                
+                Divider()
+                    .padding(.leading, 44)
+                
+                FeatureRow(
+                    icon: "heart.fill",
+                    title: "Unlimited Wishlist",
+                    description: "Build and manage your dream list"
+                )
+                .padding(.vertical, 6)
+                
+                Divider()
+                    .padding(.leading, 44)
+                
+                FeatureRow(
+                    icon: "chart.bar.fill",
+                    title: "Advanced Analytics",
+                    description: "Proof, price, and composition insights"
+                )
+                .padding(.vertical, 6)
+                
+                Divider()
+                    .padding(.leading, 44)
+                
+                FeatureRow(
+                    icon: "square.and.arrow.up.fill",
+                    title: "Export & Backup",
+                    description: "Full collection export, CSV import, and backup"
+                )
+                .padding(.vertical, 6)
+            }
+            .padding(20)
+            .background(Color(.secondarySystemBackground))
+            .cornerRadius(16)
         }
-        .padding()
-        .background(Color(.systemGray6))
-        .cornerRadius(12)
     }
     
     private var subscriptionSection: some View {
-        VStack(spacing: 12) {
-            Text("Annual Subscription")
-                .font(.title2)
-                .fontWeight(.bold)
-            
+        VStack(spacing: 8) {
             if let product = subscriptionManager.currentSubscription {
-                VStack(spacing: 8) {
-                    Text(product.priceFormatted)
-                        .font(.system(size: 48, weight: .bold, design: .rounded))
-                        .foregroundColor(ColorManager.primaryBrandColor)
-                    
-                    Text("per year")
-                        .font(.title2)
-                        .fontWeight(.semibold)
-                        .foregroundColor(.primary)
-                }
-            } else if case .failed(_) = subscriptionManager.purchaseState {
-                VStack(spacing: 8) {
-                    Text("$7.99")
-                        .font(.system(size: 48, weight: .bold, design: .rounded))
-                        .foregroundColor(ColorManager.primaryBrandColor)
-                    
-                    Text("per year")
-                        .font(.title2)
-                        .fontWeight(.semibold)
-                        .foregroundColor(.primary)
-                }
+                Text(product.priceFormatted)
+                    .font(.system(size: 44, weight: .bold, design: .rounded))
+                    .foregroundColor(ColorManager.primaryBrandColor)
             } else {
-                // Show fallback pricing immediately in development mode, or while loading
-                VStack(spacing: 8) {
-                    Text("$7.99")
-                        .font(.system(size: 48, weight: .bold, design: .rounded))
-                        .foregroundColor(ColorManager.primaryBrandColor)
-                    
-                    Text("per year")
-                        .font(.title2)
-                        .fontWeight(.semibold)
-                        .foregroundColor(.primary)
-                }
+                Text("$7.99")
+                    .font(.system(size: 44, weight: .bold, design: .rounded))
+                    .foregroundColor(ColorManager.primaryBrandColor)
             }
+            Text("one-time · unlock forever")
+                .font(.subheadline)
+                .foregroundColor(.secondary)
         }
-        .padding()
-        .background(
-            RoundedRectangle(cornerRadius: 12)
-                .stroke(ColorManager.primaryBrandColor, lineWidth: 2)
-        )
+        .padding(.vertical, 4)
     }
     
     private var purchaseSection: some View {
-        VStack(spacing: 12) {
-            // Start Trial Button
+        VStack(spacing: 16) {
             Button(action: startTrial) {
-                HStack {
+                HStack(spacing: 8) {
                     if subscriptionManager.purchaseState == .purchasing {
                         ProgressView()
-                            .scaleEffect(0.8)
-                            .foregroundColor(.white)
+                            .scaleEffect(0.9)
+                            .tint(.white)
                     }
-                    
-                    Text(subscriptionManager.isInDevelopmentMode ? "Start 7-Day Free Trial (Demo)" : "Start 7-Day Free Trial")
+                    Text(subscriptionManager.purchaseState == .purchasing ? "Purchasing…" : "Unlock for \(subscriptionManager.currentSubscription?.priceFormatted ?? "$7.99")")
                         .font(.headline)
-                        .fontWeight(.bold)
+                        .fontWeight(.semibold)
                 }
                 .frame(maxWidth: .infinity)
-                .padding()
+                .padding(.vertical, 16)
                 .background(ColorManager.primaryBrandColor)
                 .foregroundColor(.white)
-                .cornerRadius(12)
+                .cornerRadius(14)
             }
             .disabled(subscriptionManager.purchaseState == .purchasing)
+            .buttonStyle(.plain)
             
-            // Restore Purchases Button
             Button(action: restorePurchases) {
                 Text("Restore Purchases")
                     .font(.subheadline)
+                    .fontWeight(.medium)
                     .foregroundColor(ColorManager.primaryBrandColor)
             }
             .disabled(subscriptionManager.purchaseState == .purchasing)
@@ -220,69 +209,44 @@ struct PaywallView: View {
     }
     
     private var legalSection: some View {
-        VStack(spacing: 8) {
-            Text("• Free trial for 7 days, then \(subscriptionManager.currentSubscription?.priceFormatted ?? "$7.99") per year")
-                .font(.caption)
+        VStack(spacing: 16) {
+            Text("Payment is charged once to your Apple ID. No subscription — you own premium forever. Restore on a new device via Restore Purchases.")
+                .font(.caption2)
                 .foregroundColor(.secondary)
                 .multilineTextAlignment(.center)
             
-            Text("• Payment will be charged to your Apple ID account at confirmation of purchase")
-                .font(.caption)
-                .foregroundColor(.secondary)
-                .multilineTextAlignment(.center)
-            
-            Text("• Subscription automatically renews unless cancelled at least 24 hours before the end of the current period")
-                .font(.caption)
-                .foregroundColor(.secondary)
-                .multilineTextAlignment(.center)
-            
-            Text("• You can cancel anytime in your Apple ID settings")
-                .font(.caption)
-                .foregroundColor(.secondary)
-                .multilineTextAlignment(.center)
-            
-            HStack(spacing: 20) {
-                Button("Terms of Service") {
-                    showingTerms = true
-                }
-                .font(.caption)
-                .foregroundColor(.blue)
-                
-                Button("Privacy Policy") {
-                    showingPrivacy = true
-                }
-                .font(.caption)
-                .foregroundColor(.blue)
+            HStack(spacing: 24) {
+                Button("Terms of Service") { showingTerms = true }
+                    .font(.caption2)
+                    .fontWeight(.medium)
+                    .foregroundColor(.blue)
+                Button("Privacy Policy") { showingPrivacy = true }
+                    .font(.caption2)
+                    .fontWeight(.medium)
+                    .foregroundColor(.blue)
             }
-            .padding(.top)
         }
-        .padding(.horizontal)
+        .padding(.top, 8)
     }
     
     // MARK: - Actions
     
     private func startTrial() {
         Task {
-            // In development mode, proceed directly to purchase
-            if subscriptionManager.isInDevelopmentMode {
-                await subscriptionManager.purchaseSubscription()
-                return
-            }
-            
-            // If no product is loaded, try to load it first
             if subscriptionManager.currentSubscription == nil {
                 await subscriptionManager.loadProducts()
             }
-            
-            // If still no product, show an error
             if subscriptionManager.currentSubscription == nil {
                 await MainActor.run {
-                    errorMessage = "Unable to load subscription details. Please check your internet connection and try again."
+                    if case .failed(let message) = subscriptionManager.purchaseState {
+                        errorMessage = message
+                    } else {
+                        errorMessage = "Premium purchase is not available. Please ensure the Non-Consumable in-app purchase is set up in App Store Connect and try again."
+                    }
                     showingError = true
                 }
                 return
             }
-            
             await subscriptionManager.purchaseSubscription()
         }
     }
@@ -290,19 +254,10 @@ struct PaywallView: View {
     private func restorePurchases() {
         Task {
             await subscriptionManager.restorePurchases()
+            if subscriptionManager.hasAccess {
+                isPresented = false
+            }
         }
-    }
-    
-    // MARK: - Helper Methods
-    
-    private func monthlyPrice(from yearlyPrice: String) -> String {
-        // Extract numeric value from price string and calculate monthly equivalent
-        let numericString = yearlyPrice.replacingOccurrences(of: "[^0-9.]", with: "", options: .regularExpression)
-        if let yearly = Double(numericString) {
-            let monthly = yearly / 12.0
-            return String(format: "$%.2f", monthly)
-        }
-        return "$0.67" // Fallback for $7.99/year
     }
 }
 
@@ -351,29 +306,19 @@ struct TermsOfServiceView: View {
                         Text("1. Acceptance of Terms")
                             .font(.headline)
                             .fontWeight(.semibold)
-                        Text("By subscribing to BarrelBook Premium, you agree to be bound by these Terms of Service. These terms apply to your use of the BarrelBook application and all related services.")
+                        Text("By purchasing BarrelBook Premium, you agree to be bound by these Terms of Service. These terms apply to your use of the BarrelBook application and all related services.")
                         
-                        Text("2. Subscription Service")
+                        Text("2. Premium Purchase")
                             .font(.headline)
                             .fontWeight(.semibold)
-                        Text("BarrelBook Premium is a subscription service that provides unlimited access to all features of the BarrelBook application, including unlimited whiskey collection management, tasting notes, wishlist management, and advanced analytics.")
+                        Text("BarrelBook Premium is a one-time in-app purchase that provides unlimited access to all features of the BarrelBook application, including unlimited whiskey collection management, tasting notes, wishlist management, and advanced analytics. The purchase price is $7.99. This is not a subscription; you own premium access with no recurring charges.")
                         
-                        Text("3. Free Trial")
+                        Text("3. Payment")
                             .font(.headline)
                             .fontWeight(.semibold)
-                        Text("New subscribers are eligible for a 7-day free trial. During the trial period, you have full access to all Premium features. The trial will automatically convert to a paid subscription unless cancelled before the trial period ends.")
+                        Text("Payment is charged once to your Apple ID account at confirmation of purchase. There are no recurring fees. You may restore your purchase on a new device using the Restore Purchases option.")
                         
-                        Text("4. Payment and Billing")
-                            .font(.headline)
-                            .fontWeight(.semibold)
-                        Text("Subscription fees are charged annually to your Apple ID account. Payment will be charged at confirmation of purchase. Subscriptions automatically renew unless auto-renew is turned off at least 24 hours before the end of the current period.")
-                        
-                        Text("5. Cancellation")
-                            .font(.headline)
-                            .fontWeight(.semibold)
-                        Text("You may cancel your subscription at any time through your Apple ID account settings. Cancellation will take effect at the end of the current billing period.")
-                        
-                        Text("6. Changes to Terms")
+                        Text("4. Changes to Terms")
                             .font(.headline)
                             .fontWeight(.semibold)
                         Text("We reserve the right to modify these terms at any time. Continued use of the service constitutes acceptance of any changes.")
@@ -426,7 +371,7 @@ struct PrivacyPolicyView: View {
                         Text("4. Third Party Services")
                             .font(.headline)
                             .fontWeight(.semibold)
-                        Text("BarrelBook uses Apple's App Store for subscription management. These services are governed by Apple's privacy policy.")
+                        Text("BarrelBook uses Apple's App Store for purchase and payment processing. These services are governed by Apple's privacy policy and terms of service.")
                         
                         Text("5. Data Deletion")
                             .font(.headline)
@@ -460,9 +405,7 @@ struct PrivacyPolicyView: View {
     }
     
     private var formattedDate: String {
-        let formatter = DateFormatter()
-        formatter.dateStyle = .long
-        return formatter.string(from: Date())
+        return "March 20, 2026"  // Update this when the Privacy Policy changes
     }
 }
 

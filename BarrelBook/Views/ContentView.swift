@@ -153,9 +153,7 @@ struct ContentView: View {
                 .tag(TabSelection.home)
             
             NavigationView {
-                SubscriptionGuardView(feature: "your whiskey collection") {
-                    CollectionView()
-                }
+                CollectionView()
             }
             .navigationViewStyle(StackNavigationViewStyle())
             .tabItem {
@@ -164,9 +162,7 @@ struct ContentView: View {
             .tag(TabSelection.collection)
             
             NavigationView {
-                SubscriptionGuardView(feature: "your wishlist") {
-                    WishlistView()
-                }
+                WishlistView()
             }
             .navigationViewStyle(StackNavigationViewStyle())
             .tabItem {
@@ -175,9 +171,7 @@ struct ContentView: View {
             .tag(TabSelection.wishlist)
             
             NavigationView {
-                SubscriptionGuardView(feature: "tasting notes and journal entries") {
-                    JournalView()
-                }
+                JournalView()
             }
             .navigationViewStyle(StackNavigationViewStyle())
             .tabItem {
@@ -186,9 +180,7 @@ struct ContentView: View {
             .tag(TabSelection.journal)
             
             NavigationView {
-                SubscriptionGuardView(feature: "advanced statistics and analytics") {
-                    StatisticsView(showingFilteredView: $statisticsShowingFilteredView)
-                }
+                StatisticsView(showingFilteredView: $statisticsShowingFilteredView)
             }
             .navigationViewStyle(StackNavigationViewStyle())
             .tabItem {
@@ -328,6 +320,17 @@ struct HomeView: View {
         animation: .default)
     private var wishlistWhiskeys: FetchedResults<Whiskey>
     
+    // Fetch current month's journal entries
+    @FetchRequest(
+        sortDescriptors: [NSSortDescriptor(keyPath: \JournalEntry.date, ascending: false)],
+        predicate: {
+            let calendar = Calendar.current
+            let startOfMonth = calendar.dateInterval(of: .month, for: Date())?.start ?? Date()
+            return NSPredicate(format: "date >= %@", startOfMonth as CVarArg)
+        }(),
+        animation: .default)
+    private var currentMonthJournalEntries: FetchedResults<JournalEntry>
+    
     @StateObject private var subscriptionManager = SubscriptionManager.shared
     @Binding var selectedTab: TabSelection
     @State private var showingAddWhiskey = false
@@ -339,18 +342,32 @@ struct HomeView: View {
     @State private var showingSettings = false
     @State private var selectedActivity: ActivityItem? = nil
     @State private var showingPaywall = false
-    
+    @AppStorage("hasSeenEmptyStateTip") private var hasSeenEmptyStateTip = false
+    @State private var showingLoadDemoConfirmation = false
+
+    private var isCollectionEmpty: Bool { whiskeys.isEmpty }
+
     var body: some View {
         ScrollView {
             VStack(spacing: 24) {
-                // Main Action Cards
-                actionCardsSection
-                
-                // Recent Activity Section
-                recentActivitySection
-                
-                // Quick Stats Section
-                quickStatsSection
+                // First-run tip card — only when collection is empty and not yet dismissed
+                if isCollectionEmpty && !hasSeenEmptyStateTip {
+                    firstRunTipCard
+                }
+
+                if isCollectionEmpty {
+                    // Empty state with CTAs
+                    emptyStateView
+                } else {
+                    // Normal home content
+                    actionCardsSection
+                    UsageCounterView(
+                        currentWhiskeyCount: whiskeys.count,
+                        currentMonthTastingCount: currentMonthJournalEntries.count
+                    )
+                    recentActivitySection
+                    quickStatsSection
+                }
             }
             .padding()
         }
@@ -400,6 +417,131 @@ struct HomeView: View {
         )
     }
     
+
+    // MARK: - Empty State & First-run Tip
+
+    private var firstRunTipCard: some View {
+        HStack(alignment: .top, spacing: 12) {
+            Image(systemName: "lightbulb.fill")
+                .foregroundColor(ColorManager.primaryBrandColor)
+                .font(.title3)
+                .padding(.top, 2)
+            VStack(alignment: .leading, spacing: 4) {
+                Text("New to BarrelBook?")
+                    .font(.subheadline)
+                    .fontWeight(.semibold)
+                Text("Load sample data in Settings to explore the app — then delete it when you\'re ready to start fresh.")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            Spacer()
+            Button {
+                hasSeenEmptyStateTip = true
+            } label: {
+                Image(systemName: "xmark")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+        }
+        .padding(14)
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(ColorManager.primaryBrandColor.opacity(0.08))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .strokeBorder(ColorManager.primaryBrandColor.opacity(0.25), lineWidth: 1)
+                )
+        )
+    }
+
+    private var emptyStateView: some View {
+        VStack(spacing: 32) {
+            Spacer(minLength: 40)
+
+            // Icon
+            VStack(spacing: 16) {
+                ZStack {
+                    Circle()
+                        .fill(ColorManager.primaryBrandColor.opacity(0.10))
+                        .frame(width: 120, height: 120)
+                    Image(systemName: "square.stack.3d.up")
+                        .font(.system(size: 52, weight: .light))
+                        .foregroundColor(ColorManager.primaryBrandColor)
+                }
+
+                VStack(spacing: 8) {
+                    Text("Your shelf is empty")
+                        .font(.title2)
+                        .fontWeight(.bold)
+                    Text("Add your first bottle or explore\nthe app with sample data.")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                        .multilineTextAlignment(.center)
+                }
+            }
+
+            // CTAs
+            VStack(spacing: 12) {
+                Button {
+                    if subscriptionManager.canAddWhiskey(currentCount: whiskeys.count) {
+                        showingAddWhiskey = true
+                    } else {
+                        showingPaywall = true
+                    }
+                } label: {
+                    Label("Add Your First Bottle", systemImage: "plus")
+                        .font(.headline)
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 14)
+                        .background(ColorManager.primaryBrandColor)
+                        .cornerRadius(12)
+                }
+
+                Button {
+                    showingLoadDemoConfirmation = true
+                } label: {
+                    Label("Explore with Sample Data", systemImage: "sparkles")
+                        .font(.subheadline)
+                        .foregroundColor(ColorManager.primaryBrandColor)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 12)
+                        .background(ColorManager.primaryBrandColor.opacity(0.10))
+                        .cornerRadius(12)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 12)
+                                .strokeBorder(ColorManager.primaryBrandColor.opacity(0.30), lineWidth: 1)
+                        )
+                }
+                .alert("Load Demo Data?", isPresented: $showingLoadDemoConfirmation) {
+                    Button("Cancel", role: .cancel) { }
+                    Button("Load Demo Data", role: .destructive) {
+                        loadDemoData()
+                        hasSeenEmptyStateTip = true
+                    }
+                } message: {
+                    Text("This loads a sample bourbon collection so you can explore every feature of BarrelBook.\n\n⚠️ This will replace any existing data. It can be deleted anytime in Settings.")
+                }
+
+                Text("Sample data can be deleted anytime in Settings → Data Management")
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+                    .multilineTextAlignment(.center)
+            }
+
+            Spacer(minLength: 40)
+        }
+        .padding(.horizontal, 8)
+    }
+
+    // MARK: - Demo Data
+    private func loadDemoData() {
+        DemoDataService.load(context: viewContext) { _ in
+            HapticManager.shared.successFeedback()
+        }
+    }
+
     // Main Action Cards Section
     private var actionCardsSection: some View {
         VStack(spacing: 16) {
@@ -410,7 +552,7 @@ struct HomeView: View {
                     isEmoji: true,
                     title: "ADD NEW WHISKEY",
                     action: {
-                        if subscriptionManager.hasAccess {
+                        if subscriptionManager.canAddWhiskey(currentCount: whiskeys.count) {
                             showingAddWhiskey = true
                         } else {
                             showingPaywall = true
@@ -424,7 +566,7 @@ struct HomeView: View {
                     isEmoji: false,
                     title: "ADD NEW TASTING",
                     action: {
-                        if subscriptionManager.hasAccess {
+                        if subscriptionManager.canAddTastingThisMonth(currentMonthCount: currentMonthJournalEntries.count) {
                             showingAddJournal = true
                         } else {
                             showingPaywall = true
@@ -476,14 +618,6 @@ struct HomeView: View {
         return total
     }
     
-    // Format currency values
-    private func formatCurrency(_ value: Double) -> String {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .currency
-        formatter.maximumFractionDigits = 0
-        return formatter.string(from: NSNumber(value: value)) ?? "$0"
-    }
-    
     // Get last added bottle text for context
     private func getLastAddedBottleText() -> String {
         let recentWhiskeys = getRecentWhiskeys()
@@ -515,7 +649,7 @@ struct HomeView: View {
                     id: UUID(),
                     icon: "plus.circle.fill",
                     title: "Added \(whiskey.name ?? "Unknown Whiskey")",
-                    timeAgo: formatDate(addedDate),
+                    timeAgo: AppFormatters.formatDateShort(addedDate),
                     date: addedDate,
                     whiskey: whiskey,
                     isJournal: false,
@@ -525,10 +659,13 @@ struct HomeView: View {
         }
         
         // Add recently EDITED whiskeys (based on modificationDate)
+        let oneMinute: TimeInterval = 60
         let recentlyEditedWhiskeys = whiskeys.filter { 
-            $0.status == "owned" && 
-            // Only include if modificationDate is different from addedDate (it's a true edit, not an add)
-            ($0.modificationDate != $0.addedDate) 
+            guard $0.status == "owned",
+                  let mod = $0.modificationDate,
+                  let add = $0.addedDate else { return false }
+            // Only show as "edited" if modification is meaningfully after add (avoids CSV import showing as edit)
+            return mod.timeIntervalSince(add) > oneMinute
         }
         .sorted { ($0.modificationDate ?? Date.distantPast) > ($1.modificationDate ?? Date.distantPast) }
         .prefix(3)
@@ -547,7 +684,7 @@ struct HomeView: View {
                 let oneHourAgo = Calendar.current.date(byAdding: .hour, value: -1, to: Date()) ?? Date()
                 if lastModification > oneHourAgo {
                     // First, check if name was changed - we need to infer this from the history
-                    if didNameChangeRecently(whiskey) {
+                    if whiskey.didNameChangeRecently {
                         title = "Renamed to: \(whiskey.name ?? "Unknown Whiskey")"
                         icon = "character.cursor.ibeam"
                     }
@@ -570,7 +707,7 @@ struct HomeView: View {
                     id: UUID(),
                     icon: icon,
                     title: title,
-                    timeAgo: formatDate(date),
+                    timeAgo: AppFormatters.formatDateShort(date),
                     date: date,
                     whiskey: whiskey,
                     isJournal: false,
@@ -606,7 +743,7 @@ struct HomeView: View {
                             id: UUID(),
                             icon: "text.badge.plus",
                             title: "Tasting Added: \(whiskey.name ?? "Unknown Whiskey")",
-                            timeAgo: formatDate(mostRecentEntry.date ?? date),
+                            timeAgo: AppFormatters.formatDateShort(mostRecentEntry.date ?? date),
                             date: mostRecentEntry.date ?? date,
                             whiskey: whiskey,
                             isJournal: true,
@@ -621,7 +758,7 @@ struct HomeView: View {
                     id: UUID(),
                     icon: "checkmark.circle.fill",
                     title: "Marked as Tasted: \(whiskey.name ?? "Unknown Whiskey")",
-                    timeAgo: formatDate(date),
+                    timeAgo: AppFormatters.formatDateShort(date),
                     date: date,
                     whiskey: whiskey,
                     isJournal: false,
@@ -642,7 +779,7 @@ struct HomeView: View {
                     id: UUID(),
                     icon: "heart.fill",
                     title: "Added to Wishlist: \(whiskey.name ?? "Unknown Whiskey")",
-                    timeAgo: formatDate(date),
+                    timeAgo: AppFormatters.formatDateShort(date),
                     date: date,
                     whiskey: whiskey,
                     isJournal: false,
@@ -653,13 +790,6 @@ struct HomeView: View {
         
         // Sort all activities by date, newest first
         return activities.sorted { $0.date > $1.date }.prefix(6).map { $0 }
-    }
-    
-    // Format date to dd/mm/yyyy
-    private func formatDate(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "MM/dd/yyyy"
-        return formatter.string(from: date)
     }
     
     // Refactor recentActivitySection to use Button for selection
@@ -760,14 +890,6 @@ struct HomeView: View {
         return totalPPP / Double(validWhiskeys.count)
     }
     
-    // Format PPP value
-    private func formatPPP(_ value: Double) -> String {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .currency
-        formatter.maximumFractionDigits = 2
-        return formatter.string(from: NSNumber(value: value)) ?? "$0.00"
-    }
-    
     // Quick Stats Section
     private var quickStatsSection: some View {
         return VStack(alignment: .leading, spacing: 12) {
@@ -831,7 +953,7 @@ struct HomeView: View {
                     
                     Spacer()
                     
-                    Text(formatPPP(calculateAveragePPP()))
+                    Text(AppFormatters.formatCurrency(calculateAveragePPP(), maxFractionDigits: 2))
                         .font(.subheadline)
                         .fontWeight(.semibold)
                 }
@@ -871,72 +993,7 @@ struct HomeView: View {
     private func getWishlistCountText() -> String {
         // Use the dedicated wishlist fetch request instead of filtering
         let count = wishlistWhiskeys.count
-        print("ContentView: Using wishlist count = \(count)")
         return "\(count) whiskeys"
-    }
-    
-    // Helper function to check if a whiskey's name was recently changed
-    private func didNameChangeRecently(_ whiskey: Whiskey) -> Bool {
-        // We don't have previous whiskey state to compare against, so we'll use some heuristics
-        
-        // 1. Check if any property toggles are enabled - less likely to be a rename operation
-        if whiskey.isOpen || whiskey.isTasted || whiskey.isCaskStrength || 
-           whiskey.isBiB || whiskey.isSiB || whiskey.isStorePick {
-            // If the whiskey was just created (addedDate very close to modificationDate),
-            // and these properties are set, it's more likely an addition with properties
-            // than a rename
-            if let addedDate = whiskey.addedDate, let modDate = whiskey.modificationDate {
-                let hoursSinceAdded = Calendar.current.dateComponents([.hour], from: addedDate, to: modDate).hour ?? 0
-                
-                if hoursSinceAdded <= 1 {
-                    // If modified within an hour of being added, more likely
-                    // this is setting initial properties, not a rename
-                    return false
-                }
-            }
-        }
-        
-        // 2. Check journal entries - if the whiskey has journal entries with a different name
-        // it suggests a rename
-        if let entries = whiskey.journalEntries as? Set<JournalEntry>, !entries.isEmpty {
-            for entry in entries {
-                // Get the date when the entry was created
-                let entryDate = entry.date ?? Date.distantPast
-                let whiskeyCurrName = whiskey.name ?? ""
-                
-                // If the entry is old enough (created more than a day before the latest modification)
-                if let modDate = whiskey.modificationDate,
-                   let daysBetween = Calendar.current.dateComponents([.day], from: entryDate, to: modDate).day,
-                   daysBetween > 0,
-                   !whiskeyCurrName.isEmpty {
-                    return true
-                }
-            }
-        }
-        
-        // 3. If neither case above was triggered, we'll make a more reasonable guess
-        // Instead of just checking if toggles are true, we'll consider several factors:
-        
-        // a. Has it been modified significantly after being added?
-        if let addedDate = whiskey.addedDate, let modDate = whiskey.modificationDate {
-            let daysSinceAdded = Calendar.current.dateComponents([.day], from: addedDate, to: modDate).day ?? 0
-            
-            // For bottles that have been in the collection for a while, name changes are more common
-            if daysSinceAdded > 30 {
-                // For older items, it's more likely to be a name correction/update
-                return true
-            }
-        }
-        
-        // b. Does it look like a correction? (e.g., simple name changes often happen shortly after adding)
-        if let name = whiskey.name, name.count > 3 {
-            // Name is long enough to be a proper name - less likely to just be a typo correction
-            // We'll err on the side of NOT showing rename notifications for minor edits
-            return false
-        }
-        
-        // c. Default to not showing rename notification when we can't be sure
-        return false
     }
     
     // Helper function to count total active bottles
@@ -1227,7 +1284,7 @@ struct RecentActivityView: View {
                             id: UUID(),
                             icon: "plus.circle.fill",
                             title: "Added \(whiskey.name ?? "Unknown Whiskey")",
-                            timeAgo: formatDateString(addedDate),
+                            timeAgo: AppFormatters.formatDateShort(addedDate),
                             date: addedDate,
                             whiskey: whiskey,
                             isJournal: false,
@@ -1267,7 +1324,7 @@ struct RecentActivityView: View {
                 let oneHourAgo = Calendar.current.date(byAdding: .hour, value: -1, to: Date()) ?? Date()
                 if lastModification > oneHourAgo {
                     // First, check if name was changed - we need to infer this from the history
-                    if didNameChangeRecently(whiskey) {
+                    if whiskey.didNameChangeRecently {
                         title = "Renamed to: \(whiskey.name ?? "Unknown Whiskey")"
                         icon = "character.cursor.ibeam"
                     }
@@ -1290,7 +1347,7 @@ struct RecentActivityView: View {
                     id: UUID(),
                     icon: icon,
                     title: title,
-                    timeAgo: formatDateString(date),
+                    timeAgo: AppFormatters.formatDateShort(date),
                     date: date,
                     whiskey: whiskey,
                     isJournal: false,
@@ -1330,7 +1387,7 @@ struct RecentActivityView: View {
                             id: UUID(),
                             icon: "text.badge.plus",
                             title: "Tasting Added: \(whiskey.name ?? "Unknown Whiskey")",
-                            timeAgo: formatDateString(entry.date ?? date),
+                            timeAgo: AppFormatters.formatDateShort(entry.date ?? date),
                             date: entry.date ?? date,
                             whiskey: whiskey,
                             isJournal: true,
@@ -1347,7 +1404,7 @@ struct RecentActivityView: View {
                     id: UUID(),
                     icon: "checkmark.circle.fill",
                     title: "Marked as Tasted: \(whiskey.name ?? "Unknown Whiskey")",
-                    timeAgo: formatDateString(date),
+                    timeAgo: AppFormatters.formatDateShort(date),
                     date: date,
                     whiskey: whiskey,
                     isJournal: false,
@@ -1376,7 +1433,7 @@ struct RecentActivityView: View {
                 id: UUID(),
                 icon: "heart.fill",
                 title: "Added to Wishlist: \(whiskey.name ?? "Unknown Whiskey")",
-                timeAgo: formatDateString(date),
+                timeAgo: AppFormatters.formatDateShort(date),
                 date: date,
                 whiskey: whiskey,
                 isJournal: false,
@@ -1386,77 +1443,6 @@ struct RecentActivityView: View {
         
         // Sort all activities by date, newest first
         return activities.sorted(by: { $0.date > $1.date })
-    }
-    
-    // Format date to string
-    private func formatDateString(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "MM/dd/yyyy"
-        return formatter.string(from: date)
-    }
-    
-    // Helper function to check if a whiskey's name was recently changed
-    private func didNameChangeRecently(_ whiskey: Whiskey) -> Bool {
-        // We don't have previous whiskey state to compare against, so we'll use some heuristics
-        
-        // 1. Check if any property toggles are enabled - less likely to be a rename operation
-        if whiskey.isOpen || whiskey.isTasted || whiskey.isCaskStrength || 
-           whiskey.isBiB || whiskey.isSiB || whiskey.isStorePick {
-            // If the whiskey was just created (addedDate very close to modificationDate),
-            // and these properties are set, it's more likely an addition with properties
-            // than a rename
-            if let addedDate = whiskey.addedDate, let modDate = whiskey.modificationDate {
-                let hoursSinceAdded = Calendar.current.dateComponents([.hour], from: addedDate, to: modDate).hour ?? 0
-                
-                if hoursSinceAdded <= 1 {
-                    // If modified within an hour of being added, more likely
-                    // this is setting initial properties, not a rename
-                    return false
-                }
-            }
-        }
-        
-        // 2. Check journal entries - if the whiskey has journal entries with a different name
-        // it suggests a rename
-        if let entries = whiskey.journalEntries as? Set<JournalEntry>, !entries.isEmpty {
-            for entry in entries {
-                // Get the date when the entry was created
-                let entryDate = entry.date ?? Date.distantPast
-                let whiskeyCurrName = whiskey.name ?? ""
-                
-                // If the entry is old enough (created more than a day before the latest modification)
-                if let modDate = whiskey.modificationDate,
-                   let daysBetween = Calendar.current.dateComponents([.day], from: entryDate, to: modDate).day,
-                   daysBetween > 0,
-                   !whiskeyCurrName.isEmpty {
-                    return true
-                }
-            }
-        }
-        
-        // 3. If neither case above was triggered, we'll make a more reasonable guess
-        // Instead of just checking if toggles are true, we'll consider several factors:
-        
-        // a. Has it been modified significantly after being added?
-        if let addedDate = whiskey.addedDate, let modDate = whiskey.modificationDate {
-            let daysSinceAdded = Calendar.current.dateComponents([.day], from: addedDate, to: modDate).day ?? 0
-            
-            // For bottles that have been in the collection for a while, name changes are more common
-            if daysSinceAdded > 30 {
-                // For older items, it's more likely to be a name correction/update
-                return true
-            }
-        }
-        
-        // b. Does it look like a correction? (e.g., simple name changes often happen shortly after adding)
-        if let name = whiskey.name, name.count > 3 {
-            // Name is long enough to be a proper name - less likely to just be a typo correction
-            // We'll err on the side of NOT showing rename notifications for minor edits
-            return false
-        }
-        
-        // c. Default to not showing rename notification when we can't be sure
-        return false
     }
     
     // Helper to return the correct destination view
@@ -1498,7 +1484,7 @@ struct PrivacyAwareValueText: View {
                         .foregroundColor(.secondary)
                 }
             } else {
-                Text(formatCurrency(value))
+                Text(AppFormatters.formatCurrency(value))
                     .fontWeight(.semibold)
                 
                 if privacyManager.hidePrices && temporarilyShowValue {
@@ -1510,11 +1496,100 @@ struct PrivacyAwareValueText: View {
         }
     }
     
-    // Format currency values
-    private func formatCurrency(_ value: Double) -> String {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .currency
-        formatter.maximumFractionDigits = 0
-        return formatter.string(from: NSNumber(value: value)) ?? "$0"
+}
+
+// Usage Counter Component for Freemium Users
+struct UsageCounterView: View {
+    @StateObject private var subscriptionManager = SubscriptionManager.shared
+    let currentWhiskeyCount: Int
+    let currentMonthTastingCount: Int
+    @State private var showingPaywall = false
+    
+    var body: some View {
+        if !subscriptionManager.hasAccess {
+            VStack(spacing: 12) {
+                HStack {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("BarrelBook Essentials")
+                            .font(.headline)
+                            .fontWeight(.semibold)
+                        
+                        Text("Free tier includes 10 whiskeys & 5 tastings/month")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                        
+                        HStack(spacing: 16) {
+                            UsageCounter(
+                                label: "Whiskeys",
+                                current: currentWhiskeyCount,
+                                limit: subscriptionManager.whiskeyLimit,
+                                icon: "🥃"
+                            )
+                            
+                            UsageCounter(
+                                label: "Tastings",
+                                current: currentMonthTastingCount,
+                                limit: subscriptionManager.monthlyTastingLimit,
+                                icon: "📝"
+                            )
+                        }
+                    }
+                    
+                    Spacer()
+                    
+                    Button("Upgrade") {
+                        showingPaywall = true
+                    }
+                    .font(.caption)
+                    .fontWeight(.semibold)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                    .background(ColorManager.primaryBrandColor)
+                    .foregroundColor(.white)
+                    .cornerRadius(16)
+                }
+            }
+            .padding()
+            .background(
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(Color.orange.opacity(0.1))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12)
+                            .stroke(Color.orange.opacity(0.3), lineWidth: 1)
+                    )
+            )
+            .fullScreenCover(isPresented: $showingPaywall) {
+                PaywallView(isPresented: $showingPaywall)
+            }
+        }
     }
-} 
+}
+
+struct UsageCounter: View {
+    let label: String
+    let current: Int
+    let limit: Int
+    let icon: String
+    
+    private var isNearLimit: Bool {
+        Double(current) / Double(limit) >= 0.8
+    }
+    
+    var body: some View {
+        HStack(spacing: 6) {
+            Text(icon)
+                .font(.caption)
+            
+            VStack(alignment: .leading, spacing: 2) {
+                Text(label)
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+                
+                Text("\(current)/\(limit)")
+                    .font(.caption)
+                    .fontWeight(.medium)
+                    .foregroundColor(isNearLimit ? .orange : .primary)
+            }
+        }
+    }
+}

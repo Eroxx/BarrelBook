@@ -2,7 +2,7 @@ import SwiftUI
 import CoreData
 
 // Wishlist-specific sort options
-enum WishlistSortOption: String, CaseIterable {
+enum WishlistSortOption: String, CaseIterable, Codable {
     case nameAsc = "Name (A-Z)"
     case nameDesc = "Name (Z-A)"
     case priorityHigh = "Priority (High-Low)"
@@ -241,11 +241,14 @@ struct SearchResultsCountOverlay: View {
 // Main WishlistView
 struct WishlistView: View {
     @Environment(\.managedObjectContext) private var viewContext
+    @StateObject private var subscriptionManager = SubscriptionManager.shared
+    @State private var showingPaywall = false
     @State private var showingAddSheet = false
     @State private var showingFilterSheet = false
     @State private var showingSettings = false
     @State private var searchText = ""
-    @State private var sortOption: WishlistSortOption = .nameAsc
+    @State private var sortConfig = WishlistHierarchicalSortConfig(activeSorts: [WishlistSortCriterionIdentifiable(option: .nameAsc)])
+    @State private var showingSortSheet = false
     @State private var debouncedSearchText = ""
     @State private var isUpdatingFiltersFromSearch = false
     @State private var wishlistFilterOptions = WishlistFilterOptions()
@@ -255,6 +258,10 @@ struct WishlistView: View {
     @State private var selectedTab = 0 // 0 for wishlist, 1 for replacements
     @State private var selectedStore: Store? = nil
     @State private var showingStorePicker = false
+    @State private var showingNoStoresExplanation = false
+    @AppStorage("hasSeenWishlistTutorial") private var hasSeenWishlistTutorial = false
+    @State private var showingWishlistTutorialOverlay = false
+    @State private var wishlistTutorialStep = 1
     @State private var showingShareSheet = false
     @State private var shareActivityVC: UIActivityViewController?
     
@@ -331,41 +338,14 @@ struct WishlistView: View {
                (whiskey.whereToFind?.localizedCaseInsensitiveContains(searchText) ?? false) ||
                (String(format: "%.1f", whiskey.proof).contains(searchText)) ||
                (String(whiskey.targetPrice).contains(searchText))
-        print("DEBUG: searchMatches for \(whiskey.name ?? "unnamed") - matches=\(matches)")
         return matches
     }
     
     // Removed old filtering helper functions - now using direct filtering logic in filteredWhiskeys
     
-    // Sorted whiskeys
+    // Sorted whiskeys using hierarchical sorting
     private var sortedWhiskeys: [Whiskey] {
-        let filtered = filteredWhiskeys
-        
-        // Wishlist-specific sorting logic
-        switch sortOption {
-        case .nameAsc:
-            return filtered.sorted { ($0.name ?? "") < ($1.name ?? "") }
-        case .nameDesc:
-            return filtered.sorted { ($0.name ?? "") > ($1.name ?? "") }
-        case .priorityHigh:
-            return filtered.sorted { $0.priority > $1.priority }
-        case .targetPriceLow:
-            return filtered.sorted { $0.targetPrice < $1.targetPrice }
-        case .targetPriceHigh:
-            return filtered.sorted { $0.targetPrice > $1.targetPrice }
-        case .rarityLow:
-            return filtered.sorted { (w1, w2) in
-                let rarity1 = WhiskeyRarity(rawValue: w1.rarity ?? "") ?? .notSure
-                let rarity2 = WhiskeyRarity(rawValue: w2.rarity ?? "") ?? .notSure
-                return rarity1.sortOrder < rarity2.sortOrder
-            }
-        case .rarityHigh:
-            return filtered.sorted { (w1, w2) in
-                let rarity1 = WhiskeyRarity(rawValue: w1.rarity ?? "") ?? .notSure
-                let rarity2 = WhiskeyRarity(rawValue: w2.rarity ?? "") ?? .notSure
-                return rarity1.sortOrder > rarity2.sortOrder
-            }
-        }
+        return SortingUtils.sortWishlistHierarchically(filteredWhiskeys, by: sortConfig)
     }
     
     // Get unique types for filter options
@@ -386,6 +366,7 @@ struct WishlistView: View {
     }
     
     var body: some View {
+        ZStack {
         VStack(spacing: 0) {
             // Tab selector
             Picker("", selection: $selectedTab) {
@@ -436,7 +417,11 @@ struct WishlistView: View {
                 // Wishlist tab
                 if wishlistItems.isEmpty && searchText.isEmpty {
                     WishlistEmptyStateView(searchText: searchText) {
-                        showingAddSheet = true
+                        if subscriptionManager.hasAccess {
+                            showingAddSheet = true
+                        } else {
+                            showingPaywall = true
+                        }
                     }
                 } else {
                     List {
@@ -498,6 +483,17 @@ struct WishlistView: View {
                 }
             }
         }
+            if showingWishlistTutorialOverlay {
+                WishlistTutorialOverlay(step: wishlistTutorialStep, onNext: {
+                    wishlistTutorialStep = 2
+                    HapticManager.shared.lightImpact()
+                }, onDismiss: {
+                    hasSeenWishlistTutorial = true
+                    showingWishlistTutorialOverlay = false
+                    HapticManager.shared.lightImpact()
+                })
+            }
+        }
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .principal) {
@@ -517,26 +513,19 @@ struct WishlistView: View {
                         Image(systemName: "line.3.horizontal.decrease.circle")
                     }
                     
-                    // Sort menu
-                    Menu {
-                        ForEach(WishlistSortOption.allCases, id: \.self) { option in
-                            Button {
-                                sortOption = option
-                                HapticManager.shared.selectionFeedback()
-                                
-                                // Note: Not saving wishlist sort to general settings
-                                // Wishlist has its own sorting preferences
-                            } label: {
-                                HStack {
-                                    Text(option.rawValue)
-                                    if sortOption == option {
-                                        Image(systemName: "checkmark")
-                                    }
-                                }
+                    // Sort button
+                    Button {
+                        showingSortSheet = true
+                        HapticManager.shared.mediumImpact()
+                    } label: {
+                        HStack(spacing: 4) {
+                            Image(systemName: "arrow.up.arrow.down")
+                            if sortConfig.activeSorts.count > 1 {
+                                Text("\(sortConfig.activeSorts.count)")
+                                    .font(.caption2)
+                                    .foregroundColor(.accentColor)
                             }
                         }
-                    } label: {
-                        Image(systemName: "arrow.up.arrow.down")
                     }
                 }
                 // Hide sort/filter buttons on iPad
@@ -569,7 +558,11 @@ struct WishlistView: View {
             Group {
                 if selectedTab == 0 && (!sortedWhiskeys.isEmpty || !searchText.isEmpty) {
                     FloatingAddButton {
-                        showingAddSheet = true
+                        if subscriptionManager.hasAccess {
+                            showingAddSheet = true
+                        } else {
+                            showingPaywall = true
+                        }
                     }
                 }
             }
@@ -583,6 +576,9 @@ struct WishlistView: View {
             AddWhiskeyToWishlistView()
                 .environment(\.managedObjectContext, viewContext)
         }
+        .sheet(isPresented: $showingSortSheet) {
+            WishlistHierarchicalSortPickerView(sortConfig: $sortConfig)
+        }
         .sheet(isPresented: $showingFilterSheet) {
             WishlistFilterView(
                 filterOptions: $wishlistFilterOptions,
@@ -593,6 +589,9 @@ struct WishlistView: View {
         }
         .sheet(isPresented: $showingSettings) {
             SettingsView()
+        }
+        .fullScreenCover(isPresented: $showingPaywall) {
+            PaywallView(isPresented: $showingPaywall)
         }
         .sheet(isPresented: Binding(
             get: { showingShareSheet && shareActivityVC != nil },
@@ -622,6 +621,7 @@ struct WishlistView: View {
             }
         }
         .sheet(isPresented: $showingStorePicker) {
+            let pickerStores = Array(Set(wishlistItems.flatMap { $0.stores?.allObjects as? [Store] ?? [] }))
             NavigationView {
                 List {
                     Button("All Stores") {
@@ -630,7 +630,7 @@ struct WishlistView: View {
                     }
                     .foregroundColor(.primary)
                     
-                    ForEach(Array(Set(wishlistItems.flatMap { $0.stores?.allObjects as? [Store] ?? [] })), id: \.self) { store in
+                    ForEach(pickerStores, id: \.self) { store in
                         Button(store.name ?? "Unnamed Store") {
                             selectedStore = store
                             showingStorePicker = false
@@ -648,22 +648,35 @@ struct WishlistView: View {
                     }
                 }
             }
+            .onAppear {
+                if pickerStores.isEmpty {
+                    showingNoStoresExplanation = true
+                }
+            }
+            .onDisappear {
+                showingNoStoresExplanation = false
+            }
+            .alert("No stores yet", isPresented: $showingNoStoresExplanation) {
+                Button("OK", role: .cancel) { }
+            } message: {
+                Text("Stores appear here when you add them to wishlist items. When adding or editing a bottle, use \"Where to Find\" to add one or more stores.")
+            }
         }
         .onAppear {
-            print("🔍 DEBUG: WishlistView appeared")
+            if !hasSeenWishlistTutorial {
+                showingWishlistTutorialOverlay = true
+                wishlistTutorialStep = 1
+            }
             
             // Reset filters to default state
             wishlistFilterOptions = WishlistFilterOptions()
-            print("🔍 DEBUG: Reset wishlist filters to default")
             
             // Fetch all whiskeys to check their status
             let fetchRequest: NSFetchRequest<Whiskey> = Whiskey.fetchRequest()
             do {
                 let allWhiskeys = try viewContext.fetch(fetchRequest)
-                print("🔍 DEBUG: Found \(allWhiskeys.count) total whiskeys")
                 
                 for whiskey in allWhiskeys {
-                    print("🔍 DEBUG: Whiskey '\(whiskey.name ?? "unnamed")' - status: '\(whiskey.status ?? "nil")', statusEnum: \(whiskey.statusEnum), isWishlist: \(whiskey.isWishlist)")
                 }
                 
                 // Fetch only wishlist items
@@ -760,6 +773,74 @@ struct WishlistView: View {
                     }
                 }
             }
+        }
+    }
+}
+
+// MARK: - Wishlist tutorial (screen 1: general, screen 2: Stores)
+
+private struct WishlistTutorialOverlay: View {
+    let step: Int
+    let onNext: () -> Void
+    let onDismiss: () -> Void
+    
+    var body: some View {
+        ColorManager.tutorialScrim
+            .ignoresSafeArea()
+            .onTapGesture { }
+        if step == 1 {
+            wishlistGeneralScreen(onNext: onNext)
+        } else {
+            StoresTutorialOverlay(onDismiss: onDismiss, useParentScrim: true)
+        }
+    }
+    
+    private func wishlistGeneralScreen(onNext: @escaping () -> Void) -> some View {
+        GeometryReader { geometry in
+            ScrollView {
+                VStack(spacing: 0) {
+                    Spacer(minLength: 0)
+                    VStack(spacing: 20) {
+                        VStack(alignment: .leading, spacing: 16) {
+                            HStack {
+                                Image(systemName: "list.star")
+                        .font(.title2)
+                        .foregroundColor(ColorManager.primaryBrandColor)
+                    Text("Your Wishlist")
+                        .font(.headline)
+                }
+                VStack(alignment: .leading, spacing: 10) {
+                    Text(LocalizedStringKey("Track bottles you’re hunting for. Add name, target price, and priority; tap **Save** when you’re done."))
+                    Text("You can filter by store, sort, and edit or remove items anytime.")
+                        .font(.subheadline)
+                }
+                .font(.subheadline)
+            }
+            .padding(24)
+            .background(Color(UIColor.secondarySystemBackground))
+            .overlay(
+                RoundedRectangle(cornerRadius: 16)
+                    .stroke(ColorManager.tutorialCardBorder, lineWidth: 1)
+            )
+            .cornerRadius(16)
+            .shadow(radius: 12)
+            .padding(.horizontal, 24)
+            Button(action: onNext) {
+                Text("Next")
+                    .fontWeight(.semibold)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 12)
+            }
+            .buttonStyle(.borderedProminent)
+            .tint(ColorManager.primaryBrandColor)
+            .padding(.horizontal, 24)
+                    }
+                    .padding()
+                    Spacer(minLength: 0)
+                }
+                .frame(minHeight: geometry.size.height)
+            }
+            .padding()
         }
     }
 }

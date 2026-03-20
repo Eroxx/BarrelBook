@@ -2,197 +2,268 @@ import SwiftUI
 
 struct OnboardingPage: Identifiable {
     let id = UUID()
-    let image: String  // SF Symbol name
+    let image: String           // SF Symbol name — ignored on welcome page
     let title: String
     let subtitle: String
     let description: String
     let accentColor: Color
-    let secondarySymbols: [String]  // Additional SF Symbols for feature highlights
+    let isWelcome: Bool         // shows the real app icon instead of an SF Symbol
 }
 
 struct OnboardingView: View {
     @AppStorage("hasSeenOnboarding") private var hasSeenOnboarding: Bool = false
     @Environment(\.dismiss) private var dismiss
-    
-    private let pages: [OnboardingPage] = [
-        OnboardingPage(
-            image: "square.grid.3x3.square",
-            title: "Welcome to BarrelBook",
-            subtitle: "Your Personal Whiskey Collection",
-            description: "Track, discover, and organize your whiskey journey with powerful features designed for enthusiasts.",
-            accentColor: .blue,
-            secondarySymbols: ["magnifyingglass", "tag.fill", "chart.bar.fill"]
-        ),
-        OnboardingPage(
-            image: "magnifyingglass",
-            title: "Quick Search",
-            subtitle: "Find Your Bottles Fast",
-            description: "Search by name, type, or attributes:\n\n• 'Eagle Rare' → All Eagle Rare\n• 'Eagle Rare sib' → Eagle Rare Single Barrel\n• 'Eagle Rare proof: 100' → 100 proof Eagle Rare\n• 'type: bourbon price: 50-100' → Bourbons $50-$100",
-            accentColor: .blue,
-            secondarySymbols: []
-        ),
-        OnboardingPage(
-            image: "line.3.horizontal.decrease.circle.fill",
-            title: "Advanced Filtering",
-            subtitle: "Perfect Organization",
-            description: "Filter your collection by:\n\n• Whiskey Type\n• Price Range\n• Proof\n• Special Designations",
-            accentColor: .purple,
-            secondarySymbols: []
-        ),
-        OnboardingPage(
-            image: "chart.bar.fill",
-            title: "Collection Insights",
-            subtitle: "Know Your Collection",
-            description: "Track everything about your whiskeys:\n\n• Total Collection Value\n• Bottle Count\n• Tasting Notes\n• Store Picks",
-            accentColor: .orange,
-            secondarySymbols: []
-        ),
-        OnboardingPage(
-            image: "book.fill",
-            title: "Track Every Tasting!",
-            subtitle: "Your Digital Tasting Journal",
-            description: """
-            Capture nose, palate & finish notes
-            Rate your experience (1-10)
-            Serve: 🥃 Neat  🧊 Rocks  💧 Water  ✏️ Custom
 
-            View in list or calendar mode
-            
-            ──────────
-            
-            Your tasting notes are powerful. Search for specific flavors like "nose: vanilla", filter by how you enjoyed it ("neat"), or find your highest-rated pours.
-            """,
-            accentColor: Color(red: 0.8, green: 0.6, blue: 0.3),
-            secondarySymbols: ["pencil.and.list.clipboard", "star.fill", "magnifyingglass", "calendar"]
-        )
-    ]
-    
+    /// Pass SettingsView's loadDemoData() to enable the "Explore with Sample Data" button
+    var onLoadDemoData: (() -> Void)? = nil
+
     @State private var currentPage = 0
-    @State private var shouldAnimate = false
-    
+    @State private var isLoadingDemo = false
+
+    // ── Amber palette ─────────────────────────────────────────────────────
+    private let deepAmber = Color(red: 0.48, green: 0.22, blue: 0.04)
+    private let richAmber = Color(red: 0.60, green: 0.30, blue: 0.06)
+    private let medAmber  = Color(red: 0.70, green: 0.40, blue: 0.08)
+    private let warmAmber = Color(red: 0.78, green: 0.50, blue: 0.12)
+    private let gold      = Color(red: 0.84, green: 0.63, blue: 0.24)
+
+    private var pages: [OnboardingPage] {[
+        OnboardingPage(
+            image: "",
+            title: "Welcome to BarrelBook",
+            subtitle: "Know thy shelf.",
+            description: "Track your collection, log tastings, build your wishlist, and explore your whiskey journey. All in one app.",
+            accentColor: gold,
+            isWelcome: true
+        ),
+        OnboardingPage(
+            image: "square.stack.3d.up.fill",
+            title: "Your Collection",
+            subtitle: "Start with What's on Your Shelf",
+            description: "Add every bottle with proof, price, distillery, and special designations. Track open, sealed, and finished bottles separately and see your collection's total value at a glance.",
+            accentColor: warmAmber,
+            isWelcome: false
+        ),
+        OnboardingPage(
+            image: "star.bubble.fill",
+            title: "Log a Tasting",
+            subtitle: "A Journal for Every Pour",
+            description: "Record nose, palate, and finish using the flavor wheel. Rate from 1 to 10, add tasting notes, and browse your full history in list or calendar view.",
+            accentColor: medAmber,
+            isWelcome: false
+        ),
+        OnboardingPage(
+            image: "heart.fill",
+            title: "Your Wishlist",
+            subtitle: "Never Miss a Release",
+            description: "Save bottles you want with target prices and store notes. When you find one, move it straight to your collection.",
+            accentColor: richAmber,
+            isWelcome: false
+        ),
+    ]}
+
+    private var isLastPage: Bool { currentPage == pages.count - 1 }
+    private var currentAccent: Color { pages[currentPage].accentColor }
+
     var body: some View {
         ZStack {
-            // Background gradient
             LinearGradient(
-                gradient: Gradient(colors: [
-                    pages[currentPage].accentColor.opacity(0.2),
-                    Color(.systemBackground)
-                ]),
+                colors: [currentAccent.opacity(0.15), Color(.systemBackground)],
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             )
             .ignoresSafeArea()
-            
-            // Content
+            .animation(.easeInOut(duration: 0.4), value: currentPage)
+
             VStack(spacing: 0) {
-                // Skip button
                 HStack {
                     Spacer()
-                    Button("Skip") {
-                        completeOnboarding()
-                    }
-                    .foregroundColor(.secondary)
-                    .padding()
+                    Button("Skip") { completeOnboarding() }
+                        .foregroundColor(.secondary)
+                        .padding()
                 }
-                
-                // Page content
+
                 TabView(selection: $currentPage) {
                     ForEach(pages.indices, id: \.self) { index in
-                        pageView(for: pages[index])
-                            .tag(index)
+                        pageView(for: pages[index]).tag(index)
                     }
                 }
                 .tabViewStyle(.page(indexDisplayMode: .always))
                 .indexViewStyle(.page(backgroundDisplayMode: .always))
-                .onChange(of: currentPage) { _ in
-                    shouldAnimate = false
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                        shouldAnimate = true
-                    }
+
+                if isLastPage {
+                    lastPageButtons
+                } else {
+                    nextButton
                 }
-                
-                // Next/Get Started button
-                Button(action: {
-                    if currentPage < pages.count - 1 {
-                        withAnimation {
-                            currentPage += 1
-                        }
-                    } else {
-                        completeOnboarding()
-                    }
-                }) {
-                    HStack {
-                        Text(currentPage < pages.count - 1 ? "Next" : "Get Started")
-                            .font(.headline)
-                        Image(systemName: currentPage < pages.count - 1 ? "arrow.right" : "checkmark")
-                    }
-                    .foregroundColor(.white)
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(pages[currentPage].accentColor.gradient)
-                    .cornerRadius(15)
-                }
-                .padding(.horizontal)
-                .padding(.bottom, 40)
+
+                Text("You can replay this anytime in Settings → About")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    .opacity(isLastPage ? 1 : 0)
+                    .padding(.bottom, 28)
             }
         }
     }
-    
+
+    // ── Page layout ───────────────────────────────────────────────────────
     private func pageView(for page: OnboardingPage) -> some View {
-        VStack(spacing: 32) {
+        VStack(spacing: 28) {
             Spacer()
-            
-            // Icon Section - Consistent height for all pages
-            VStack(spacing: 24) {
-                Image(systemName: page.image)
-                    .font(.system(size: 60))
-                    .foregroundColor(page.accentColor)
-                    .symbolEffect(.bounce, options: .repeat(2), value: shouldAnimate)
-                
-                if !page.secondarySymbols.isEmpty {
-                    HStack(spacing: 30) {
-                        ForEach(page.secondarySymbols, id: \.self) { symbol in
-                            Image(systemName: symbol)
-                                .font(.system(size: 24))
-                                .foregroundColor(page.accentColor)
-                                .frame(width: 50, height: 50)
-                                .background(
-                                    Circle()
-                                        .fill(page.accentColor.opacity(0.1))
-                                )
-                        }
-                    }
-                }
+
+            // Icon area
+            if page.isWelcome {
+                appIconView
+            } else {
+                symbolIconView(name: page.image, color: page.accentColor)
             }
-            .frame(height: 160) // Fixed height for icon section
-            
-            // Text Section
-            VStack(spacing: 16) {
+
+            // Text
+            VStack(spacing: 14) {
                 Text(page.title)
-                    .font(.title2)
-                    .bold()
+                    .font(.title2).bold()
                     .multilineTextAlignment(.center)
-                
+
                 Text(page.subtitle)
                     .font(.title3)
+                    .foregroundColor(page.accentColor)
+                    .multilineTextAlignment(.center)
+
+                Text(page.description)
+                    .font(.body)
                     .foregroundColor(.secondary)
                     .multilineTextAlignment(.center)
-                
-                ScrollView {
-                    Text(page.description)
-                        .font(.body)
-                        .multilineTextAlignment(.center)
-                        .frame(maxWidth: .infinity, alignment: .center)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
+                    .fixedSize(horizontal: false, vertical: true)
             }
             .padding(.horizontal, 32)
-            
+
             Spacer()
         }
         .padding(.top, 20)
     }
-    
+
+    // ── App icon (welcome page) ───────────────────────────────────────────
+    private var appIconView: some View {
+        Group {
+            if let uiImage = UIImage(named: "AppIcon") {
+                Image(uiImage: uiImage)
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: 120, height: 120)
+                    .clipShape(RoundedRectangle(cornerRadius: 26, style: .continuous))
+                    .shadow(color: gold.opacity(0.4), radius: 16, x: 0, y: 8)
+            } else {
+                // Fallback: styled amber circle with a whiskey glass emoji
+                ZStack {
+                    Circle()
+                        .fill(LinearGradient(
+                            colors: [gold, deepAmber],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ))
+                        .frame(width: 120, height: 120)
+                    Text("🥃")
+                        .font(.system(size: 60))
+                }
+                .shadow(color: gold.opacity(0.4), radius: 16, x: 0, y: 8)
+            }
+        }
+        .frame(height: 160)
+    }
+
+    // ── SF Symbol icon (feature pages) ───────────────────────────────────
+    private func symbolIconView(name: String, color: Color) -> some View {
+        ZStack {
+            Circle()
+                .fill(LinearGradient(
+                    colors: [color.opacity(0.25), color.opacity(0.08)],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                ))
+                .frame(width: 140, height: 140)
+
+            Image(systemName: name)
+                .font(.system(size: 58, weight: .medium))
+                .foregroundStyle(
+                    LinearGradient(
+                        colors: [color, deepAmber],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                )
+                .symbolRenderingMode(.hierarchical)
+        }
+        .frame(height: 160)
+    }
+
+    // ── Next button ───────────────────────────────────────────────────────
+    private var nextButton: some View {
+        Button {
+            withAnimation { currentPage += 1 }
+        } label: {
+            HStack {
+                Text("Next").font(.headline)
+                Image(systemName: "arrow.right")
+            }
+            .foregroundColor(.white)
+            .frame(maxWidth: .infinity)
+            .padding()
+            .background(currentAccent.gradient)
+            .cornerRadius(15)
+        }
+        .padding(.horizontal)
+        .padding(.bottom, 8)
+    }
+
+    // ── Last page: two choices ────────────────────────────────────────────
+    private var lastPageButtons: some View {
+        VStack(spacing: 12) {
+            Button { completeOnboarding() } label: {
+                HStack {
+                    Text("Get Started").font(.headline)
+                    Image(systemName: "checkmark")
+                }
+                .foregroundColor(.white)
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(currentAccent.gradient)
+                .cornerRadius(15)
+            }
+
+            if onLoadDemoData != nil {
+                Button {
+                    isLoadingDemo = true
+                    onLoadDemoData?()
+                    completeOnboarding()
+                } label: {
+                    HStack {
+                        if isLoadingDemo {
+                            ProgressView().tint(currentAccent).padding(.trailing, 4)
+                        }
+                        Text("Explore with Sample Data").font(.subheadline).fontWeight(.medium)
+                        Image(systemName: "sparkles")
+                    }
+                    .foregroundColor(currentAccent)
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(
+                        RoundedRectangle(cornerRadius: 15)
+                            .strokeBorder(currentAccent.opacity(0.5), lineWidth: 1.5)
+                    )
+                }
+                .disabled(isLoadingDemo)
+
+                Text("Loads a sample bourbon collection so you can explore every feature. Clear it anytime in Settings.")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal)
+            }
+        }
+        .padding(.horizontal)
+        .padding(.bottom, 8)
+    }
+
     private func completeOnboarding() {
         hasSeenOnboarding = true
         dismiss()
@@ -201,4 +272,4 @@ struct OnboardingView: View {
 
 #Preview {
     OnboardingView()
-} 
+}

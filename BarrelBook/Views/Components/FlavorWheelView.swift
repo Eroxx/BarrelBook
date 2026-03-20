@@ -1,306 +1,334 @@
 import SwiftUI
 
+// MARK: - Donut geometry helpers (extracted to avoid @ViewBuilder type-checker overload)
+
+private enum WheelGeometry {
+    static let innerFraction: CGFloat = 0.22   // inner hole as fraction of diameter
+    static let gapDegrees:    Double  = 0.0    // no gap — solid continuous ring
+
+    static func outerRadius(for size: CGFloat) -> CGFloat { size / 2 - 1 }
+    static func innerRadius(for size: CGFloat) -> CGFloat { size * innerFraction }
+    static func centerDiameter(for size: CGFloat) -> CGFloat { size * 0.40 }
+    static func labelRadius(for size: CGFloat) -> CGFloat {
+        // Midpoint of the ring — visually centred in each segment
+        (outerRadius(for: size) + innerRadius(for: size)) / 2
+    }
+
+    /// Annular sector path for a single donut segment
+    static func donutPath(size: CGFloat, start: Angle, end: Angle) -> Path {
+        let center   = CGPoint(x: size / 2, y: size / 2)
+        let outerR   = outerRadius(for: size)
+        let innerR   = innerRadius(for: size)
+        let gapRad   = gapDegrees * .pi / 180
+        let adjStart = Angle(radians: start.radians + gapRad)
+        let adjEnd   = Angle(radians: end.radians   - gapRad)
+
+        // Convert Double radians → CGFloat so cos/sin overloads are unambiguous
+        let sRad = CGFloat(adjStart.radians)
+        let eRad = CGFloat(adjEnd.radians)
+
+        var path = Path()
+        path.move(to: CGPoint(x: center.x + innerR * cos(sRad),
+                              y: center.y + innerR * sin(sRad)))
+        path.addLine(to: CGPoint(x: center.x + outerR * cos(sRad),
+                                 y: center.y + outerR * sin(sRad)))
+        path.addArc(center: center, radius: outerR,
+                    startAngle: adjStart, endAngle: adjEnd, clockwise: false)
+        path.addLine(to: CGPoint(x: center.x + innerR * cos(eRad),
+                                 y: center.y + innerR * sin(eRad)))
+        path.addArc(center: center, radius: innerR,
+                    startAngle: adjEnd, endAngle: adjStart, clockwise: true)
+        path.closeSubpath()
+        return path
+    }
+}
+
+// MARK: - FlavorWheelView
+
 struct FlavorWheelView: View {
     @Binding var flavorProfile: FlavorProfile
     var phase: TastingPhase
     @State private var selectedCategory: FlavorCategory?
     @State private var showingSubflavorPicker = false
-    
-    private let wheelSize: CGFloat = 300
-    private let centerSize: CGFloat = 60
-    
+
+    private func wheelSize(for geometry: GeometryProxy) -> CGFloat {
+        let available = min(geometry.size.width - 32, geometry.size.height - 140)
+        return min(max(available, 240), 320)
+    }
+
+    private func startAngle(for index: Int) -> Angle {
+        let slice = 360.0 / Double(FlavorCategory.allCases.count)
+        return Angle(degrees: slice * Double(index) - 90)
+    }
+
+    private func endAngle(for index: Int) -> Angle {
+        let slice = 360.0 / Double(FlavorCategory.allCases.count)
+        return Angle(degrees: slice * Double(index + 1) - 90)
+    }
+
+    private func getAllSelectedFlavors() -> [(category: FlavorCategory, subflavor: String)] {
+        var result: [(category: FlavorCategory, subflavor: String)] = []
+        for category in FlavorCategory.allCases {
+            for subflavor in flavorProfile.subflavors(for: category, in: phase).sorted() {
+                result.append((category: category, subflavor: subflavor))
+            }
+        }
+        return result
+    }
+
+    private func removeSubflavor(_ subflavor: String, from category: FlavorCategory) {
+        var subs = flavorProfile.subflavors(for: category, in: phase)
+        subs.remove(subflavor)
+        updateSubflavors(for: category, value: subs)
+        if subs.isEmpty { updateIntensity(for: category, value: 0.0) }
+    }
+
+    private func updateIntensity(for category: FlavorCategory, value: Double) {
+        var profile    = flavorProfile
+        var intensities = phase == .nose ? profile.nose : (phase == .palate ? profile.palate : profile.finish)
+        if let i = intensities.firstIndex(where: { $0.category == category }) {
+            intensities[i].intensity = value
+            if phase == .nose          { profile.nose    = intensities }
+            else if phase == .palate   { profile.palate  = intensities }
+            else                       { profile.finish  = intensities }
+            flavorProfile = profile
+        }
+    }
+
+    private func updateSubflavors(for category: FlavorCategory, value: Set<String>) {
+        var profile    = flavorProfile
+        var intensities = phase == .nose ? profile.nose : (phase == .palate ? profile.palate : profile.finish)
+        if let i = intensities.firstIndex(where: { $0.category == category }) {
+            intensities[i].intensity          = value.isEmpty ? 0.0 : 0.5
+            intensities[i].selectedSubflavors = value
+            if phase == .nose          { profile.nose    = intensities }
+            else if phase == .palate   { profile.palate  = intensities }
+            else                       { profile.finish  = intensities }
+            flavorProfile = profile
+        }
+    }
+
+    private static let cardBG  = Color(red: 0.96, green: 0.92, blue: 0.86) // warm parchment
+    private static let wheelBG = Color(red: 0.09, green: 0.06, blue: 0.02) // dark bourbon centre
+
     var body: some View {
         GeometryReader { geometry in
-            VStack(spacing: 0) {
-                // Flavor Wheel - centered in available space
-                ZStack {
-                    // Background circle
-                    Circle()
-                        .fill(Color(.systemBackground))
-                        .shadow(radius: 5)
-                    
-                    // Flavor segments
-                    ForEach(Array(FlavorCategory.allCases.enumerated()), id: \.element) { index, category in
-                        FlavorSegment(
-                            category: category,
-                            intensity: flavorProfile.intensity(for: category, in: phase),
-                            startAngle: startAngle(for: index),
-                            endAngle: endAngle(for: index)
-                        )
-                        .contentShape(Path { path in
-                            path.move(to: CGPoint(x: wheelSize/2, y: wheelSize/2))
-                            path.addArc(
-                                center: CGPoint(x: wheelSize/2, y: wheelSize/2),
-                                radius: wheelSize/2,
-                                startAngle: .radians(startAngle(for: index).radians),
-                                endAngle: .radians(endAngle(for: index).radians),
-                                clockwise: false
-                            )
-                            path.closeSubpath()
-                        })
-                        .onTapGesture {
-                            // Ensure we don't have a race condition
-                            DispatchQueue.main.async {
-                                selectedCategory = category
-                                showingSubflavorPicker = true
-                            }
-                        }
-                    }
-                    
-                    // Center circle with phase name
-                    Circle()
-                        .fill(Color(.systemBackground))
-                        .frame(width: centerSize, height: centerSize)
-                        .overlay(
-                            Text(phase.rawValue)
-                                .font(.headline)
-                                .foregroundColor(.primary)
-                        )
+            let size = wheelSize(for: geometry)
+            // ZStack centres content in GeometryReader (default is top-leading)
+            ZStack {
+                VStack(spacing: 0) {
+                    wheelZStack(size: size)
+                        .frame(width: size, height: size)
+
+                    selectedFlavorsRow
+                        .frame(height: 120)
+                        .frame(maxWidth: .infinity)
                 }
-                .frame(width: wheelSize, height: wheelSize)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .background(Color.clear)
-                
-                // Selected flavors as tags/chips
-                VStack(alignment: .leading, spacing: 12) {
-                    let selectedFlavors = getAllSelectedFlavors()
-                    
-                    if !selectedFlavors.isEmpty {
-                        Text("Selected Flavors")
-                            .font(.headline)
-                            .padding(.horizontal)
-                        
-                        ScrollView(.horizontal, showsIndicators: false) {
-                            LazyHStack(spacing: 8) {
-                                ForEach(selectedFlavors, id: \.subflavor) { item in
-                                    FlavorTag(
-                                        category: item.category,
-                                        subflavor: item.subflavor
-                                    ) {
-                                        removeSubflavor(item.subflavor, from: item.category)
-                                    }
-                                }
-                            }
-                            .padding(.horizontal)
-                        }
-                    } else {
-                        Text("Tap on wheel segments to add flavors")
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                            .padding(.horizontal)
-                    }
-                }
-                .frame(height: 120)
-                .frame(maxWidth: .infinity)
             }
+            .frame(width: geometry.size.width, height: geometry.size.height)
+            .background(Self.cardBG)
         }
+        .listRowBackground(Self.cardBG)
+        .listRowInsets(EdgeInsets())
         .sheet(isPresented: Binding(
             get: { showingSubflavorPicker && selectedCategory != nil },
-            set: { newValue in 
-                showingSubflavorPicker = newValue
-                if !newValue {
-                    selectedCategory = nil
-                }
-            }
+            set: { if !$0 { showingSubflavorPicker = false; selectedCategory = nil } }
         )) {
-            if let category = selectedCategory {
-                SubflavorPickerView(
-                    category: category,
-                    intensity: Binding(
-                        get: { flavorProfile.intensity(for: category, in: phase) },
-                        set: { newValue in
-                            updateIntensity(for: category, value: newValue)
-                        }
-                    ),
-                    selectedSubflavors: Binding(
-                        get: { flavorProfile.subflavors(for: category, in: phase) },
-                        set: { newValue in
-                            updateSubflavors(for: category, value: newValue)
-                        }
-                    )
+            sheetContent
+        }
+    }
+
+    // MARK: - Sub-views (extracted to keep body simple)
+
+    private func wheelZStack(size: CGFloat) -> some View {
+        ZStack {
+            // Dark backing circle — gaps between segments read as dark, not parchment
+            Circle()
+                .fill(Self.wheelBG)
+
+            ForEach(Array(FlavorCategory.allCases.enumerated()), id: \.element) { index, category in
+                FlavorSegment(
+                    category:   category,
+                    intensity:  flavorProfile.intensity(for: category, in: phase),
+                    startAngle: startAngle(for: index),
+                    endAngle:   endAngle(for: index),
+                    wheelSize:  size
                 )
-                .presentationDetents([.medium, .large])
-            } else {
-                // Fallback view to prevent blank screen
-                VStack {
-                    Text("Loading...")
-                        .font(.headline)
-                        .padding()
-                    
-                    Button("Close") {
-                        showingSubflavorPicker = false
+                .contentShape(WheelGeometry.donutPath(
+                    size:  size,
+                    start: startAngle(for: index),
+                    end:   endAngle(for: index)
+                ))
+                .onTapGesture {
+                    DispatchQueue.main.async {
+                        selectedCategory = category
+                        showingSubflavorPicker = true
                     }
-                    .buttonStyle(.borderedProminent)
                 }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .background(Color(.systemBackground))
             }
+            centerHub(size: size)
         }
     }
-    
-    private func getAllSelectedFlavors() -> [(category: FlavorCategory, subflavor: String)] {
-        var allFlavors: [(category: FlavorCategory, subflavor: String)] = []
-        
-        for category in FlavorCategory.allCases {
-            let subflavors = flavorProfile.subflavors(for: category, in: phase)
-            for subflavor in subflavors.sorted() {
-                allFlavors.append((category: category, subflavor: subflavor))
-            }
-        }
-        
-        return allFlavors
+
+    private func centerHub(size: CGFloat) -> some View {
+        let diameter = WheelGeometry.centerDiameter(for: size)
+        return Circle()
+            .fill(Self.wheelBG)
+            .frame(width: diameter, height: diameter)
+            .overlay(
+                Circle()
+                    .strokeBorder(
+                        Color(red: 0.55, green: 0.28, blue: 0.05).opacity(0.70),
+                        lineWidth: 1.5
+                    )
+            )
+            .overlay(
+                Text(phase.rawValue)
+                    .font(.system(size: size * 0.052, weight: .semibold))
+                    .foregroundColor(Color(red: 0.84, green: 0.63, blue: 0.24))
+            )
     }
-    
-    private func removeSubflavor(_ subflavor: String, from category: FlavorCategory) {
-        var currentSubflavors = flavorProfile.subflavors(for: category, in: phase)
-        currentSubflavors.remove(subflavor)
-        updateSubflavors(for: category, value: currentSubflavors)
-        
-        // If no subflavors remain, set intensity to 0
-        if currentSubflavors.isEmpty {
-            updateIntensity(for: category, value: 0.0)
-        }
-    }
-    
-    private func startAngle(for index: Int) -> Angle {
-        let count = Double(FlavorCategory.allCases.count)
-        let degreesPerSegment = 360.0 / count
-        let degrees = degreesPerSegment * Double(index) - 90 // Start at top
-        return Angle(degrees: degrees)
-    }
-    
-    private func endAngle(for index: Int) -> Angle {
-        let count = Double(FlavorCategory.allCases.count)
-        let degreesPerSegment = 360.0 / count
-        let degrees = degreesPerSegment * Double(index + 1) - 90 // Start at top
-        return Angle(degrees: degrees)
-    }
-    
-    private func updateIntensity(for category: FlavorCategory, value: Double) {
-        var profile = flavorProfile
-        var intensities = phase == .nose ? profile.nose : (phase == .palate ? profile.palate : profile.finish)
-        if let index = intensities.firstIndex(where: { $0.category == category }) {
-            intensities[index].intensity = value
-            if phase == .nose {
-                profile.nose = intensities
-            } else if phase == .palate {
-                profile.palate = intensities
+
+    private var selectedFlavorsRow: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            let flavors = getAllSelectedFlavors()
+            if flavors.isEmpty {
+                Text("Tap on wheel segments to add flavors")
+                    .font(.subheadline)
+                    .foregroundColor(Color(red: 0.40, green: 0.25, blue: 0.08).opacity(0.70))
+                    .padding(.horizontal)
             } else {
-                profile.finish = intensities
+                Text("Selected Flavors")
+                    .font(.headline)
+                    .foregroundColor(Color(red: 0.30, green: 0.18, blue: 0.04))
+                    .padding(.horizontal)
+                ScrollView(.horizontal, showsIndicators: false) {
+                    LazyHStack(spacing: 8) {
+                        ForEach(flavors, id: \.subflavor) { item in
+                            FlavorTag(category: item.category, subflavor: item.subflavor) {
+                                removeSubflavor(item.subflavor, from: item.category)
+                            }
+                        }
+                    }
+                    .padding(.horizontal)
+                }
             }
-            flavorProfile = profile
         }
     }
-    
-    private func updateSubflavors(for category: FlavorCategory, value: Set<String>) {
-        var profile = flavorProfile
-        var intensities = phase == .nose ? profile.nose : (phase == .palate ? profile.palate : profile.finish)
-        if let index = intensities.firstIndex(where: { $0.category == category }) {
-            intensities[index].intensity = value.isEmpty ? 0.0 : 0.5
-            intensities[index].selectedSubflavors = value
-            
-            if phase == .nose {
-                profile.nose = intensities
-            } else if phase == .palate {
-                profile.palate = intensities
-            } else {
-                profile.finish = intensities
+
+    @ViewBuilder
+    private var sheetContent: some View {
+        if let category = selectedCategory {
+            SubflavorPickerView(
+                category: category,
+                intensity: Binding(
+                    get: { flavorProfile.intensity(for: category, in: phase) },
+                    set: { updateIntensity(for: category, value: $0) }
+                ),
+                selectedSubflavors: Binding(
+                    get: { flavorProfile.subflavors(for: category, in: phase) },
+                    set: { updateSubflavors(for: category, value: $0) }
+                )
+            )
+            .presentationDetents([.medium, .large])
+        } else {
+            VStack {
+                Text("Loading...").font(.headline).padding()
+                Button("Close") { showingSubflavorPicker = false }
+                    .buttonStyle(.borderedProminent)
             }
-            flavorProfile = profile
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(Color(.systemBackground))
         }
     }
 }
+
+// MARK: - Donut Segment
 
 struct FlavorSegment: View {
-    let category: FlavorCategory
-    let intensity: Double
+    let category:   FlavorCategory
+    let intensity:  Double
     let startAngle: Angle
-    let endAngle: Angle
-    
-    private let wheelSize: CGFloat = 300
-    
+    let endAngle:   Angle
+    var wheelSize:  CGFloat = 300
+
     var body: some View {
         ZStack {
-            // Background segment
-            Path { path in
-                let center = CGPoint(x: wheelSize/2, y: wheelSize/2)
-                path.move(to: center)
-                path.addArc(
-                    center: center,
-                    radius: wheelSize/2,
-                    startAngle: .radians(startAngle.radians),
-                    endAngle: .radians(endAngle.radians),
-                    clockwise: false
-                )
-                path.closeSubpath()
-            }
-            .fill(category.color.opacity(0.3))
-            
-            // Removed intensity segment to eliminate secondary color effect
-            
-            // Category label
+            WheelGeometry.donutPath(size: wheelSize, start: startAngle, end: endAngle)
+                .fill(category.color)
+
             CategoryLabel(
-                category: category,
+                category:   category,
                 startAngle: startAngle,
-                endAngle: endAngle
+                endAngle:   endAngle,
+                wheelSize:  wheelSize,
+                intensity:  intensity
             )
         }
     }
 }
 
+// MARK: - Category Label
+
 struct CategoryLabel: View {
-    let category: FlavorCategory
+    let category:   FlavorCategory
     let startAngle: Angle
-    let endAngle: Angle
-    
-    private let wheelSize: CGFloat = 300
-    private let labelRadius: CGFloat = 85
-    
+    let endAngle:   Angle
+    var wheelSize:  CGFloat = 300
+    var intensity:  Double  = 0.0
+
     var body: some View {
-        let midAngle = Angle(radians: (startAngle.radians + endAngle.radians) / 2)
-        let x = labelRadius * cos(midAngle.radians)
-        let y = labelRadius * sin(midAngle.radians)
-        
+        let labelR  = WheelGeometry.labelRadius(for: wheelSize)
+        let midRad  = CGFloat((startAngle.radians + endAngle.radians) / 2)
+        // Round to whole pixels so the glyph rasteriser never straddles a pixel boundary
+        let px      = (wheelSize / 2 + labelR * cos(midRad)).rounded()
+        let py      = (wheelSize / 2 + labelR * sin(midRad)).rounded()
+
         Text(category.rawValue)
-            .font(.system(size: 12, weight: .semibold))
+            .font(.system(size: 11, weight: .heavy))
             .foregroundColor(.white)
-            .padding(.horizontal, 6)
-            .padding(.vertical, 2)
-            .background(
-                Capsule()
-                    .fill(Color.black.opacity(0.35))
-            )
-            .shadow(color: .black.opacity(0.8), radius: 2, x: 0, y: 1)
-            .position(x: wheelSize/2 + x, y: wheelSize/2 + y)
+            .shadow(color: .black.opacity(0.65), radius: 0, x: 1, y: 1)
+            .position(x: px, y: py)
     }
 }
+
+// MARK: - Subflavor Picker
 
 struct SubflavorPickerView: View {
     let category: FlavorCategory
     @Binding var intensity: Double
     @Binding var selectedSubflavors: Set<String>
     @Environment(\.dismiss) private var dismiss
-    
+
     var body: some View {
         NavigationView {
             Form {
+                Section(
+                    header: Text("Intensity"),
+                    footer: Text("How strong this flavor is (e.g. a hint vs. dominant).")
+                ) {
+                    HStack {
+                        Text("Subtle").font(.caption).foregroundColor(.secondary)
+                        Slider(value: $intensity, in: 0...1.0, step: 0.1)
+                            .disabled(selectedSubflavors.isEmpty)
+                        Text("Strong").font(.caption).foregroundColor(.secondary)
+                    }
+                    if !selectedSubflavors.isEmpty {
+                        Text("\(Int(round(intensity * 10)))/10")
+                            .font(.subheadline).foregroundColor(.secondary)
+                    }
+                }
                 Section(header: Text("Subflavors")) {
                     ForEach(category.subflavors, id: \.self) { subflavor in
                         Toggle(subflavor, isOn: Binding(
                             get: { selectedSubflavors.contains(subflavor) },
-                            set: { isSelected in
-                                if isSelected {
+                            set: { isOn in
+                                if isOn {
                                     selectedSubflavors.insert(subflavor)
-                                    // Set intensity to 0.5 when any subflavor is selected
-                                    if intensity == 0 {
-                                        intensity = 0.5
-                                    }
+                                    if intensity == 0 { intensity = 0.5 }
                                 } else {
                                     selectedSubflavors.remove(subflavor)
-                                    // Set intensity to 0 if no subflavors are selected
-                                    if selectedSubflavors.isEmpty {
-                                        intensity = 0
-                                    }
+                                    if selectedSubflavors.isEmpty { intensity = 0 }
                                 }
                             }
                         ))
@@ -311,26 +339,23 @@ struct SubflavorPickerView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Done") {
-                        dismiss()
-                    }
+                    Button("Done") { dismiss() }
                 }
             }
         }
     }
 }
 
+// MARK: - Flavor Tag
+
 struct FlavorTag: View {
-    let category: FlavorCategory
+    let category:  FlavorCategory
     let subflavor: String
-    let onRemove: () -> Void
-    
+    let onRemove:  () -> Void
+
     var body: some View {
         HStack(spacing: 4) {
-            Text(subflavor)
-                .font(.caption)
-                .fontWeight(.medium)
-            
+            Text(subflavor).font(.caption).fontWeight(.medium)
             Button(action: onRemove) {
                 Image(systemName: "xmark.circle.fill")
                     .font(.caption)
@@ -339,11 +364,8 @@ struct FlavorTag: View {
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 6)
-        .background(
-            Capsule()
-                .fill(category.color)
-        )
+        .background(Capsule().fill(category.color))
         .foregroundColor(.white)
         .shadow(radius: 2)
     }
-} 
+}

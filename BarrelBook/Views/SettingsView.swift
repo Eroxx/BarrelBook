@@ -102,490 +102,38 @@ struct SettingsView: View {
     @State private var showingDeleteInfinityConfirmation = false
     @State private var showingDeleteWishlistConfirmation = false
     @State private var showingDeleteAllConfirmation = false
+    @State private var showingLoadDemoDataConfirmation = false
+    @State private var showingDemoDataInfo = false
     
     // Add new @State variables for DisclosureGroup and info alert:
     @State private var showingDeleteDataOptions = false
     @State private var showingBottleNumberingInfo = false
     @State private var showingPaywall = false
+    @AppStorage("hasSeenSettingsTutorial") private var hasSeenSettingsTutorial = false
+    @State private var showingSettingsTutorialOverlay = false
+    @State private var settingsTutorialStep = 1
     
     var body: some View {
+        ZStack {
         NavigationView {
-            Form {
-                Section(header: Text("Appearance")) {
-                    Picker("Appearance", selection: $colorScheme) {
-                        Text("Light").tag(AppColorScheme.light)
-                        Text("Dark").tag(AppColorScheme.dark)
-                        Text("System").tag(AppColorScheme.system)
-                    }
-                    .pickerStyle(SegmentedPickerStyle())
-                    .onChange(of: colorScheme) { newValue in
-                        HapticManager.shared.selectionFeedback()
-                        applyTheme(newValue)
-                    }
-                }
-                
-                // Subscription Section
-                Section(header: Text("Subscription")) {
-                    subscriptionStatusView
-                }
-                
-                Section(header: Text("Favorite Stores")) {
-                    if favoriteStores.isEmpty {
-                        VStack(alignment: .center, spacing: 8) {
-                            Image(systemName: "star")
-                                .font(.largeTitle)
-                                .foregroundColor(.secondary)
-                            Text("No favorite stores yet")
-                                .foregroundColor(.secondary)
-                            Text("Add stores to quickly find whiskeys")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                        }
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                    } else {
-                        DisclosureGroup {
-                            let nearbyStores = getNearbyStores()
-                            let otherStores = getOtherStores()
-                            
-                            if !nearbyStores.isEmpty {
-                                Section(header: Text("Nearby Stores")) {
-                                    ForEach(nearbyStores) { store in
-                                        StoreRowView(store: store)
-                                            .swipeActions(edge: .trailing) {
-                                                Button(role: .destructive) {
-                                                    store.isFavorite = false
-                                                    try? viewContext.save()
-                                                } label: {
-                                                    Label("Remove", systemImage: "trash")
-                                                }
-                                            }
-                                    }
-                                }
-                            }
-                            
-                            if !otherStores.isEmpty {
-                                Section(header: Text("Other Favorite Stores")) {
-                                    ForEach(otherStores) { store in
-                                        StoreRowView(store: store)
-                                            .swipeActions(edge: .trailing) {
-                                                Button(role: .destructive) {
-                                                    store.isFavorite = false
-                                                    try? viewContext.save()
-                                                } label: {
-                                                    Label("Remove", systemImage: "trash")
-                                                }
-                                            }
-                                    }
-                                }
-                            }
-                        } label: {
-                            HStack {
-                                Text("Favorite Stores (\(favoriteStores.count))")
-                                    .foregroundColor(.primary)
-                                Spacer()
-                            }
-                        }
-                    }
-                    
-                    Button(action: { showingStoreSelection = true }) {
-                        HStack {
-                            Image(systemName: "plus.circle.fill")
-                                .foregroundColor(.blue)
-                            Text("Add New Store")
-                        }
-                    }
-                }
-                
-                Section(header: Text("Data Management")) {
-                    // DisclosureGroup for Delete Data
-                    DisclosureGroup(
-                        isExpanded: $showingDeleteDataOptions,
-                        content: {
-                            // Delete Collection (owned whiskeys only)
-                            Button(action: {
-                                showingDeleteCollectionConfirmation = true
-                            }) {
-                                HStack {
-                                    Image(systemName: "trash.circle.fill")
-                                        .foregroundColor(.red)
-                                    Text("Delete Collection (Owned Whiskeys)")
-                                        .foregroundColor(.red)
-                                }
-                            }
-                            .buttonStyle(PlainButtonStyle())
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(.bottom, 10)
-                            .alert("Delete Collection?", isPresented: $showingDeleteCollectionConfirmation) {
-                                Button("Cancel", role: .cancel) { }
-                                Button("Delete Owned Whiskeys", role: .destructive) {
-                                    deleteOwnedCollection()
-                                }
-                            } message: {
-                                Text("This will permanently delete all owned whiskeys and their bottles. This action cannot be undone.")
-                            }
-
-                            // Delete all Tasting Data
-                            Button(action: {
-                                showingDeleteTastingConfirmation = true
-                            }) {
-                                HStack {
-                                    Image(systemName: "trash.circle.fill")
-                                        .foregroundColor(.red)
-                                    Text("Delete all Tasting Data")
-                                        .foregroundColor(.red)
-                                }
-                            }
-                            .buttonStyle(PlainButtonStyle())
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .alert("Delete All Tasting Data?", isPresented: $showingDeleteTastingConfirmation) {
-                                Button("Cancel", role: .cancel) { }
-                                Button("Delete All Tasting Data", role: .destructive) {
-                                    deleteAllTastingData()
-                                }
-                            } message: {
-                                Text("This will permanently delete all tasting notes and journal entries. This action cannot be undone.")
-                            }
-
-                            // Delete Infinity Bottles
-                            Button(action: {
-                                showingDeleteInfinityConfirmation = true
-                            }) {
-                                HStack {
-                                    Image(systemName: "trash.circle.fill")
-                                        .foregroundColor(.red)
-                                    Text("Delete Infinity Bottles")
-                                        .foregroundColor(.red)
-                                }
-                            }
-                            .buttonStyle(PlainButtonStyle())
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .alert("Delete All Infinity Bottles?", isPresented: $showingDeleteInfinityConfirmation) {
-                                Button("Cancel", role: .cancel) { }
-                                Button("Delete Infinity Bottles", role: .destructive) {
-                                    deleteAllInfinityBottles()
-                                }
-                            } message: {
-                                Text("This will permanently delete all infinity bottles and their data. This action cannot be undone.")
-                            }
-
-                            // Delete Wishlist/Replacement Bottles
-                            Button(action: {
-                                showingDeleteWishlistConfirmation = true
-                            }) {
-                                HStack {
-                                    Image(systemName: "trash.circle.fill")
-                                        .foregroundColor(.red)
-                                    Text("Delete Wishlist/Replacement Bottles")
-                                        .foregroundColor(.red)
-                                }
-                            }
-                            .buttonStyle(PlainButtonStyle())
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .alert("Delete Wishlist/Replacement Bottles?", isPresented: $showingDeleteWishlistConfirmation) {
-                                Button("Cancel", role: .cancel) { }
-                                Button("Delete Wishlist/Replacement", role: .destructive) {
-                                    deleteWishlistAndReplacementBottles()
-                                }
-                            } message: {
-                                Text("This will permanently delete all wishlist and replacement bottles. This action cannot be undone.")
-                            }
-
-                            // Delete ALL Data
-                            Button(action: {
-                                showingDeleteAllConfirmation = true
-                            }) {
-                                HStack {
-                                    Image(systemName: "trash.circle.fill")
-                                        .foregroundColor(.red)
-                                    Text("Delete all Data")
-                                        .foregroundColor(.red)
-                                }
-                            }
-                            .buttonStyle(PlainButtonStyle())
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .alert("Delete ALL Data?", isPresented: $showingDeleteAllConfirmation) {
-                                Button("Cancel", role: .cancel) { }
-                                Button("Delete EVERYTHING", role: .destructive) {
-                                    deleteAllData()
-                                }
-                            } message: {
-                                Text("This will permanently delete ALL data in BarrelBook, including whiskeys, bottles, tastings, infinity bottles, wishlist, and replacement bottles. This action cannot be undone.")
-                            }
-                        },
-                        label: {
-                            Label("Delete Data", systemImage: "trash")
-                                .foregroundColor(.red)
-                        }
-                    )
-
-                    HStack(spacing: 30) {
-                        Spacer()
-                        
-                        // Import button
-                            Button(action: {
-                                triggerImport()
-                            }) {
-                                VStack {
-                                    Image(systemName: "arrow.down.doc")
-                                        .font(.system(size: 28))
-                                        .padding(.bottom, 2)
-                                    Text("Import CSV")
-                                        .font(.caption)
-                                }
-                                .frame(width: 80, height: 80)
-                            .foregroundColor(.blue)
-                            }
-                            .buttonStyle(PlainButtonStyle())
-                            .disabled(isLoading)
-                            .opacity(isLoading ? 0.5 : 1.0)
-                        
-                        Spacer()
-                        
-                        // Export button
-                            Button(action: {
-                                exportData()
-                            }) {
-                                VStack {
-                                    Image(systemName: "arrow.up.doc")
-                                        .font(.system(size: 28))
-                                        .padding(.bottom, 2)
-                                    Text("Export CSV")
-                                        .font(.caption)
-                                }
-                                .frame(width: 80, height: 80)
-                            .foregroundColor(.blue)
-                            }
-                            .buttonStyle(PlainButtonStyle())
-                            .disabled(isLoading)
-                            .opacity(isLoading ? 0.5 : 1.0)
-                        
-                        Spacer()
-                    }
-                    .padding(.vertical, 10)
-                    
-                    // Loading indicator when import/export is in progress
-                    if isLoading {
-                        HStack {
-                            Spacer()
-                            VStack {
-                                // Replace simple progress indicator with a progress bar and status
-                                VStack(alignment: .leading, spacing: 8) {
-                                    ProgressView(value: importProgress, total: 1.0)
-                                        .progressViewStyle(LinearProgressViewStyle())
-                                        .frame(height: 8)
-                                        .padding(.bottom, 2)
-
-                                    HStack {
-                                        Text("\(Int(importProgress * 100))% Complete")
-                                            .font(.caption)
-                                            .fontWeight(.medium)
-                                        Spacer()
-                                        Text(importStatusMessage)
-                                            .font(.caption)
-                                            .foregroundColor(.secondary)
-                                    }
-                                }
-                                .frame(maxWidth: .infinity)
-                                .padding(.horizontal)
-                                .padding(.vertical, 8)
-                            }
-                            Spacer()
-                        }
-                        .padding(.vertical, 10)
-                    }
-                    
-                    // Template creation button
-                    HStack {
-                        Button {
-                            createCSVTemplate()
-                            HapticManager.shared.mediumImpact()
-                        } label: {
-                                Label("Download CSV Template", systemImage: "doc.badge.plus")
-                                .foregroundColor(.blue)
-                            }
-                        .buttonStyle(PlainButtonStyle())
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        
-                        Button {
-                            showingTemplateAlert = true
-                            HapticManager.shared.mediumImpact()
-                        } label: {
-                            Image(systemName: "info.circle")
-                                .foregroundColor(.blue)
-                        }
-                        .buttonStyle(PlainButtonStyle())
-                    }
-                }
-                
-                Section(header: Text("Help")) {
-                    Button {
-                        hasSeenOnboarding = false
-                        showingOnboarding = true
-                        HapticManager.shared.successFeedback()
-                    } label: {
-                        Label("Replay Tutorial", systemImage: "arrow.counterclockwise")
-                    }
-                }
-                
-                Section(header: Text("About")) {
-                    HStack {
-                        Text("Version")
-                        Spacer()
-                        Text(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.0")
-                            .foregroundColor(.secondary)
-                    }
-                }
-                
-                // Add a Privacy section
-                Section(header: Text("PRIVACY")) {
-                    Toggle(isOn: $privacyManager.hidePrices) {
-                        HStack {
-                            Text("Hide Prices")
-                            Image(systemName: "lock.fill")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                        }
-                    }
-                    
-                    if privacyManager.hidePrices {
-                        Text("Prices will be hidden throughout the app. Tap the lock icon to temporarily view a price.")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    }
-                }
-            }
-            .navigationTitle("Settings")
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                Button("Done") {
-                    dismiss()
+            formContent
+        }
+            if showingSettingsTutorialOverlay {
+                SettingsTutorialOverlay(step: settingsTutorialStep, onNext: {
+                    settingsTutorialStep = 2
+                }, onDismiss: {
+                    hasSeenSettingsTutorial = true
+                    showingSettingsTutorialOverlay = false
+                    settingsTutorialStep = 1
                     HapticManager.shared.lightImpact()
-                }
-                }
-            }
-            .alert("Error", isPresented: $showingError) {
-                Button("OK", role: .cancel) { }
-            } message: {
-                Text(errorMessage)
-            }
-            .alert("Success", isPresented: $showingSuccess) {
-                Button("OK", role: .cancel) { }
-            } message: {
-                Text(successMessage)
-            }
-            .alert("Import Options", isPresented: $showingImportOptions) {
-                Button("Start Fresh") {
-                    showingStartFreshWarning = true
-                }
-                Button("Merge with Existing") {
-                    if let file = selectedCSVFile {
-                        Task {
-                            do {
-                                // Start accessing the file again
-                                guard file.startAccessingSecurityScopedResource() else {
-                                    errorMessage = "Permission denied: Unable to access the selected file. Please try again."
-                                    showingError = true
-                                    return
-                                }
-                                
-                                // Read the file content
-                                let csvString = try String(contentsOf: file, encoding: .utf8)
-                                
-                                // Stop accessing the file
-                                file.stopAccessingSecurityScopedResource()
-                                
-                                // Process the import
-                                await processCSVString(csvString, isFreshImport: false)
-                            } catch {
-                                errorMessage = "Failed to read CSV file: \(error.localizedDescription)"
-                                showingError = true
-                            }
-                        }
-                    }
-                }
-                Button("Cancel", role: .cancel) { }
-            } message: {
-                Text("How would you like to import your CSV data?\n\n• Start Fresh: Delete all existing whiskeys and import only from the CSV\n• Merge with Existing: Keep existing whiskeys and add/update from the CSV")
-            }
-            .alert("Warning: Delete Collection", isPresented: $showingStartFreshWarning) {
-                Button("Cancel", role: .cancel) { }
-                Button("Delete and Import", role: .destructive) {
-                    if let file = selectedCSVFile {
-                        Task {
-                            do {
-                                // Start accessing the file again
-                                guard file.startAccessingSecurityScopedResource() else {
-                                    errorMessage = "Permission denied: Unable to access the selected file. Please try again."
-                                    showingError = true
-                                    return
-                                }
-                                
-                                // Read the file content
-                                let csvString = try String(contentsOf: file, encoding: .utf8)
-                                
-                                // Stop accessing the file
-                                file.stopAccessingSecurityScopedResource()
-                                
-                                // Process the import
-                                await processCSVString(csvString, isFreshImport: true)
-                            } catch {
-                                errorMessage = "Failed to read CSV file: \(error.localizedDescription)"
-                                showingError = true
-                            }
-                        }
-                    }
-                }
-            } message: {
-                Text("This process will delete all whiskeys currently in the app and replace them with your imported CSV file. This action cannot be undone.\n\nDo you want to continue?")
-            }
-            .alert("About CSV Templates", isPresented: $showingTemplateAlert) {
-                Button("Download Template", role: .none) {
-                    createCSVTemplate()
-                }
-                Button("Cancel", role: .cancel) { }
-            } message: {
-                Text("A CSV template helps you understand how to format your whiskey data for importing into BarrelBook.\n\nThe template includes:\n\n• Example entries showing proper formatting\n• A README with detailed instructions\n• Tips for using spreadsheet software\n\nThis is especially useful if you plan to maintain your collection data in a spreadsheet.")
-            }
-            .alert("Import Conflict", isPresented: $showingConflict) {
-                Button("Skip", role: .cancel) {
-                    conflictContinuation?.resume(returning: false)
-                    conflictContinuation = nil
-                }
-                Button("Replace", role: .destructive) {
-                    conflictContinuation?.resume(returning: true)
-                    conflictContinuation = nil
-                }
-            } message: {
-                Text(conflictMessage)
-            }
-            .fileImporter(
-                isPresented: $isShowingCSVImportPicker,
-                allowedContentTypes: [UTType.commaSeparatedText, UTType.text, UTType.data, .plainText],
-                allowsMultipleSelection: false
-            ) { result in
-                importData(result)
-            }
-            .sheet(isPresented: $showingStoreSelection) {
-                StoreSelectionView(currentlySelectedStores: Set<Store>()) { store in
-                    if let store = store {
-                        store.isFavorite = true
-                        do {
-                            try viewContext.save()
-                        } catch {
-                            let nsError = error as NSError
-                            print("Error saving store: \(nsError), \(nsError.userInfo)")
-                        }
-                    }
-                    // Note: "No Store Selected" doesn't make sense in settings context
-                }
+                })
             }
         }
         .preferredColorScheme(displayColorScheme)
         .navigationViewStyle(StackNavigationViewStyle())
         .interactiveDismissDisabled() // Prevent dismissal by dragging down
         .sheet(isPresented: $showingOnboarding) {
-            OnboardingView()
+            OnboardingView(onLoadDemoData: { loadDemoData() })
         }
         .sheet(isPresented: $isExportingToCustomLocation) {
             DocumentPickerExport(
@@ -616,6 +164,785 @@ struct SettingsView: View {
         .onAppear {
             setupConflictHandling()
             additionalSetup()
+            if !hasSeenSettingsTutorial {
+                settingsTutorialStep = 1
+                showingSettingsTutorialOverlay = true
+            }
+        }
+    }
+    
+    // MARK: - View Sections
+    
+    private var formContent: some View {
+        Form {
+            appearanceSection
+            subscriptionSection
+            favoriteStoresSection
+            dataManagementSection
+            helpSection
+            aboutSection
+            privacySection
+        }
+        .navigationTitle("Settings")
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+            Button("Done") {
+                dismiss()
+                HapticManager.shared.lightImpact()
+            }
+            }
+        }
+        .alert("Error", isPresented: $showingError) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text(errorMessage)
+        }
+        .alert("Success", isPresented: $showingSuccess) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text(successMessage)
+        }
+        .alert("Import Options", isPresented: $showingImportOptions) {
+            Button("Start Fresh") {
+                showingStartFreshWarning = true
+            }
+            Button("Merge with Existing") {
+                if let file = selectedCSVFile {
+                    Task {
+                        do {
+                            // Start accessing the file again
+                            guard file.startAccessingSecurityScopedResource() else {
+                                errorMessage = "Permission denied: Unable to access the selected file. Please try again."
+                                showingError = true
+                                return
+                            }
+                            
+                            // Read the file content
+                            let csvString = try String(contentsOf: file, encoding: .utf8)
+                            
+                            // Stop accessing the file
+                            file.stopAccessingSecurityScopedResource()
+                            
+                            // Process the import
+                            await processCSVString(csvString, isFreshImport: false)
+                        } catch {
+                            errorMessage = "Failed to read CSV file: \(error.localizedDescription)"
+                            showingError = true
+                        }
+                    }
+                }
+            }
+            Button("Cancel", role: .cancel) { }
+        } message: {
+            Text("How would you like to import your CSV data?\n\n• Start Fresh: Delete all existing whiskeys and import only from the CSV\n• Merge with Existing: Keep existing whiskeys and add/update from the CSV")
+        }
+        .alert("Warning: Delete Collection", isPresented: $showingStartFreshWarning) {
+            Button("Cancel", role: .cancel) { }
+            Button("Delete and Import", role: .destructive) {
+                if let file = selectedCSVFile {
+                    Task {
+                        do {
+                            // Start accessing the file again
+                            guard file.startAccessingSecurityScopedResource() else {
+                                errorMessage = "Permission denied: Unable to access the selected file. Please try again."
+                                showingError = true
+                                return
+                            }
+                            
+                            // Read the file content
+                            let csvString = try String(contentsOf: file, encoding: .utf8)
+                            
+                            // Stop accessing the file
+                            file.stopAccessingSecurityScopedResource()
+                            
+                            // Process the import
+                            await processCSVString(csvString, isFreshImport: true)
+                        } catch {
+                            errorMessage = "Failed to read CSV file: \(error.localizedDescription)"
+                            showingError = true
+                        }
+                    }
+                }
+            }
+        } message: {
+            Text("This process will delete all whiskeys currently in the app and replace them with your imported CSV file. This action cannot be undone.\n\nDo you want to continue?")
+        }
+        .alert("About CSV Templates", isPresented: $showingTemplateAlert) {
+            Button("Download Template", role: .none) {
+                createCSVTemplate()
+            }
+            Button("Cancel", role: .cancel) { }
+        } message: {
+            Text("A CSV template helps you understand how to format your whiskey data for importing into BarrelBook.\n\nThe template includes:\n\n• Example entries showing proper formatting\n• A README with detailed instructions\n• Tips for using spreadsheet software\n\nThis is especially useful if you plan to maintain your collection data in a spreadsheet.")
+        }
+        .alert("Import Conflict", isPresented: $showingConflict) {
+            Button("Skip", role: .cancel) {
+                conflictContinuation?.resume(returning: false)
+                conflictContinuation = nil
+            }
+            Button("Replace", role: .destructive) {
+                conflictContinuation?.resume(returning: true)
+                conflictContinuation = nil
+            }
+        } message: {
+            Text(conflictMessage)
+        }
+        .fileImporter(
+            isPresented: $isShowingCSVImportPicker,
+            allowedContentTypes: [UTType.commaSeparatedText, UTType.text, UTType.data, .plainText],
+            allowsMultipleSelection: false
+        ) { result in
+            importData(result)
+        }
+        .sheet(isPresented: $showingStoreSelection) {
+            StoreSelectionView(currentlySelectedStores: Set<Store>()) { store in
+                if let store = store {
+                    // Don't add if another favorite with same name/address already exists
+                    let name = (store.name ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+                    let address = (store.address ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+                    let request = Store.fetchRequest()
+                    request.predicate = NSPredicate(format: "isFavorite == YES AND name == %@ AND address == %@", name, address)
+                    request.fetchLimit = 2
+                    do {
+                        let existing = try viewContext.fetch(request)
+                        let otherExists = existing.contains { $0.objectID != store.objectID }
+                        if !otherExists {
+                            store.isFavorite = true
+                            try viewContext.save()
+                        }
+                    } catch {
+                        let nsError = error as NSError
+                        print("Error saving store: \(nsError), \(nsError.userInfo)")
+                    }
+                }
+                // Note: "No Store Selected" doesn't make sense in settings context
+            }
+        }
+    }
+    
+    private var appearanceSection: some View {
+        Section(header: Text("Appearance")) {
+            Picker("Appearance", selection: $colorScheme) {
+                Text("Light").tag(AppColorScheme.light)
+                Text("Dark").tag(AppColorScheme.dark)
+                Text("System").tag(AppColorScheme.system)
+            }
+            .pickerStyle(SegmentedPickerStyle())
+            .onChange(of: colorScheme) { newValue in
+                HapticManager.shared.selectionFeedback()
+                applyTheme(newValue)
+            }
+        }
+    }
+    
+    private var subscriptionSection: some View {
+        Section(header: Text("Premium")) {
+            subscriptionStatusView
+        }
+    }
+    
+    private var favoriteStoresSection: some View {
+        Section(header: Text("Favorite Stores")) {
+            if favoriteStores.isEmpty {
+                VStack(alignment: .center, spacing: 8) {
+                    Image(systemName: "star")
+                        .font(.largeTitle)
+                        .foregroundColor(.secondary)
+                    Text("No favorite stores yet")
+                        .foregroundColor(.secondary)
+                    Text("Add stores to quickly find whiskeys")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+                .frame(maxWidth: .infinity)
+                .padding()
+            } else {
+                DisclosureGroup {
+                    let nearbyStores = getNearbyStores()
+                    let otherStores = getOtherStores()
+                    
+                    if !nearbyStores.isEmpty {
+                        Section(header: Text("Nearby Stores")) {
+                            ForEach(nearbyStores) { store in
+                                StoreRowView(store: store)
+                                    .swipeActions(edge: .trailing) {
+                                        Button(role: .destructive) {
+                                            store.isFavorite = false
+                                            try? viewContext.save()
+                                        } label: {
+                                            Label("Remove", systemImage: "trash")
+                                        }
+                                    }
+                            }
+                        }
+                    }
+                    
+                    if !otherStores.isEmpty {
+                        Section(header: Text(nearbyStores.isEmpty ? "Favorite Stores" : "Other Favorite Stores")) {
+                            ForEach(otherStores) { store in
+                                StoreRowView(store: store)
+                                    .swipeActions(edge: .trailing) {
+                                        Button(role: .destructive) {
+                                            store.isFavorite = false
+                                            try? viewContext.save()
+                                        } label: {
+                                            Label("Remove", systemImage: "trash")
+                                        }
+                                    }
+                            }
+                        }
+                    }
+                } label: {
+                    HStack {
+                        Text("Favorite Stores (\(favoriteStores.count))")
+                            .foregroundColor(.primary)
+                        Spacer()
+                    }
+                }
+            }
+            
+            Button(action: { showingStoreSelection = true }) {
+                HStack {
+                    Image(systemName: "plus.circle.fill")
+                        .foregroundColor(.blue)
+                    Text("Add New Store")
+                }
+            }
+        }
+    }
+    
+    private var dataManagementSection: some View {
+        Section(header: Text("Data Management")) {
+            // DisclosureGroup for Delete Data
+            DisclosureGroup(
+                isExpanded: $showingDeleteDataOptions,
+                content: {
+                    deleteDataButtons
+                },
+                label: {
+                    Label("Delete Data", systemImage: "trash")
+                        .foregroundColor(.red)
+                }
+            )
+
+            // Load Demo Data — separate from destructive delete options
+            HStack(spacing: 10) {
+                Button(action: {
+                    showingLoadDemoDataConfirmation = true
+                }) {
+                    HStack {
+                        Image(systemName: "sparkles")
+                            .foregroundColor(ColorManager.primaryBrandColor)
+                        Text("Load Demo Data")
+                            .foregroundColor(ColorManager.primaryBrandColor)
+                    }
+                }
+                .buttonStyle(PlainButtonStyle())
+
+                Button(action: { showingDemoDataInfo = true }) {
+                    Image(systemName: "info.circle")
+                        .foregroundColor(.secondary)
+                        .font(.system(size: 16))
+                }
+                .buttonStyle(PlainButtonStyle())
+                .alert("About Demo Data", isPresented: $showingDemoDataInfo) {
+                    Button("Got it", role: .cancel) { }
+                } message: {
+                    Text("Demo data loads a sample bourbon collection so you can explore every feature of BarrelBook right away.\n\nIt includes:\n• A variety of owned bottles (open, sealed & empty)\n• Tasting notes with flavor profiles and ratings\n• Wishlist items with target prices\n• An example infinity bottle\n\n⚠️ Loading demo data will permanently delete your existing collection. Use this to take BarrelBook for a test drive before adding your own bottles.")
+                }
+                Spacer()
+            }
+            .alert("Load Demo Data?", isPresented: $showingLoadDemoDataConfirmation) {
+                Button("Cancel", role: .cancel) { }
+                Button("Load Demo Data", role: .destructive) { loadDemoData() }
+            } message: {
+                Text("This will permanently delete all current data and replace it with a sample collection. This cannot be undone.")
+            }
+
+            importExportButtons
+            
+            // Loading indicator when import/export is in progress
+            if isLoading {
+                HStack {
+                    Spacer()
+                    VStack {
+                        // Replace simple progress indicator with a progress bar and status
+                        VStack(alignment: .leading, spacing: 8) {
+                            ProgressView(value: importProgress, total: 1.0)
+                                .progressViewStyle(LinearProgressViewStyle())
+                                .frame(height: 8)
+                                .padding(.bottom, 2)
+
+                            HStack {
+                                Text("\(Int(importProgress * 100))% Complete")
+                                    .font(.caption)
+                                    .fontWeight(.medium)
+                                Spacer()
+                                Text(importStatusMessage)
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                            }
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.horizontal)
+                        .padding(.vertical, 8)
+                    }
+                    Spacer()
+                }
+                .padding(.vertical, 10)
+            }
+            
+            // Template creation button
+            HStack {
+                Button {
+                    createCSVTemplate()
+                    HapticManager.shared.mediumImpact()
+                } label: {
+                        Label("Download CSV Template", systemImage: "doc.badge.plus")
+                        .foregroundColor(.blue)
+                    }
+                .buttonStyle(PlainButtonStyle())
+                .frame(maxWidth: .infinity, alignment: .leading)
+                
+                Button {
+                    showingTemplateAlert = true
+                    HapticManager.shared.mediumImpact()
+                } label: {
+                    Image(systemName: "info.circle")
+                        .foregroundColor(.blue)
+                }
+                .buttonStyle(PlainButtonStyle())
+            }
+        }
+    }
+    
+    private var deleteDataButtons: some View {
+        Group {
+            // Delete Collection (owned whiskeys only)
+            Button(action: {
+                showingDeleteCollectionConfirmation = true
+            }) {
+                HStack {
+                    Image(systemName: "trash.circle.fill")
+                        .foregroundColor(.red)
+                    Text("Delete Collection (Owned Whiskeys)")
+                        .foregroundColor(.red)
+                }
+            }
+            .buttonStyle(PlainButtonStyle())
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.bottom, 10)
+            .alert("Delete Collection?", isPresented: $showingDeleteCollectionConfirmation) {
+                Button("Cancel", role: .cancel) { }
+                Button("Delete Owned Whiskeys", role: .destructive) {
+                    deleteOwnedCollection()
+                }
+            } message: {
+                Text("This will permanently delete all owned whiskeys and their bottles. This action cannot be undone.")
+            }
+
+            // Delete all Tasting Data
+            Button(action: {
+                showingDeleteTastingConfirmation = true
+            }) {
+                HStack {
+                    Image(systemName: "trash.circle.fill")
+                        .foregroundColor(.red)
+                    Text("Delete all Tasting Data")
+                        .foregroundColor(.red)
+                }
+            }
+            .buttonStyle(PlainButtonStyle())
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .alert("Delete All Tasting Data?", isPresented: $showingDeleteTastingConfirmation) {
+                Button("Cancel", role: .cancel) { }
+                Button("Delete All Tasting Data", role: .destructive) {
+                    deleteAllTastingData()
+                }
+            } message: {
+                Text("This will permanently delete all tasting notes and journal entries. This action cannot be undone.")
+            }
+
+            // Delete Infinity Bottles
+            Button(action: {
+                showingDeleteInfinityConfirmation = true
+            }) {
+                HStack {
+                    Image(systemName: "trash.circle.fill")
+                        .foregroundColor(.red)
+                    Text("Delete Infinity Bottles")
+                        .foregroundColor(.red)
+                }
+            }
+            .buttonStyle(PlainButtonStyle())
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .alert("Delete All Infinity Bottles?", isPresented: $showingDeleteInfinityConfirmation) {
+                Button("Cancel", role: .cancel) { }
+                Button("Delete Infinity Bottles", role: .destructive) {
+                    deleteAllInfinityBottles()
+                }
+            } message: {
+                Text("This will permanently delete all infinity bottles and their data. This action cannot be undone.")
+            }
+
+            // Delete Wishlist/Replacement Bottles
+            Button(action: {
+                showingDeleteWishlistConfirmation = true
+            }) {
+                HStack {
+                    Image(systemName: "trash.circle.fill")
+                        .foregroundColor(.red)
+                    Text("Delete Wishlist/Replacement Bottles")
+                        .foregroundColor(.red)
+                }
+            }
+            .buttonStyle(PlainButtonStyle())
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .alert("Delete Wishlist/Replacement Bottles?", isPresented: $showingDeleteWishlistConfirmation) {
+                Button("Cancel", role: .cancel) { }
+                Button("Delete Wishlist/Replacement", role: .destructive) {
+                    deleteWishlistAndReplacementBottles()
+                }
+            } message: {
+                Text("This will permanently delete all wishlist and replacement bottles. This action cannot be undone.")
+            }
+
+            // Delete ALL Data
+            Button(action: {
+                showingDeleteAllConfirmation = true
+            }) {
+                HStack {
+                    Image(systemName: "trash.circle.fill")
+                        .foregroundColor(.red)
+                    Text("Delete all Data")
+                        .foregroundColor(.red)
+                }
+            }
+            .buttonStyle(PlainButtonStyle())
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .alert("Delete ALL Data?", isPresented: $showingDeleteAllConfirmation) {
+                Button("Cancel", role: .cancel) { }
+                Button("Delete EVERYTHING", role: .destructive) {
+                    deleteAllData()
+                }
+            } message: {
+                Text("This will permanently delete ALL data in BarrelBook, including whiskeys, bottles, tastings, infinity bottles, wishlist, and replacement bottles. This action cannot be undone.")
+            }
+            
+
+        }
+    }
+    
+    private var importExportButtons: some View {
+        HStack(spacing: 30) {
+            Spacer()
+            
+            // Import button
+                Button(action: {
+                    triggerImport()
+                }) {
+                    VStack {
+                        Image(systemName: "arrow.down.doc")
+                            .font(.system(size: 28))
+                            .padding(.bottom, 2)
+                        Text("Import CSV")
+                            .font(.caption)
+                    }
+                    .frame(width: 80, height: 80)
+                .foregroundColor(.blue)
+                }
+                .buttonStyle(PlainButtonStyle())
+                .disabled(isLoading)
+                .opacity(isLoading ? 0.5 : 1.0)
+            
+            Spacer()
+            
+            // Export button
+                Button(action: {
+                    exportData()
+                }) {
+                    VStack {
+                        Image(systemName: "arrow.up.doc")
+                            .font(.system(size: 28))
+                            .padding(.bottom, 2)
+                        Text("Export CSV")
+                            .font(.caption)
+                    }
+                    .frame(width: 80, height: 80)
+                .foregroundColor(.blue)
+                }
+                .buttonStyle(PlainButtonStyle())
+                .disabled(isLoading)
+                .opacity(isLoading ? 0.5 : 1.0)
+            
+            Spacer()
+        }
+        .padding(.vertical, 10)
+    }
+    
+    private var helpSection: some View {
+        Section(header: Text("Help")) {
+            Button {
+                hasSeenOnboarding = false
+                showingOnboarding = true
+                HapticManager.shared.successFeedback()
+            } label: {
+                Label("Reset Onboarding Tutorial", systemImage: "arrow.counterclockwise")
+            }
+            Button {
+                resetAllTutorials()
+            } label: {
+                Label("Reset Individual Tutorials", systemImage: "lightbulb")
+            }
+
+        }
+    }
+    
+    private func resetAllTutorials() {
+        let keys = [
+            "hasSeenSortTutorial",
+            "hasSeenStoresTutorialInAddWishlist",
+            "hasSeenWishlistTutorial",
+            "hasSeenInfinityBottleTutorial",
+            "hasSeenAddInfinityBottleTutorial",
+            "hasSeenAddPourToInfinityBottleTutorial",
+            "hasSeenJournalTutorial",
+            "hasSeenStatisticsTutorial",
+            "hasSeenBottleViewTutorial",
+            "hasSeenCollectionTutorial",
+            "hasSeenEmptyCollectionTutorial",
+            "hasSeenAddWhiskeyTutorial",
+            "hasSeenSettingsTutorial"
+        ]
+        for key in keys {
+            UserDefaults.standard.removeObject(forKey: key)
+        }
+        successMessage = "Tutorials reset. You’ll see the tips again when you open Collection (empty or with bottles), Add Whiskey, Sort, Wishlist, Stores, Infinity Bottles, Tastings, Statistics, Settings, and a bottle."
+        showingSuccess = true
+        HapticManager.shared.lightImpact()
+    }
+    
+    private var aboutSection: some View {
+        Section(header: Text("About")) {
+
+            // ── Developer note ──────────────────────────────────────────
+            VStack(alignment: .leading, spacing: 12) {
+                HStack(spacing: 8) {
+                    Text("🥃")
+                        .font(.title2)
+                    Text("A Tasting Note from the Developer")
+                        .font(.headline)
+                        .foregroundColor(ColorManager.primaryBrandColor)
+                }
+
+                Text("""
+Hi! I'm Eric, the solo developer behind BarrelBook.
+
+I tried several whiskey catalog apps and none of them quite clicked, especially when it came to seeing my collection clearly at a glance.
+
+So I built the one I actually wanted. BarrelBook lets you track your collection and its value, log tastings, manage your wishlist, build infinity bottles, and more, all in one place.
+
+I'm always open to feedback and new feature ideas. Join the Discord and let me know what you think. I read everything.
+
+Know thy shelf. — Eric
+""")
+                    .font(.subheadline)
+                    .foregroundColor(.primary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .padding(.vertical, 8)
+
+            // ── Video tutorials ──────────────────────────────────────────
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Video Tutorials")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    .textCase(.uppercase)
+                    .padding(.top, 4)
+
+                Link(destination: URL(string: "https://youtu.be/WQjhyPm62KA")!) {
+                    HStack(spacing: 10) {
+                        Image(systemName: "play.rectangle.fill")
+                            .foregroundColor(ColorManager.primaryBrandColor)
+                            .font(.title3)
+                        Text("Getting Started")
+                            .foregroundColor(.primary)
+                        Spacer()
+                        Image(systemName: "arrow.up.right")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                    .padding(.vertical, 6)
+                }
+
+                Divider()
+
+                Link(destination: URL(string: "https://youtu.be/yY71ND7r3hs")!) {
+                    HStack(spacing: 10) {
+                        Image(systemName: "play.rectangle.fill")
+                            .foregroundColor(ColorManager.primaryBrandColor)
+                            .font(.title3)
+                        Text("Full Walkthrough")
+                            .foregroundColor(.primary)
+                        Spacer()
+                        Image(systemName: "arrow.up.right")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                    .padding(.vertical, 6)
+                }
+            }
+            .padding(.vertical, 4)
+
+            // ── Version ─────────────────────────────────────────────────
+            HStack {
+                Text("Version")
+                Spacer()
+                Text(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.0")
+                    .foregroundColor(.secondary)
+            }
+        }
+    }
+    
+    private var privacySection: some View {
+        Section(header: Text("PRIVACY")) {
+            Toggle(isOn: $privacyManager.hidePrices) {
+                HStack {
+                    Text("Hide Prices")
+                    Image(systemName: "lock.fill")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+            }
+            
+            if privacyManager.hidePrices {
+                Text("Prices will be hidden throughout the app. Tap the lock icon to temporarily view a price.")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+        }
+    }
+    
+    // MARK: - Settings tutorial (page 1: Appearance, Stores, Privacy; page 2: Data Management)
+    private struct SettingsTutorialOverlay: View {
+        let step: Int
+        let onNext: () -> Void
+        let onDismiss: () -> Void
+        
+        var body: some View {
+            ColorManager.tutorialScrim
+                .ignoresSafeArea()
+                .onTapGesture { }
+            if step == 1 {
+                settingsTutorialPage1(onNext: onNext)
+            } else {
+                settingsTutorialPage2(onDismiss: onDismiss)
+            }
+        }
+        
+        private func settingsTutorialPage1(onNext: @escaping () -> Void) -> some View {
+            GeometryReader { geometry in
+                ScrollView {
+                    VStack(spacing: 0) {
+                        Spacer(minLength: 0)
+                        VStack(spacing: 20) {
+                            VStack(alignment: .leading, spacing: 16) {
+                                HStack {
+                                    Image(systemName: "gearshape.fill")
+                                        .font(.title2)
+                                        .foregroundColor(ColorManager.primaryBrandColor)
+                                    Text("Settings")
+                                        .font(.headline)
+                                }
+                                VStack(alignment: .leading, spacing: 10) {
+                                    settingsTutorialRow(icon: "1.circle.fill", text: "**Appearance**: Choose Light, Dark, or System for the whole app.")
+                                    settingsTutorialRow(icon: "2.circle.fill", text: "**Favorite Stores**: You can save stores as favorites here. When you add a bottle to your **wishlist**, you can attach one or more stores to that bottle so you remember where you found it (or where you're looking) and at what price. Add or remove favorite stores in this section.")
+                                    settingsTutorialRow(icon: "3.circle.fill", text: "**Privacy**: **Hide Prices** hides dollar amounts app-wide; tap the lock icon when you want to reveal a price.")
+                                }
+                                .font(.subheadline)
+                            }
+                            .padding(24)
+                            .background(Color(UIColor.secondarySystemBackground))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 16)
+                                    .stroke(ColorManager.tutorialCardBorder, lineWidth: 1)
+                            )
+                            .cornerRadius(16)
+                            .shadow(radius: 12)
+                            .padding(.horizontal, 24)
+                            Button(action: onNext) {
+                                Text("Next")
+                                    .fontWeight(.semibold)
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 12)
+                            }
+                            .buttonStyle(.borderedProminent)
+                            .tint(ColorManager.primaryBrandColor)
+                            .padding(.horizontal, 24)
+                        }
+                        .padding()
+                        Spacer(minLength: 0)
+                    }
+                    .frame(minHeight: geometry.size.height)
+                }
+                .padding()
+            }
+        }
+        
+        private func settingsTutorialPage2(onDismiss: @escaping () -> Void) -> some View {
+            GeometryReader { geometry in
+                ScrollView {
+                    VStack(spacing: 0) {
+                        Spacer(minLength: 0)
+                        VStack(spacing: 20) {
+                            VStack(alignment: .leading, spacing: 16) {
+                                HStack {
+                                    Image(systemName: "doc.badge.arrow.up")
+                                        .font(.title2)
+                                        .foregroundColor(ColorManager.primaryBrandColor)
+                                    Text("Data Management")
+                                        .font(.headline)
+                                }
+                                Text(LocalizedStringKey("The app lets you add whiskeys from a **CSV file** (a spreadsheet).\n\nIf you're **starting from scratch**, use **Download CSV Template** to get a ready-made file and instructions. Fill it in on your computer, then **Import CSV** to bring those bottles into the app.\n\nIf you already have bottles in the app, you can **merge** your CSV with them instead of replacing everything.\n\n**Export CSV** backs up your collection to a file.\n\n**Delete Data** (tap to expand) lets you remove specific things—owned whiskeys, tastings, infinity bottles, wishlist, or everything—each with its own confirmation so nothing is removed by accident."))
+                                    .font(.subheadline)
+                                    .fixedSize(horizontal: false, vertical: true)
+                            }
+                            .padding(24)
+                            .background(Color(UIColor.secondarySystemBackground))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 16)
+                                    .stroke(ColorManager.tutorialCardBorder, lineWidth: 1)
+                            )
+                            .cornerRadius(16)
+                            .shadow(radius: 12)
+                            .padding(.horizontal, 24)
+                            Button(action: onDismiss) {
+                                Text("Got it")
+                                    .fontWeight(.semibold)
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 12)
+                            }
+                            .buttonStyle(.borderedProminent)
+                            .tint(ColorManager.primaryBrandColor)
+                            .padding(.horizontal, 24)
+                        }
+                        .padding()
+                        Spacer(minLength: 0)
+                    }
+                    .frame(minHeight: geometry.size.height)
+                }
+                .padding()
+            }
+        }
+        
+        private func settingsTutorialRow(icon: String, text: String) -> some View {
+            HStack(alignment: .top, spacing: 10) {
+                Image(systemName: icon)
+                    .foregroundColor(ColorManager.primaryBrandColor)
+                    .font(.subheadline)
+                Text(LocalizedStringKey(text))
+                    .fixedSize(horizontal: false, vertical: true)
+            }
         }
     }
     
@@ -692,24 +1019,24 @@ struct SettingsView: View {
     private func triggerImport() {
         HapticManager.shared.mediumImpact()
         
+        guard subscriptionManager.hasAccess else {
+            showingPaywall = true
+            return
+        }
+        
         // Print debug information
-        print("\n----- CSV Import Triggered -----")
-        debugPresentationHierarchy()
         
         // To fix the presentation issue, we need to ensure no other presentations
         // are active before showing the file picker
         if let presentedVC = UIApplication.topViewController()?.presentedViewController {
-            print("WARNING: Dismissing existing presentation before showing file picker")
             presentedVC.dismiss(animated: true) {
                 // Wait for the dismissal to complete
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                    print("📂 Showing CSV import file picker")
                     self.isShowingCSVImportPicker = true
                 }
             }
         } else {
             // No existing presentation, safe to show picker
-            print("📂 Showing CSV import file picker directly")
             self.isShowingCSVImportPicker = true
         }
     }
@@ -790,9 +1117,14 @@ struct SettingsView: View {
                 
                 selectedFile.stopAccessingSecurityScopedResource()
                 
-                await MainActor.run {
-                    selectedCSVFile = selectedFile
-                    showingImportOptions = true
+                let collectionEmpty = await MainActor.run { whiskeys.isEmpty }
+                if collectionEmpty {
+                    await processCSVString(finalCsvString, isFreshImport: false)
+                } else {
+                    await MainActor.run {
+                        selectedCSVFile = selectedFile
+                        showingImportOptions = true
+                    }
                 }
                 
             } catch {
@@ -877,7 +1209,6 @@ struct SettingsView: View {
                                 // Track metrics but don't show them in UI
                                 let elapsedTime = now.timeIntervalSince(startTime)
                                 let speed = progress > 0 ? String(format: "%.1f", progress / elapsedTime * 100) : "0"
-                                print("IMPORT PROGRESS: \(Int(progress * 100))% - Time: \(String(format: "%.1f", elapsedTime))s, Speed: \(speed)%/s")
                                 
                                 // Simplified status message without timing info
                                 self.importStatusMessage = status
@@ -893,7 +1224,6 @@ struct SettingsView: View {
                                     let endIndex = status.index(closingParenRange.lowerBound, offsetBy: 0)
                                     let countString = status[startIndex..<endIndex].trimmingCharacters(in: .whitespaces)
                                     totalImportCount = Int(countString) ?? 0
-                                    print("DEBUG: Extracted total count from status message: \(totalImportCount)")
                                 }
                             }
                             
@@ -907,13 +1237,11 @@ struct SettingsView: View {
                                         String(format: "%.1f", Double(totalImportCount) / totalTime) : "N/A"
                                     
                                     // Log the final metrics
-                                    print("IMPORT METRICS: Total time: \(String(format: "%.1f", totalTime))s, Speed: \(itemsPerSecond) items/sec")
                                     
                                     // Show saving progress
                                     self.importStatusMessage = "Saving changes..."
                                     
                                     // Save the changes - this is the most intensive operation
-                                    print("Saving import context to viewContext...")
                                     try importContext.save()
                                     
                                     self.importStatusMessage = "Finalizing..."
@@ -926,7 +1254,6 @@ struct SettingsView: View {
                                     let countAfter = whiskeys.count
                                     
                                     // Log performance metrics but don't include in UI
-                                    print("IMPORT COMPLETE: \(totalImportCount > 0 ? totalImportCount : countAfter) whiskeys in \(String(format: "%.1f", totalTime))s (\(itemsPerSecond) items/sec)")
                                     
                                     if isFreshImport {
                                         // Use the actual count from the progress message instead of the final count
@@ -1052,8 +1379,6 @@ struct SettingsView: View {
         HapticManager.shared.mediumImpact()
         
         // Print debug information
-        print("\n----- Export Data Called -----")
-        debugPresentationHierarchy()
         
         // Generate export CSV data first
         if whiskeys.isEmpty {
@@ -1091,7 +1416,6 @@ struct SettingsView: View {
             
             // Now show the document picker
             if let presentedVC = UIApplication.topViewController()?.presentedViewController {
-                print("WARNING: Dismissing existing presentation before showing export picker")
                 presentedVC.dismiss(animated: true) {
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                         self.showExportDocumentPicker(with: fileURL)
@@ -1109,7 +1433,6 @@ struct SettingsView: View {
     }
     
     private func showExportDocumentPicker(with fileURL: URL) {
-        print("📱 Showing export document picker for file: \(fileURL.path)")
         
         // Create and configure the document picker
         let picker = UIDocumentPickerViewController(forExporting: [fileURL])
@@ -1118,7 +1441,6 @@ struct SettingsView: View {
         class PickerDelegate: NSObject, UIDocumentPickerDelegate {
             func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
                 guard let url = urls.first else { return }
-                print("📱 Export file saved to: \(url.path)")
                 
                 // Post success message
                 DispatchQueue.main.async {
@@ -1131,7 +1453,6 @@ struct SettingsView: View {
             }
             
             func documentPickerWasCancelled(_ controller: UIDocumentPickerViewController) {
-                print("📱 Export cancelled")
             }
         }
         
@@ -1144,9 +1465,7 @@ struct SettingsView: View {
         
         // Present the picker
         if let rootViewController = UIApplication.topViewController() {
-            print("📱 Presenting export document picker")
             rootViewController.present(picker, animated: true) {
-                print("📱 Export document picker presentation completed")
             }
         }
     }
@@ -1160,7 +1479,6 @@ struct SettingsView: View {
     }
     
     private func createCSVTemplate() {
-        print("📱 Preparing CSV template for export...")
         
         // Generate CSV and README content
         let csvContent = createTemplateCSVString()
@@ -1222,7 +1540,6 @@ struct SettingsView: View {
             // Clean up temporary directory
             try FileManager.default.removeItem(at: tempFilesDir)
             
-            print("📦 Created zip file at: \(zipURL.path)")
             
             // Use DispatchQueue to ensure we're not presenting on top of another presentation
             DispatchQueue.main.async {
@@ -1239,7 +1556,6 @@ struct SettingsView: View {
                 class PickerDelegate: NSObject, UIDocumentPickerDelegate {
                     func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
                         guard let url = urls.first else { return }
-                        print("📦 Template saved to: \(url.path)")
                         
                         // Post success message
                         DispatchQueue.main.async {
@@ -1252,7 +1568,6 @@ struct SettingsView: View {
                     }
                     
                     func documentPickerWasCancelled(_ controller: UIDocumentPickerViewController) {
-                        print("📦 Template export cancelled")
                     }
                 }
                 
@@ -1264,9 +1579,7 @@ struct SettingsView: View {
                 objc_setAssociatedObject(picker, "templateDelegate", delegate, .OBJC_ASSOCIATION_RETAIN)
                 
                 // Present the picker
-                print("📦 Presenting template document picker on top controller: \(type(of: rootViewController))")
                 rootViewController.present(picker, animated: true) {
-                    print("📦 Template document picker presentation completed")
                 }
             }
         } catch {
@@ -1439,7 +1752,6 @@ struct SettingsView: View {
     
     // Update the direct document picker presentation method
     private func showDirectDocumentPicker(csvData: String, filename: String, completion: @escaping (URL) -> Void) {
-        print("📱 showDirectDocumentPicker called with \(csvData.count) bytes")
         
         // Create temporary file in Documents directory
         let documentsDir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
@@ -1462,7 +1774,6 @@ struct SettingsView: View {
             Task {
                 do {
                     try await CSVSyncService.shared.writeToFile(at: fileURL, content: csvData)
-                    print("📱 Created temp file at: \(fileURL.path)")
                     
                     // Continue with showing the document picker on the main thread
                     await MainActor.run {
@@ -1487,12 +1798,10 @@ struct SettingsView: View {
                             
                             func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
                                 guard let url = urls.first else { return }
-                                print("📱 Direct picker selected URL: \(url.path)")
                                 completion(url)
                             }
                             
                             func documentPickerWasCancelled(_ controller: UIDocumentPickerViewController) {
-                                print("📱 Document picker cancelled")
                             }
                         }
                         
@@ -1503,9 +1812,7 @@ struct SettingsView: View {
                         // Store the delegate in the picker to keep it alive
                         objc_setAssociatedObject(picker, "delegate", delegate, .OBJC_ASSOCIATION_RETAIN)
                         
-                        print("📱 Presenting document picker on top view controller: \(type(of: rootViewController))")
                         rootViewController.present(picker, animated: true) {
-                            print("📱 Document picker presentation completed")
                         }
                     }
                 } catch {
@@ -1526,24 +1833,18 @@ struct SettingsView: View {
     // Update showDocumentPickerAfterAlert with longer delay
     private func showDocumentPickerAfterAlert(forTemplate: Bool = false) {
         // Debug the current presentation hierarchy
-        print("\n----- showDocumentPickerAfterAlert called -----")
-        debugPresentationHierarchy()
         
         // Use a longer delay to ensure alert is fully dismissed
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.75) {
-            print("📱 Alert dismissal delay completed, preparing to show file picker")
             
             // Check again if there are any presentations still active
             if let presentedVC = UIApplication.topViewController()?.presentedViewController {
-                print("WARNING: Found existing presentation after alert dismissal, dismissing it")
                 presentedVC.dismiss(animated: true) {
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                        print("📱 Second dismissal completed, now showing file picker")
                         self.showAppropriateDocumentPicker(forTemplate: forTemplate)
                     }
                 }
             } else {
-                print("📱 No presentations active, proceeding with file picker")
                 self.showAppropriateDocumentPicker(forTemplate: forTemplate)
             }
         }
@@ -1566,7 +1867,6 @@ struct SettingsView: View {
         
         do {
             let csvContent = try CSVService.shared.exportWhiskeys(Array(self.whiskeys))
-            print("📱 Successfully created CSV content with \(csvContent.count) bytes")
             
             // Generate a unique filename with timestamp
             let timestamp = Int(Date().timeIntervalSince1970)
@@ -1640,45 +1940,7 @@ struct SettingsView: View {
         }
     }
 
-    // Debugging method to help diagnose presentation issues
-    private func debugPresentationHierarchy() {
-        print("\n===== DEBUG: PRESENTATION HIERARCHY =====")
-        func printController(_ controller: UIViewController, level: Int = 0) {
-            let indent = String(repeating: "  ", count: level)
-            print("\(indent)• \(type(of: controller))")
-            
-            if let presented = controller.presentedViewController {
-                print("\(indent)  └─ Presented:")
-                printController(presented, level: level + 2)
-            }
-            
-            if let nav = controller as? UINavigationController {
-                print("\(indent)  └─ Navigation Stack:")
-                for (index, vc) in nav.viewControllers.enumerated() {
-                    print("\(indent)    \(index). \(type(of: vc))")
-                }
-            }
-            
-            if let tab = controller as? UITabBarController {
-                print("\(indent)  └─ Tab Controllers:")
-                for (index, vc) in (tab.viewControllers ?? []).enumerated() {
-                    print("\(indent)    \(index). \(type(of: vc))")
-                    if vc == tab.selectedViewController {
-                        print("\(indent)      (SELECTED)")
-                    }
-                }
-            }
-        }
-        
-        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-           let rootVC = windowScene.windows.first?.rootViewController {
-            print("Root View Controller:")
-            printController(rootVC)
-        } else {
-            print("No root view controller found")
-        }
-        print("=========================================\n")
-    }
+
     
     // MARK: - Safe Alert Handling
     
@@ -1714,61 +1976,6 @@ struct SettingsView: View {
             successMessage = message
             showingSuccess = true
             HapticManager.shared.successFeedback()
-        }
-    }
-
-    // Add this method elsewhere in the class
-    private func handleCSVError(_ error: CSVError) {
-        DispatchQueue.main.async {
-            isLoading = false
-            
-            // For permission errors, give the user options to solve the problem
-            if error == .permissionError {
-                // Create a detailed alert with multiple actions
-                let alert = UIAlertController(
-                    title: "Import Failed: Permission Error",
-                    message: "BarrelBook couldn't save the imported data due to Core Data permission issues. You can try again later, or if the problem persists, you can reset the Core Data store, which will restart the app (your data will remain safe).",
-                    preferredStyle: .alert
-                )
-                
-                // Option 1: Just dismiss the error
-                alert.addAction(UIAlertAction(title: "OK", style: .default))
-                
-                // Option 2: Attempt to reload the Core Data container
-                alert.addAction(UIAlertAction(title: "Reset Core Data & Retry", style: .destructive) { _ in
-                    // Reset the Core Data stack and restart the app
-                    self.resetCoreDataAndRestart()
-                })
-                
-                // Show the alert
-                if let topVC = UIApplication.topViewController() {
-                    topVC.present(alert, animated: true)
-                }
-                
-                HapticManager.shared.errorFeedback()
-                return
-            }
-            
-            // For other errors, show the regular alert
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                switch error {
-                case .invalidData:
-                    self.errorMessage = "The CSV file contains invalid data. Please check that all required fields (Name, Type, Proof, Distillery) are present and properly formatted."
-                case .encodingError:
-                    self.errorMessage = "There was a problem reading the CSV file. Please ensure it uses a supported encoding (UTF-8, ASCII, Latin1)."
-                case .decodingError:
-                    self.errorMessage = "There was a problem processing the CSV data. Please check that all fields are properly formatted."
-                case .permissionError:
-                    // This case is handled above
-                    break
-                }
-                
-                if error != .permissionError {
-                    self.showingError = true
-                    HapticManager.shared.errorFeedback()
-                }
-            }
-            print("CSV specific error: \(error)")
         }
     }
 
@@ -1826,7 +2033,6 @@ struct SettingsView: View {
         batchDeleteRequest.resultType = .resultTypeObjectIDs
         
         do {
-            print("Starting emergency journal entry cleanup...")
             
             // Execute the batch delete
             let batchDelete = try context.execute(batchDeleteRequest) as? NSBatchDeleteResult
@@ -1839,7 +2045,6 @@ struct SettingsView: View {
             // Save the context to persist changes
             try context.save()
             
-            print("🧹 Successfully deleted \(objectIDArray.count) journal entries using batch delete")
             successMessage = "Successfully deleted \(objectIDArray.count) journal entries."
             showingSuccess = true
             HapticManager.shared.successFeedback()
@@ -1864,7 +2069,6 @@ struct SettingsView: View {
         
         // First approach: Using batch delete
         do {
-            print("🧨 STARTING DIRECT DELETION OF ALL JOURNAL ENTRIES...")
             
             // Create a fetch request for all journal entries
             let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "JournalEntry")
@@ -1878,7 +2082,6 @@ struct SettingsView: View {
             let result = try privateContext.execute(batchDeleteRequest) as? NSBatchDeleteResult
             let count = result?.result as? Int ?? 0
             
-            print("🧹 DELETED \(count) JOURNAL ENTRIES VIA BATCH DELETE")
             
             // Save the private context
             try privateContext.save()
@@ -1888,14 +2091,12 @@ struct SettingsView: View {
             let entries = try viewContext.fetch(directFetchRequest)
             
             if !entries.isEmpty {
-                print("⚠️ FOUND \(entries.count) REMAINING ENTRIES, DELETING DIRECTLY...")
                 
                 for entry in entries {
                     viewContext.delete(entry)
                 }
                 
                 try viewContext.save()
-                print("✅ DELETED \(entries.count) ADDITIONAL ENTRIES DIRECTLY")
             }
             
             // Force a cross-context refresh
@@ -1905,7 +2106,6 @@ struct SettingsView: View {
             let verifyRequest = NSFetchRequest<NSManagedObject>(entityName: "JournalEntry")
             let remainingCount = try viewContext.count(for: verifyRequest)
             
-            print("🔍 VERIFICATION: \(remainingCount) JOURNAL ENTRIES REMAIN IN DATABASE")
             
             // Show success or failure message
             await MainActor.run {
@@ -1934,7 +2134,6 @@ struct SettingsView: View {
             
             // Delete all whiskeys
             let whiskeys = try context.fetch(Whiskey.fetchRequest())
-            print("Found \(whiskeys.count) whiskeys to delete")
             
             for whiskey in whiskeys {
                 context.delete(whiskey)
@@ -1943,7 +2142,6 @@ struct SettingsView: View {
             // Delete all journal entries
             let journalFetchRequest: NSFetchRequest<NSManagedObject> = NSFetchRequest(entityName: "JournalEntry")
             let journalEntries = try context.fetch(journalFetchRequest)
-            print("Found \(journalEntries.count) journal entries to delete")
             
             for entry in journalEntries {
                 context.delete(entry)
@@ -1952,7 +2150,6 @@ struct SettingsView: View {
             // Save changes
             try context.save()
             
-            print("Successfully deleted entire collection")
             successMessage = "Successfully deleted all whiskeys and journal entries."
             showingSuccess = true
             HapticManager.shared.successFeedback()
@@ -2084,7 +2281,6 @@ struct SettingsView: View {
                 try viewContext.save()
             }
             
-            print("✅ Successfully created new whiskey '\(name)' with \(bottles) bottles")
         } catch {
             print("❌ Error creating whiskey: \(error)")
             errorMessage = "Failed to create whiskey: \(error.localizedDescription)"
@@ -2126,7 +2322,6 @@ struct SettingsView: View {
     private func clearMemory() {
         // Force a cleanup of memory
         #if DEBUG
-        print("🧹 Clearing memory...")
         #endif
         
         // Recommend system-level memory cleanup
@@ -2261,16 +2456,30 @@ struct SettingsView: View {
         }
     }
     
-    // MARK: - Subscription Status View
+    /// Deletes all data then seeds a demo collection, tastings, and wishlist for trying the app or screenshots.
+    private func loadDemoData() {
+        DemoDataService.load(context: viewContext) { result in
+            switch result {
+            case .success:
+                self.successMessage = "Demo data loaded. You now have a sample collection, tastings, and wishlist."
+                self.showingSuccess = true
+                HapticManager.shared.successFeedback()
+            case .failure(let error):
+                self.errorMessage = "Error loading demo data: \(error.localizedDescription)"
+                self.showingError = true
+                HapticManager.shared.errorFeedback()
+            }
+        }
+    }
+
+        // MARK: - Subscription Status View
     
     @ViewBuilder
     private var subscriptionStatusView: some View {
         VStack(spacing: 12) {
             HStack {
-                Image(systemName: subscriptionManager.isSubscribed ? "checkmark.circle.fill" : 
-                      subscriptionManager.isTrialActive ? "clock.fill" : "xmark.circle.fill")
-                    .foregroundColor(subscriptionManager.isSubscribed ? .green : 
-                                   subscriptionManager.isTrialActive ? .orange : .red)
+                Image(systemName: subscriptionManager.isSubscribed ? "checkmark.circle.fill" : "circle")
+                    .foregroundColor(subscriptionManager.isSubscribed ? .green : .blue)
                     .font(.title2)
                 
                 VStack(alignment: .leading, spacing: 4) {
@@ -2288,10 +2497,8 @@ struct SettingsView: View {
             .padding(.vertical, 8)
             
             if !subscriptionManager.isSubscribed {
-                Button(action: {
-                    showingPaywall = true
-                }) {
-                    Text(subscriptionManager.isTrialActive ? "Upgrade to Premium" : "Start Free Trial")
+                Button(action: { showingPaywall = true }) {
+                    Text("Unlock Premium")
                         .font(.headline)
                         .foregroundColor(.white)
                         .frame(maxWidth: .infinity)
@@ -2299,11 +2506,8 @@ struct SettingsView: View {
                         .background(ColorManager.primaryBrandColor)
                         .cornerRadius(8)
                 }
-            } else {
-                Button(action: {
-                    openSubscriptionManagement()
-                }) {
-                    Text("Manage Subscription")
+                Button(action: restorePurchasesFromSettings) {
+                    Text("Restore Purchases")
                         .font(.subheadline)
                         .foregroundColor(ColorManager.primaryBrandColor)
                 }
@@ -2315,29 +2519,20 @@ struct SettingsView: View {
     }
     
     private var subscriptionStatusText: String {
-        if subscriptionManager.isSubscribed {
-            return "Premium Active"
-        } else if subscriptionManager.isTrialActive {
-            return "Free Trial Active"
-        } else {
-            return "Premium Required"
-        }
+        subscriptionManager.isSubscribed ? "BarrelBook Premium" : "BarrelBook Essentials"
     }
     
     private var subscriptionDetailText: String {
         if subscriptionManager.isSubscribed {
-            return "You have access to all premium features"
-        } else if subscriptionManager.isTrialActive {
-            let daysRemaining = subscriptionManager.trialDaysRemaining
-            return "\(daysRemaining) day\(daysRemaining == 1 ? "" : "s") remaining"
+            return "Unlimited whiskeys, tastings, and premium features"
         } else {
-            return "Subscribe to unlock all features"
+            return "10 whiskeys • 5 tastings/month • Basic stats"
         }
     }
     
-    private func openSubscriptionManagement() {
-        if let settingsUrl = URL(string: UIApplication.openSettingsURLString) {
-            UIApplication.shared.open(settingsUrl)
+    private func restorePurchasesFromSettings() {
+        Task {
+            await subscriptionManager.restorePurchases()
         }
     }
 }
@@ -2386,24 +2581,20 @@ struct DocumentPickerExport: UIViewControllerRepresentable {
         self.csvData = csvData
         self.filename = filename
         self.onComplete = onComplete
-        print("📄 DocumentPickerExport initialized with filename: \(filename)")
     }
     
     func makeUIViewController(context: Context) -> UIDocumentPickerViewController {
         // Create a temporary file with the CSV data
         let tempURL = createTempCSVFile()
-        print("📄 Created temp file at: \(tempURL.path)")
         
         // Create a document picker in export mode - use exportToService instead of forExporting:asCopy:
         let controller = UIDocumentPickerViewController(forExporting: [tempURL])
         controller.delegate = context.coordinator
         controller.modalPresentationStyle = .fullScreen
-        print("📄 DocumentPicker controller created")
         return controller
     }
     
     func updateUIViewController(_ uiViewController: UIDocumentPickerViewController, context: Context) {
-        print("📄 DocumentPicker updateUIViewController called")
     }
     
     func makeCoordinator() -> Coordinator {
@@ -2418,7 +2609,6 @@ struct DocumentPickerExport: UIViewControllerRepresentable {
         // Remove any existing file
         if FileManager.default.fileExists(atPath: fileURL.path) {
             try? FileManager.default.removeItem(at: fileURL)
-            print("📄 Removed existing file at: \(fileURL.path)")
         }
         
         // We need to use a synchronized approach since this method is not async
@@ -2428,7 +2618,6 @@ struct DocumentPickerExport: UIViewControllerRepresentable {
             Task.detached {
                 do {
                     try await CSVSyncService.shared.writeToFile(at: fileURL, content: csvDataContent)
-                    print("📄 Created temporary CSV file at: \(fileURL.path), size: \(csvDataContent.count) bytes")
                 } catch {
                     print("⚠️ Error creating temporary CSV file: \(error)")
                 }
@@ -2449,7 +2638,6 @@ struct DocumentPickerExport: UIViewControllerRepresentable {
         
         init(_ parent: DocumentPickerExport) {
             self.parent = parent
-            print("📄 DocumentPicker Coordinator initialized")
         }
         
         func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
@@ -2458,16 +2646,13 @@ struct DocumentPickerExport: UIViewControllerRepresentable {
                 return 
             }
             
-            print("📄 Document picked at: \(url.path)")
             
             // Call the completion handler if provided
             if let onComplete = parent.onComplete {
-                print("📄 Calling completion handler with URL")
                 onComplete(url)
             } else {
                 // Otherwise post the default notification
                 DispatchQueue.main.async {
-                    print("📄 Posting CSV export successful notification")
                     NotificationCenter.default.post(
                         name: NSNotification.Name("CSVExportSuccessful"),
                         object: nil
@@ -2478,7 +2663,6 @@ struct DocumentPickerExport: UIViewControllerRepresentable {
         }
         
         func documentPickerWasCancelled(_ controller: UIDocumentPickerViewController) {
-            print("📄 Document picker was cancelled")
         }
     }
 }

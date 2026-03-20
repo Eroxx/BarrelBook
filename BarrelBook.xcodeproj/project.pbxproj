@@ -7,12 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		DA1DDCF22E3BD2CC009DF7EE /* TestStore.storekit in Resources */ = {isa = PBXBuildFile; fileRef = DA1DDCF12E3BD2CC009DF7EE /* TestStore.storekit */; };
+		DAB9DE552E4E5ED2008294EF /* BarrelBookConfiguration.storekit in Resources */ = {isa = PBXBuildFile; fileRef = DAB9DE542E4E5ED2008294EF /* BarrelBookConfiguration.storekit */; };
+		DAE824552F61C9F500AA673B /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DAE824542F61C9F500AA673B /* StoreKit.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		DA1DDCF12E3BD2CC009DF7EE /* TestStore.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = TestStore.storekit; sourceTree = "<group>"; };
 		DA6D2FB22D7F556D00C84192 /* BarrelBook.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BarrelBook.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		DAB9DE542E4E5ED2008294EF /* BarrelBookConfiguration.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = BarrelBookConfiguration.storekit; sourceTree = "<group>"; };
+		DAE824542F61C9F500AA673B /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -41,6 +43,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DAE824552F61C9F500AA673B /* StoreKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -50,8 +53,9 @@
 		DA6D2FA92D7F556D00C84192 = {
 			isa = PBXGroup;
 			children = (
-				DA1DDCF12E3BD2CC009DF7EE /* TestStore.storekit */,
+				DAB9DE542E4E5ED2008294EF /* BarrelBookConfiguration.storekit */,
 				DA6D2FB42D7F556D00C84192 /* BarrelBook */,
+				DAE824532F61C9F500AA673B /* Frameworks */,
 				DA6D2FB32D7F556D00C84192 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -62,6 +66,14 @@
 				DA6D2FB22D7F556D00C84192 /* BarrelBook.app */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		DAE824532F61C9F500AA673B /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				DAE824542F61C9F500AA673B /* StoreKit.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -101,6 +113,17 @@
 				TargetAttributes = {
 					DA6D2FB12D7F556D00C84192 = {
 						CreatedOnToolsVersion = 16.2;
+						SystemCapabilities = {
+							com.apple.BackgroundModes = {
+								enabled = 1;
+							};
+							com.apple.Push = {
+								enabled = 1;
+							};
+							com.apple.iCloud = {
+								enabled = 1;
+							};
+						};
 					};
 				};
 			};
@@ -128,7 +151,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DA1DDCF22E3BD2CC009DF7EE /* TestStore.storekit in Resources */,
+				DAB9DE552E4E5ED2008294EF /* BarrelBookConfiguration.storekit in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -273,25 +296,29 @@
 				CODE_SIGN_ENTITLEMENTS = BarrelBook/BarrelBook.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"BarrelBook/Preview Content\"";
 				DEVELOPMENT_TEAM = NS3S739J3P;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = BarrelBook/Info.plist;
-				INFOPLIST_KEY_NSCameraUsageDescription = "BarrelBook needs camera access to scan bottle barcodes";
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = BarrelBook;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.food-and-drink";
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "BarrelBook needs your location to find nearby liquor stores";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "BarrelBook needs your location to find nearby liquor stores";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UIRequiredDeviceCapabilities = armv7;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.0.2;
 				"OTHER_CODE_SIGN_FLAGS[sdk=*]" = "";
-				PRODUCT_BUNDLE_IDENTIFIER = Linder.BarrelBook;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ericlinder.barrelbookapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -313,24 +340,28 @@
 				CODE_SIGN_ENTITLEMENTS = BarrelBook/BarrelBook.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"BarrelBook/Preview Content\"";
 				DEVELOPMENT_TEAM = NS3S739J3P;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = BarrelBook/Info.plist;
-				INFOPLIST_KEY_NSCameraUsageDescription = "BarrelBook needs camera access to scan bottle barcodes";
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = BarrelBook;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.food-and-drink";
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "BarrelBook needs your location to find nearby liquor stores";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "BarrelBook needs your location to find nearby liquor stores";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UIRequiredDeviceCapabilities = armv7;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = Linder.BarrelBook;
+				MARKETING_VERSION = 1.0.2;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ericlinder.barrelbookapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
