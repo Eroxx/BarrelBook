@@ -156,6 +156,12 @@ struct CSVImportOnboardingView: View {
                         Text("Three quick steps and your collection is in.")
                             .font(.subheadline)
                             .foregroundColor(.secondary)
+                        Text("Already have a spreadsheet? If your columns are close to the template format, it usually takes just a few tweaks to get it import-ready.")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                            .multilineTextAlignment(.center)
+                            .fixedSize(horizontal: false, vertical: true)
+                            .padding(.top, 2)
                     }
                     .frame(maxWidth: .infinity, alignment: .center)
                     .multilineTextAlignment(.center)
