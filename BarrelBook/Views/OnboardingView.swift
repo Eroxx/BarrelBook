@@ -19,6 +19,7 @@ struct OnboardingView: View {
 
     @State private var currentPage = 0
     @State private var isLoadingDemo = false
+    @State private var showingCSVImport = false
 
     // ── Amber palette ─────────────────────────────────────────────────────
     private let deepAmber = Color(red: 0.48, green: 0.22, blue: 0.04)
@@ -97,7 +98,7 @@ struct OnboardingView: View {
                     nextButton
                 }
 
-                Text("You can replay this anytime in Settings → About")
+                Text("You can replay this anytime in Settings → Help")
                     .font(.caption)
                     .foregroundColor(.secondary)
                     .opacity(isLastPage ? 1 : 0)
@@ -259,6 +260,31 @@ struct OnboardingView: View {
                     .multilineTextAlignment(.center)
                     .padding(.horizontal)
             }
+
+            Button {
+                showingCSVImport = true
+            } label: {
+                HStack {
+                    Text("Import from Spreadsheet").font(.subheadline).fontWeight(.medium)
+                    Image(systemName: "tablecells")
+                }
+                .foregroundColor(.secondary)
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(
+                    RoundedRectangle(cornerRadius: 15)
+                        .strokeBorder(Color.secondary.opacity(0.3), lineWidth: 1.5)
+                )
+            }
+            .sheet(isPresented: $showingCSVImport) {
+                CSVImportOnboardingView(onComplete: completeOnboarding)
+            }
+
+            Text("Already tracking your collection in a spreadsheet? Import it directly.")
+                .font(.caption)
+                .foregroundColor(.secondary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal)
         }
         .padding(.horizontal)
         .padding(.bottom, 8)

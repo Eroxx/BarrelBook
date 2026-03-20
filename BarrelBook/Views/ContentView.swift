@@ -344,6 +344,7 @@ struct HomeView: View {
     @State private var showingPaywall = false
     @AppStorage("hasSeenEmptyStateTip") private var hasSeenEmptyStateTip = false
     @State private var showingLoadDemoConfirmation = false
+    @State private var showingCSVImport = false
 
     private var isCollectionEmpty: Bool { whiskeys.isEmpty }
 
@@ -430,7 +431,7 @@ struct HomeView: View {
                 Text("New to BarrelBook?")
                     .font(.subheadline)
                     .fontWeight(.semibold)
-                Text("Load sample data in Settings to explore the app — then delete it when you\'re ready to start fresh.")
+                Text("Already tracking in a spreadsheet? Use Import from Spreadsheet below. Or load sample data to explore, then delete it when ready.")
                     .font(.caption)
                     .foregroundColor(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
@@ -525,6 +526,28 @@ struct HomeView: View {
                 }
 
                 Text("Sample data can be deleted anytime in Settings → Data Management")
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+                    .multilineTextAlignment(.center)
+
+                Button {
+                    showingCSVImport = true
+                } label: {
+                    Label("Import from Spreadsheet", systemImage: "tablecells")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 12)
+                        .background(
+                            RoundedRectangle(cornerRadius: 12)
+                                .strokeBorder(Color.secondary.opacity(0.3), lineWidth: 1)
+                        )
+                }
+                .sheet(isPresented: $showingCSVImport) {
+                    CSVImportOnboardingView()
+                }
+
+                Text("Already tracking in a spreadsheet? Import your collection directly.")
                     .font(.caption2)
                     .foregroundColor(.secondary)
                     .multilineTextAlignment(.center)
