@@ -187,24 +187,6 @@ struct CSVImportOnboardingView: View {
                         )
                     }
 
-                    // Export note
-                    HStack(alignment: .top, spacing: 10) {
-                        Image(systemName: "arrow.up.doc")
-                            .foregroundColor(gold)
-                            .padding(.top, 2)
-                        Text("Already using BarrelBook? You can export your collection to CSV anytime from Settings → Data Management → Export Collection.")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
-                    .padding(14)
-                    .background(
-                        RoundedRectangle(cornerRadius: 10)
-                            .fill(gold.opacity(0.08))
-                            .overlay(RoundedRectangle(cornerRadius: 10)
-                                .strokeBorder(gold.opacity(0.2), lineWidth: 1))
-                    )
-
                     // Tip box
                     HStack(alignment: .top, spacing: 10) {
                         Image(systemName: "lightbulb.fill")

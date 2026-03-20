@@ -103,6 +103,7 @@ struct SettingsView: View {
     @State private var showingDeleteWishlistConfirmation = false
     @State private var showingDeleteAllConfirmation = false
     @State private var showingLoadDemoDataConfirmation = false
+    @State private var demoConfirmationText = ""
     @State private var showingDemoDataInfo = false
     
     // Add new @State variables for DisclosureGroup and info alert:
@@ -359,7 +360,7 @@ struct SettingsView: View {
                     let otherStores = getOtherStores()
                     
                     if !nearbyStores.isEmpty {
-                        Section(header: Text("Nearby Stores")) {
+                        Section(header: Text("Nearby")) {
                             ForEach(nearbyStores) { store in
                                 StoreRowView(store: store)
                                     .swipeActions(edge: .trailing) {
@@ -373,9 +374,9 @@ struct SettingsView: View {
                             }
                         }
                     }
-                    
+
                     if !otherStores.isEmpty {
-                        Section(header: Text(nearbyStores.isEmpty ? "Favorite Stores" : "Other Favorite Stores")) {
+                        if nearbyStores.isEmpty {
                             ForEach(otherStores) { store in
                                 StoreRowView(store: store)
                                     .swipeActions(edge: .trailing) {
@@ -386,6 +387,20 @@ struct SettingsView: View {
                                             Label("Remove", systemImage: "trash")
                                         }
                                     }
+                            }
+                        } else {
+                            Section(header: Text("Other")) {
+                                ForEach(otherStores) { store in
+                                    StoreRowView(store: store)
+                                        .swipeActions(edge: .trailing) {
+                                            Button(role: .destructive) {
+                                                store.isFavorite = false
+                                                try? viewContext.save()
+                                            } label: {
+                                                Label("Remove", systemImage: "trash")
+                                            }
+                                        }
+                                }
                             }
                         }
                     }
@@ -410,60 +425,13 @@ struct SettingsView: View {
     
     private var dataManagementSection: some View {
         Section(header: Text("Data Management")) {
-            // DisclosureGroup for Delete Data
-            DisclosureGroup(
-                isExpanded: $showingDeleteDataOptions,
-                content: {
-                    deleteDataButtons
-                },
-                label: {
-                    Label("Delete Data", systemImage: "trash")
-                        .foregroundColor(.red)
-                }
-            )
-
-            // Load Demo Data — separate from destructive delete options
-            HStack(spacing: 10) {
-                Button(action: {
-                    showingLoadDemoDataConfirmation = true
-                }) {
-                    HStack {
-                        Image(systemName: "sparkles")
-                            .foregroundColor(ColorManager.primaryBrandColor)
-                        Text("Load Demo Data")
-                            .foregroundColor(ColorManager.primaryBrandColor)
-                    }
-                }
-                .buttonStyle(PlainButtonStyle())
-
-                Button(action: { showingDemoDataInfo = true }) {
-                    Image(systemName: "info.circle")
-                        .foregroundColor(.secondary)
-                        .font(.system(size: 16))
-                }
-                .buttonStyle(PlainButtonStyle())
-                .alert("About Demo Data", isPresented: $showingDemoDataInfo) {
-                    Button("Got it", role: .cancel) { }
-                } message: {
-                    Text("Demo data loads a sample bourbon collection so you can explore every feature of BarrelBook right away.\n\nIt includes:\n• A variety of owned bottles (open, sealed & empty)\n• Tasting notes with flavor profiles and ratings\n• Wishlist items with target prices\n• An example infinity bottle\n\n⚠️ Loading demo data will permanently delete your existing collection. Use this to take BarrelBook for a test drive before adding your own bottles.")
-                }
-                Spacer()
-            }
-            .alert("Load Demo Data?", isPresented: $showingLoadDemoDataConfirmation) {
-                Button("Cancel", role: .cancel) { }
-                Button("Load Demo Data", role: .destructive) { loadDemoData() }
-            } message: {
-                Text("This will permanently delete all current data and replace it with a sample collection. This cannot be undone.")
-            }
-
             importExportButtons
-            
+
             // Loading indicator when import/export is in progress
             if isLoading {
                 HStack {
                     Spacer()
                     VStack {
-                        // Replace simple progress indicator with a progress bar and status
                         VStack(alignment: .leading, spacing: 8) {
                             ProgressView(value: importProgress, total: 1.0)
                                 .progressViewStyle(LinearProgressViewStyle())
@@ -488,19 +456,19 @@ struct SettingsView: View {
                 }
                 .padding(.vertical, 10)
             }
-            
+
             // Template creation button
             HStack {
                 Button {
                     createCSVTemplate()
                     HapticManager.shared.mediumImpact()
                 } label: {
-                        Label("Download BarrelBook CSV Template", systemImage: "doc.badge.plus")
+                    Label("Download BarrelBook CSV Template", systemImage: "doc.badge.plus")
                         .foregroundColor(.blue)
-                    }
+                }
                 .buttonStyle(PlainButtonStyle())
                 .frame(maxWidth: .infinity, alignment: .leading)
-                
+
                 Button {
                     showingTemplateAlert = true
                     HapticManager.shared.mediumImpact()
@@ -510,9 +478,95 @@ struct SettingsView: View {
                 }
                 .buttonStyle(PlainButtonStyle())
             }
+
+            // Load Demo Data
+            HStack {
+                Button(action: {
+                    showingLoadDemoDataConfirmation = true
+                }) {
+                    HStack {
+                        Image(systemName: "sparkles")
+                            .foregroundColor(ColorManager.primaryBrandColor)
+                        Text("Load Demo Data")
+                            .foregroundColor(ColorManager.primaryBrandColor)
+                    }
+                }
+                .buttonStyle(PlainButtonStyle())
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+                Button(action: { showingDemoDataInfo = true }) {
+                    Image(systemName: "info.circle")
+                        .foregroundColor(.secondary)
+                        .font(.system(size: 16))
+                }
+                .buttonStyle(PlainButtonStyle())
+                .alert("About Demo Data", isPresented: $showingDemoDataInfo) {
+                    Button("Got it", role: .cancel) { }
+                } message: {
+                    Text("Demo data loads a sample bourbon collection so you can explore every feature of BarrelBook right away.\n\nIt includes:\n• A variety of owned bottles (open, sealed & empty)\n• Tasting notes with flavor profiles and ratings\n• Wishlist items with target prices\n• An example infinity bottle\n\n⚠️ Loading demo data will permanently delete your existing collection. Use this to take BarrelBook for a test drive before adding your own bottles.")
+                }
+            }
+            .sheet(isPresented: $showingLoadDemoDataConfirmation, onDismiss: { demoConfirmationText = "" }) {
+                VStack(spacing: 24) {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .font(.system(size: 48))
+                        .foregroundColor(.orange)
+
+                    Text("Load Demo Data?")
+                        .font(.title2.bold())
+
+                    Text("This will **permanently delete** your entire collection, wishlist, tasting notes, and infinity bottles, and replace everything with a sample collection.\n\nThis cannot be undone.")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                        .multilineTextAlignment(.center)
+
+                    VStack(spacing: 8) {
+                        Text("Type **demo** to confirm")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                        TextField("demo", text: $demoConfirmationText)
+                            .textFieldStyle(.roundedBorder)
+                            .autocorrectionDisabled()
+                            .textInputAutocapitalization(.never)
+                            .multilineTextAlignment(.center)
+                            .frame(maxWidth: 160)
+                    }
+
+                    HStack(spacing: 16) {
+                        Button("Cancel") {
+                            demoConfirmationText = ""
+                            showingLoadDemoDataConfirmation = false
+                        }
+                        .buttonStyle(.bordered)
+
+                        Button("Load Demo Data") {
+                            demoConfirmationText = ""
+                            showingLoadDemoDataConfirmation = false
+                            loadDemoData()
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .tint(.red)
+                        .disabled(demoConfirmationText.lowercased() != "demo")
+                    }
+                }
+                .padding(32)
+                .presentationDetents([.medium])
+            }
+
+            // Delete Data — most destructive, at the bottom
+            DisclosureGroup(
+                isExpanded: $showingDeleteDataOptions,
+                content: {
+                    deleteDataButtons
+                },
+                label: {
+                    Label("Delete Data", systemImage: "trash")
+                        .foregroundColor(.red)
+                }
+            )
         }
     }
-    
+
     private var deleteDataButtons: some View {
         Group {
             // Delete Collection (owned whiskeys only)
@@ -665,6 +719,7 @@ struct SettingsView: View {
                             .padding(.bottom, 2)
                         Text("Export Collection")
                             .font(.caption)
+                            .multilineTextAlignment(.center)
                     }
                     .frame(width: 80, height: 80)
                 .foregroundColor(.blue)
@@ -677,7 +732,7 @@ struct SettingsView: View {
         }
         .padding(.vertical, 10)
 
-        Text("Export Collection saves your entire collection to a CSV file — great for backups or moving your data.")
+        Text("Export Collection saves your entire collection to a CSV file, great for backups or moving your data.")
             .font(.caption)
             .foregroundColor(.secondary)
             .multilineTextAlignment(.center)
@@ -688,7 +743,7 @@ struct SettingsView: View {
     
     private var helpSection: some View {
         Section(header: Text("Help")) {
-            Link(destination: URL(string: "mailto:barrelbookdev@gmail.com")!) {
+            Button(action: openContactEmail) {
                 Label("Contact Developer", systemImage: "envelope")
                     .foregroundColor(.primary)
             }
@@ -705,9 +760,11 @@ struct SettingsView: View {
                     .foregroundColor(.primary)
             }
             Button {
-                UserDefaults.standard.set(false, forKey: "hasSeenOnboarding")
                 HapticManager.shared.successFeedback()
                 dismiss()
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    UserDefaults.standard.set(false, forKey: "hasSeenOnboarding")
+                }
             } label: {
                 Label("Reset Onboarding Tutorial", systemImage: "arrow.counterclockwise")
             }
@@ -719,6 +776,19 @@ struct SettingsView: View {
         }
     }
     
+    private func openContactEmail() {
+        let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "Unknown"
+        let buildNumber = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "Unknown"
+        let device = UIDevice.current.model
+        let ios = UIDevice.current.systemVersion
+        let body = "\n\n\n---\nApp: BarrelBook \(appVersion) (Build \(buildNumber))\niOS: \(ios)\nDevice: \(device)"
+        let encodedBody = body.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+        let urlString = "mailto:barrelbookdev@gmail.com?subject=BarrelBook%20Feedback&body=\(encodedBody)"
+        if let url = URL(string: urlString) {
+            UIApplication.shared.open(url)
+        }
+    }
+
     private func resetAllTutorials() {
         let keys = [
             "hasSeenSortTutorial",
@@ -772,6 +842,17 @@ Know thy shelf - Eric
                     .fixedSize(horizontal: false, vertical: true)
             }
             .padding(.vertical, 8)
+
+            // ── Leave a Review ──────────────────────────────────────────
+            Link(destination: URL(string: "https://apps.apple.com/app/id6751058765?action=write-review")!) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Label("Leave a Review", systemImage: "star")
+                    Text("Enjoying BarrelBook? A review means a lot!")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+                .foregroundColor(.primary)
+            }
 
             // ── Version ─────────────────────────────────────────────────
             HStack {
@@ -882,9 +963,13 @@ Know thy shelf - Eric
                                     Text("Data Management")
                                         .font(.headline)
                                 }
-                                Text(LocalizedStringKey("The app lets you add whiskeys from a **CSV file** (a spreadsheet).\n\nIf you're **starting from scratch**, use **Download BarrelBook CSV Template** to get a ready-made file and instructions. Fill it in on your computer, then **Import CSV** to bring those bottles into the app.\n\nIf you already have bottles in the app, you can **merge** your CSV with them instead of replacing everything.\n\n**Export CSV** backs up your collection to a file.\n\n**Delete Data** (tap to expand) lets you remove specific things—owned whiskeys, tastings, infinity bottles, wishlist, or everything—each with its own confirmation so nothing is removed by accident."))
-                                    .font(.subheadline)
-                                    .fixedSize(horizontal: false, vertical: true)
+                            VStack(alignment: .leading, spacing: 10) {
+                                settingsTutorialRow(icon: "1.circle.fill", text: "**Import CSV**: Use **Download BarrelBook CSV Template** to get a ready-made file. Fill it in on your computer, then tap **Import CSV** to bring those bottles into the app. You can merge with existing bottles or start fresh.")
+                                settingsTutorialRow(icon: "2.circle.fill", text: "**Export Collection**: Back up your entire collection to a CSV file at any time.")
+                                settingsTutorialRow(icon: "3.circle.fill", text: "**Load Demo Data**: Replaces your collection with a sample bourbon set, great for exploring features before adding your own bottles.")
+                                settingsTutorialRow(icon: "4.circle.fill", text: "**Delete Data** (tap to expand): Remove specific things like owned whiskeys, tastings, infinity bottles, or the entire collection. Each option has its own confirmation.")
+                            }
+                            .font(.subheadline)
                             }
                             .padding(24)
                             .background(Color(UIColor.secondarySystemBackground))

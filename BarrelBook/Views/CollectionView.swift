@@ -2,7 +2,7 @@ import SwiftUI
 import CoreData
 import Foundation
 
-enum SortOption: String, CaseIterable {
+enum SortOption: String, CaseIterable, Codable {
     case nameAsc = "Name (A-Z)"
     case nameDesc = "Name (Z-A)"
     case proofHigh = "Proof (High-Low)"
@@ -121,23 +121,17 @@ struct SectionIndexModifier: ViewModifier {
     let proxy: ScrollViewProxy
     let alphabet: [Character]
     let filteredWhiskeys: [(key: String, whiskeys: [Whiskey])]
-    @State private var currentSort: SortOption = .nameAsc
+    let primarySortOption: SortOption?
     
-    // Get the current sort from the same place it's stored in CollectionView
-    init(proxy: ScrollViewProxy, alphabet: [Character], filteredWhiskeys: [(key: String, whiskeys: [Whiskey])]) {
+    init(proxy: ScrollViewProxy, alphabet: [Character], filteredWhiskeys: [(key: String, whiskeys: [Whiskey])], primarySortOption: SortOption?) {
         self.proxy = proxy
         self.alphabet = alphabet
         self.filteredWhiskeys = filteredWhiskeys
-        
-        // Get the current sort from UserDefaults
-        if let sortString = UserDefaults.standard.string(forKey: "currentSortOption"),
-           let sort = SortOption(rawValue: sortString) {
-            _currentSort = State(initialValue: sort)
-        }
+        self.primarySortOption = primarySortOption
     }
     
     func body(content: Content) -> some View {
-        if currentSort == .nameAsc || currentSort == .nameDesc {
+        if primarySortOption == .nameAsc || primarySortOption == .nameDesc {
             // Only show alphabet bar for name-based sorts
             return AnyView(
                 ZStack {
@@ -182,13 +176,17 @@ struct SectionIndexModifier: ViewModifier {
 
 struct CollectionView: View {
     @Environment(\.managedObjectContext) private var viewContext
+    @StateObject private var subscriptionManager = SubscriptionManager.shared
+    @State private var showingPaywall = false
     @State private var showingAddSheet = false
     @State private var showingFilterSheet = false
     @State private var showingSettings = false
     @State private var searchText = ""
-    @State private var sortOption: SortOption = .nameAsc
+    @State private var sortConfig = HierarchicalSortConfig(activeSorts: [SortCriterionIdentifiable(option: .nameAsc)])
+    @State private var showingSortSheet = false
     @State private var debouncedSearchText = ""
     @State private var isUpdatingFiltersFromSearch = false
+    @State private var searchDebounceTimer: Timer?
     @State private var filterOptions = FilterOptions()
     @State private var showingDeleteConfirmation = false
     @State private var refreshTrigger = UUID()
@@ -221,6 +219,10 @@ struct CollectionView: View {
     
     // State for showing add infinity bottle view
     @State private var showingAddInfinityBottle = false
+    @AppStorage("hasSeenCollectionTutorial") private var hasSeenCollectionTutorial = false
+    @State private var showingCollectionTutorialOverlay = false
+    @AppStorage("hasSeenEmptyCollectionTutorial") private var hasSeenEmptyCollectionTutorial = false
+    @State private var showingEmptyCollectionTutorialOverlay = false
     
     // Add a new state object to track updates
     @StateObject private var viewStateUpdater = ViewStateUpdater()
@@ -384,7 +386,21 @@ struct CollectionView: View {
     
     // Computed property for sorted and grouped whiskeys
     private var filteredAndSortedWhiskeysByLetter: [(key: String, whiskeys: [Whiskey])] {
-        return SortingUtils.groupByFirstLetter(filteredWhiskeys, sortedBy: sortOption)
+        // Use hierarchical sorting
+        let sorted = SortingUtils.sortWhiskeysHierarchically(filteredWhiskeys, by: sortConfig)
+        
+        // Group by first letter if the primary sort is name-based
+        if let firstSort = sortConfig.activeSorts.first?.option,
+           firstSort == .nameAsc || firstSort == .nameDesc {
+            let grouped = Dictionary(grouping: sorted) { whiskey in
+                String(whiskey.name?.prefix(1).uppercased() ?? "#")
+            }
+            return grouped.map { (key: $0.key, whiskeys: $0.value) }
+                .sorted { $0.key < $1.key }
+        } else {
+            // For other sorts, return as single section
+            return [("All Whiskeys", sorted)]
+        }
     }
     
     // Initialize filter options with all available types when the view appears
@@ -402,8 +418,9 @@ struct CollectionView: View {
             FilterSettingsManager.saveFilterOptions(filterOptions)
         }
         
-        // Also load the saved sort option
-        sortOption = FilterSettingsManager.loadCurrentSort()
+        // Also load the saved sort config (for now, using legacy single-sort as default)
+        let savedSort = FilterSettingsManager.loadCurrentSort()
+        sortConfig = HierarchicalSortConfig(activeSorts: [SortCriterionIdentifiable(option: savedSort)])
     }
     
     @State private var shouldMaintainNavigation = false
@@ -479,28 +496,55 @@ struct CollectionView: View {
                             let isEmpty = filteredAndSortedWhiskeysByLetter.isEmpty || filteredAndSortedWhiskeysByLetter.allSatisfy { $0.whiskeys.isEmpty }
                             
                             if isEmpty {
-                                // Empty state with reset filters button
-                                VStack(spacing: 16) {
-                                    Text("No whiskeys found")
-                                        .font(.headline)
-                                        .foregroundColor(.secondary)
-                                    
-                                    Button {
-                                        // Reset filters
-                                        resetFiltersToDefault()
-                                        HapticManager.shared.mediumImpact()
-                                    } label: {
-                                        Text("Tap here to reset all filters")
-                                            .foregroundColor(.blue)
-                                            .padding(.horizontal, 20)
-                                            .padding(.vertical, 10)
-                                            .background(Color.blue.opacity(0.1))
-                                            .cornerRadius(8)
+                                // Empty state
+                                VStack(spacing: 20) {
+                                    Image(systemName: "cabinet")
+                                        .font(.system(size: 52, weight: .thin))
+                                        .foregroundColor(ColorManager.primaryBrandColor.opacity(0.55))
+
+                                    if collectionItems.isEmpty {
+                                        // Truly empty shelf
+                                        VStack(spacing: 8) {
+                                            Text("Your shelf is empty")
+                                                .font(.title3)
+                                                .fontWeight(.semibold)
+                                                .foregroundColor(.primary)
+                                            Text("Add your first bottle to get started")
+                                                .font(.subheadline)
+                                                .foregroundColor(.secondary)
+                                                .multilineTextAlignment(.center)
+                                        }
+                                    } else {
+                                        // Filters returned nothing
+                                        VStack(spacing: 8) {
+                                            Text("No whiskeys match")
+                                                .font(.title3)
+                                                .fontWeight(.semibold)
+                                                .foregroundColor(.primary)
+                                            Text("Try adjusting your search or filters")
+                                                .font(.subheadline)
+                                                .foregroundColor(.secondary)
+                                        }
+                                        Button {
+                                            resetFiltersToDefault()
+                                            HapticManager.shared.mediumImpact()
+                                        } label: {
+                                            Text("Reset Filters")
+                                                .font(.subheadline)
+                                                .fontWeight(.medium)
+                                                .foregroundColor(.white)
+                                                .padding(.horizontal, 24)
+                                                .padding(.vertical, 10)
+                                                .background(ColorManager.primaryBrandColor)
+                                                .cornerRadius(10)
+                                        }
                                     }
                                 }
+                                .padding(40)
                                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                                 .background(Color(UIColor.systemGroupedBackground))
-                            } else if sortOption == .nameAsc || sortOption == .nameDesc {
+                            } else if let firstSort = sortConfig.activeSorts.first?.option,
+                                      firstSort == .nameAsc || firstSort == .nameDesc {
                                 // For name-based sorts, use sections with index
                                 List {
                                     // Use sections with alphabetical headers for name-based sorts
@@ -523,7 +567,7 @@ struct CollectionView: View {
                                     }
                                 }
                                 .listStyle(.plain)
-                                .modifier(SectionIndexModifier(proxy: scrollProxy, alphabet: alphabet, filteredWhiskeys: filteredAndSortedWhiskeysByLetter))
+                                .modifier(SectionIndexModifier(proxy: scrollProxy, alphabet: alphabet, filteredWhiskeys: filteredAndSortedWhiskeysByLetter, primarySortOption: sortConfig.activeSorts.first?.option))
                             } else {
                                 // For other sorts, use a flat list with no alphabet index
                                 List {
@@ -584,26 +628,19 @@ struct CollectionView: View {
                         Image(systemName: "line.3.horizontal.decrease.circle")
                     }
                     
-                    // Sort menu
-                    Menu {
-                        ForEach(SortOption.allCases, id: \.self) { option in
-                            Button {
-                                sortOption = option
-                                HapticManager.shared.selectionFeedback()
-                                
-                                // Save sort option when changed
-                                FilterSettingsManager.saveCurrentSort(option)
-                            } label: {
-                                HStack {
-                                    Text(option.rawValue)
-                                    if sortOption == option {
-                                        Image(systemName: "checkmark")
-                                    }
-                                }
+                    // Sort button
+                    Button {
+                        showingSortSheet = true
+                        HapticManager.shared.mediumImpact()
+                    } label: {
+                        HStack(spacing: 4) {
+                            Image(systemName: "arrow.up.arrow.down")
+                            if sortConfig.activeSorts.count > 1 {
+                                Text("\(sortConfig.activeSorts.count)")
+                                    .font(.caption2)
+                                    .foregroundColor(.accentColor)
                             }
                         }
-                    } label: {
-                        Image(systemName: "arrow.up.arrow.down")
                     }
                 }
                 // Hide sort/filter buttons on iPad
@@ -619,6 +656,9 @@ struct CollectionView: View {
                 // Only show this settings icon on iPhone, not on iPad
                 .opacity(UIDevice.current.userInterfaceIdiom == .pad ? 0 : 1)
             }
+        }
+        .sheet(isPresented: $showingSortSheet) {
+            HierarchicalSortPickerView(sortConfig: $sortConfig)
         }
         .sheet(isPresented: $showingFilterSheet) {
             WhiskeyFilterView(
@@ -668,6 +708,12 @@ struct CollectionView: View {
             // Initial filtering
             updateFilteredWhiskeys()
             
+            if collectionItems.isEmpty && !hasSeenEmptyCollectionTutorial {
+                showingEmptyCollectionTutorialOverlay = true
+            } else if !collectionItems.isEmpty && !hasSeenCollectionTutorial {
+                showingCollectionTutorialOverlay = true
+            }
+            
             // Set up notification observers
             NotificationCenter.default.addObserver(
                 forName: NSNotification.Name("WhiskeyUpdated"),
@@ -694,10 +740,24 @@ struct CollectionView: View {
             }
         }
         .onChange(of: searchText) { newValue in
-            // Debounce search text updates to improve performance
+            // Cancel any existing timer
+            searchDebounceTimer?.invalidate()
+            
+            // Show loading indicator
             isUpdatingFiltersFromSearch = true
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                if searchText == newValue && isUpdatingFiltersFromSearch {
+            
+            // Create a new timer for debouncing
+            searchDebounceTimer = Timer.scheduledTimer(withTimeInterval: 0.3, repeats: false) { _ in
+                DispatchQueue.main.async {
+                    debouncedSearchText = newValue
+                    isUpdatingFiltersFromSearch = false
+                    updateFilteredWhiskeys()
+                }
+            }
+            
+            // Fallback: ensure search results update even if debouncing fails
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                if debouncedSearchText != newValue {
                     debouncedSearchText = newValue
                     isUpdatingFiltersFromSearch = false
                     updateFilteredWhiskeys()
@@ -743,8 +803,12 @@ struct CollectionView: View {
         .onChange(of: filterOptions.proofRange) { _ in
             updateFilteredWhiskeys()
         }
-        .onChange(of: sortOption) { _ in
+        .onChange(of: sortConfig.activeSorts) { _ in
             updateFilteredWhiskeys()
+            // Save the first sort option for backwards compatibility
+            if let firstSort = sortConfig.activeSorts.first?.option {
+                FilterSettingsManager.saveCurrentSort(firstSort)
+            }
         }
         .onChange(of: collectionItems.count) { newCount in
             updateFilteredWhiskeys()
@@ -762,17 +826,40 @@ struct CollectionView: View {
         .overlay(alignment: .bottomTrailing) {
             FloatingAddButton {
                 if viewMode == .whiskeys {
-                    showingAddSheet = true
-                    HapticManager.shared.lightImpact()
+                    if subscriptionManager.canAddWhiskey(currentCount: collectionItems.count) {
+                        showingAddSheet = true
+                        HapticManager.shared.lightImpact()
+                    } else {
+                        showingPaywall = true
+                        HapticManager.shared.lightImpact()
+                    }
                 } else {
                     showingAddInfinityBottle = true
                     HapticManager.shared.lightImpact()
                 }
             }
         }
+        .overlay {
+            if showingEmptyCollectionTutorialOverlay {
+                EmptyCollectionTutorialOverlay(onDismiss: {
+                    hasSeenEmptyCollectionTutorial = true
+                    showingEmptyCollectionTutorialOverlay = false
+                    HapticManager.shared.lightImpact()
+                })
+            } else if showingCollectionTutorialOverlay {
+                CollectionTutorialOverlay(onDismiss: {
+                    hasSeenCollectionTutorial = true
+                    showingCollectionTutorialOverlay = false
+                    HapticManager.shared.lightImpact()
+                })
+            }
+        }
         .sheet(isPresented: $showingAddSheet) {
             AddWhiskeyView()
                 .environment(\.managedObjectContext, viewContext)
+        }
+        .fullScreenCover(isPresented: $showingPaywall) {
+            PaywallView(isPresented: $showingPaywall)
         }
     }
     
@@ -865,12 +952,6 @@ struct CollectionView: View {
         isUpdatingFiltersFromSearch = false
     }
     
-    private func formatCurrency(_ value: Double) -> String {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .currency
-        formatter.maximumFractionDigits = 0
-        return formatter.string(from: NSNumber(value: value)) ?? "$0"
-    }
     
     // Function to show add infinity bottle view
     private func showAddInfinityBottle() {
@@ -887,9 +968,12 @@ enum CollectionViewMode {
 // Define InfinityBottlesView
 struct InfinityBottlesView: View {
     @Environment(\.managedObjectContext) private var viewContext
+    @AppStorage("hasSeenInfinityBottleTutorial") private var hasSeenInfinityBottleTutorial = false
+    @State private var showingTutorialOverlay = false
     let infinityBottles: FetchedResults<InfinityBottle>
     
     var body: some View {
+        ZStack {
         if infinityBottles.isEmpty {
             VStack(spacing: 16) {
                 Image(systemName: "wineglass")
@@ -921,6 +1005,19 @@ struct InfinityBottlesView: View {
             }
             .listStyle(.plain)
         }
+            if showingTutorialOverlay {
+                InfinityBottleTutorialOverlay(onDismiss: {
+                    hasSeenInfinityBottleTutorial = true
+                    showingTutorialOverlay = false
+                    HapticManager.shared.lightImpact()
+                })
+            }
+        }
+        .onAppear {
+            if !hasSeenInfinityBottleTutorial {
+                showingTutorialOverlay = true
+            }
+        }
     }
     
     private func deleteInfinityBottles(at offsets: IndexSet) {
@@ -932,6 +1029,194 @@ struct InfinityBottlesView: View {
             } catch {
                 print("Error deleting infinity bottles: \(error)")
             }
+        }
+    }
+}
+
+// MARK: - Infinity Bottle tutorial (first-time overlay)
+
+struct InfinityBottleTutorialOverlay: View {
+    var onDismiss: () -> Void
+    
+    var body: some View {
+        ColorManager.tutorialScrim
+            .ignoresSafeArea()
+            .onTapGesture { }
+        GeometryReader { geometry in
+            ScrollView {
+                VStack(spacing: 0) {
+                    Spacer(minLength: 0)
+                    VStack(spacing: 20) {
+                        VStack(alignment: .leading, spacing: 16) {
+                            HStack {
+                                Image(systemName: "wineglass.fill")
+                                    .font(.title2)
+                                    .foregroundColor(ColorManager.primaryBrandColor)
+                                Text("Infinity Bottles")
+                                    .font(.headline)
+                            }
+                            VStack(alignment: .leading, spacing: 10) {
+                                Text("Some whiskey lovers create what are known as infinity bottles. An infinity bottle is made from a few ounces of different bottles that are combined into a single bottle that evolves over time as you drink it and add new whiskeys to it. This section helps you keep track of what whiskeys are in your infinity bottles.")
+                                    .font(.subheadline)
+                                Text("Tap the + button below to create your first bottle, and I'll walk you through the process!")
+                                    .font(.subheadline)
+                            }
+                            .font(.subheadline)
+                        }
+                        .padding(24)
+                        .background(Color(UIColor.secondarySystemBackground))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 16)
+                                .stroke(ColorManager.tutorialCardBorder, lineWidth: 1)
+                        )
+                        .cornerRadius(16)
+                        .shadow(radius: 12)
+                        .padding(.horizontal, 24)
+                        Button(action: onDismiss) {
+                            Text("Got it")
+                                .fontWeight(.semibold)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 12)
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .tint(ColorManager.primaryBrandColor)
+                        .padding(.horizontal, 24)
+                    }
+                    .padding()
+                    Spacer(minLength: 0)
+                }
+                .frame(minHeight: geometry.size.height)
+            }
+            .padding()
+        }
+    }
+}
+
+// MARK: - Empty collection tutorial (first bottle — show when collection is empty)
+private struct EmptyCollectionTutorialOverlay: View {
+    var onDismiss: () -> Void
+    
+    var body: some View {
+        ColorManager.tutorialScrim
+            .ignoresSafeArea()
+            .onTapGesture { }
+        GeometryReader { geometry in
+            ScrollView {
+                VStack(spacing: 0) {
+                    Spacer(minLength: 0)
+                    VStack(spacing: 20) {
+                        VStack(alignment: .leading, spacing: 16) {
+                            HStack {
+                                Image(systemName: "plus.circle.fill")
+                                    .font(.title2)
+                                    .foregroundColor(ColorManager.primaryBrandColor)
+                                Text("Add your first bottle")
+                                    .font(.headline)
+                            }
+                            VStack(alignment: .leading, spacing: 10) {
+                                Text(LocalizedStringKey("Your collection is empty. Tap the **+** button below to add your first whiskey. You can enter name, type, proof, price, and more."))
+                                    .font(.subheadline)
+                                Text(LocalizedStringKey("Have a whiskey database already? You can import from a CSV in **Settings → Data Management → Import CSV**."))
+                                    .font(.subheadline)
+                                    .foregroundColor(.secondary)
+                            }
+                            .font(.subheadline)
+                        }
+                        .padding(24)
+                        .background(Color(UIColor.secondarySystemBackground))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 16)
+                                .stroke(ColorManager.tutorialCardBorder, lineWidth: 1)
+                        )
+                        .cornerRadius(16)
+                        .shadow(radius: 12)
+                        .padding(.horizontal, 24)
+                        Button(action: onDismiss) {
+                            Text("Got it")
+                                .fontWeight(.semibold)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 12)
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .tint(ColorManager.primaryBrandColor)
+                        .padding(.horizontal, 24)
+                    }
+                    .padding()
+                    Spacer(minLength: 0)
+                }
+                .frame(minHeight: geometry.size.height)
+            }
+            .padding()
+        }
+    }
+}
+
+// MARK: - Collection tutorial (first-time overlay — show when collection has at least one bottle)
+private struct CollectionTutorialOverlay: View {
+    var onDismiss: () -> Void
+    
+    var body: some View {
+        ColorManager.tutorialScrim
+            .ignoresSafeArea()
+            .onTapGesture { }
+        GeometryReader { geometry in
+            ScrollView {
+                VStack(spacing: 0) {
+                    Spacer(minLength: 0)
+                    VStack(spacing: 20) {
+                        VStack(alignment: .leading, spacing: 16) {
+                            HStack {
+                                Image(systemName: "square.grid.2x2.fill")
+                                    .font(.title2)
+                                    .foregroundColor(ColorManager.primaryBrandColor)
+                                Text("Your Collection")
+                                    .font(.headline)
+                            }
+                            VStack(alignment: .leading, spacing: 10) {
+                                collectionTutorialRow(icon: "1.circle.fill", text: "**Tap any bottle** to open its detail view: inventory, individual bottles, notes, tastings, and saved reviews all live there.")
+                                collectionTutorialRow(icon: "2.circle.fill", text: "Use the **search bar** to find bottles by name, type, distillery, proof, or age.")
+                                collectionTutorialRow(icon: "3.circle.fill", text: "**Filter** (funnel icon) narrows by type, price, proof, open/sealed, tasted, and more.")
+                                collectionTutorialRow(icon: "4.circle.fill", text: "**Sort** (arrows icon) changes order: by name, proof, price, date added, or open first.")
+                                collectionTutorialRow(icon: "5.circle.fill", text: "**Open bottles** show a half-circle indicator on the row so you can tell at a glance which whiskeys you’ve cracked into.")
+                                collectionTutorialRow(icon: "plus.circle.fill", text: "The **+** button adds a new whiskey. Switch to **Infinity Bottles** in the segment to manage or create infinity bottles.")
+                            }
+                            .font(.subheadline)
+                        }
+                        .padding(24)
+                        .background(Color(UIColor.secondarySystemBackground))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 16)
+                                .stroke(ColorManager.tutorialCardBorder, lineWidth: 1)
+                        )
+                        .cornerRadius(16)
+                        .shadow(radius: 12)
+                        .padding(.horizontal, 24)
+                        Button(action: onDismiss) {
+                            Text("Got it")
+                                .fontWeight(.semibold)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 12)
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .tint(ColorManager.primaryBrandColor)
+                        .padding(.horizontal, 24)
+                    }
+                    .padding()
+                    Spacer(minLength: 0)
+                }
+                .frame(minHeight: geometry.size.height)
+            }
+            .padding()
+        }
+    }
+    
+    private func collectionTutorialRow(icon: String, text: String) -> some View {
+        HStack(alignment: .top, spacing: 10) {
+            Image(systemName: icon)
+                .foregroundColor(ColorManager.primaryBrandColor)
+                .font(.subheadline)
+            Text(LocalizedStringKey(text))
+                .fixedSize(horizontal: false, vertical: true)
         }
     }
 }
@@ -1425,7 +1710,8 @@ struct SearchResultsView: View {
     let whiskeys: [Whiskey]
     
     @State private var showingFilterSheet = false
-    @State private var currentSort: SortOption = .nameAsc
+    @State private var sortConfig = HierarchicalSortConfig(activeSorts: [SortCriterionIdentifiable(option: .nameAsc)])
+    @State private var showingSortSheet = false
     @State private var filterOptions = FilterOptions()
     @State private var localSearchText: String
     
@@ -1581,45 +1867,9 @@ struct SearchResultsView: View {
         return filtered
     }
     
-    // Add sorting functionality
+    // Hierarchical sorting functionality
     private var sortedWhiskeys: [Whiskey] {
-        return filteredWhiskeys.sorted { first, second in
-            switch currentSort {
-            case .nameAsc:
-                return (first.name ?? "") < (second.name ?? "")
-            case .nameDesc:
-                return (first.name ?? "") > (second.name ?? "")
-            case .proofHigh:
-                return first.proof > second.proof
-            case .proofLow:
-                return first.proof < second.proof
-            case .priceHigh:
-                return first.price > second.price
-            case .priceLow:
-                return first.price < second.price
-            case .typeAsc:
-                return (first.type ?? "") < (second.type ?? "")
-            case .ageDesc:
-                return (first.age ?? "") > (second.age ?? "")
-            case .ageAsc:
-                return (first.age ?? "") < (second.age ?? "")
-            case .openFirst:
-                // Sort open bottles first, then by name
-                if first.isOpen != second.isOpen {
-                    return first.isOpen
-                }
-                return (first.name ?? "") < (second.name ?? "")
-            case .sealedFirst:
-                // Sort sealed (not open) bottles first, then by name
-                if first.isOpen != second.isOpen {
-                    return !first.isOpen
-                }
-                return (first.name ?? "") < (second.name ?? "")
-            case .dateAdded:
-                // Fallback to name if dateAdded isn't available
-                return (first.name ?? "") < (second.name ?? "")
-            }
-        }
+        return SortingUtils.sortWhiskeysHierarchically(filteredWhiskeys, by: sortConfig)
     }
     
     var body: some View {
@@ -1666,7 +1916,7 @@ struct SearchResultsView: View {
                         .foregroundColor(.secondary)
                     
                     let totalValue = filteredWhiskeys.reduce(0.0) { $0 + ($1.price * Double($1.numberOfBottles)) }
-                    Text(formatCurrency(totalValue))
+                    Text(AppFormatters.formatCurrency(totalValue))
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                 }
@@ -1710,26 +1960,25 @@ struct SearchResultsView: View {
                         Image(systemName: "line.3.horizontal.decrease.circle")
                     }
                     
-                    // Sort menu
-                    Menu {
-                        ForEach(SortOption.allCases, id: \.self) { option in
-                            Button {
-                                currentSort = option
-                                HapticManager.shared.selectionFeedback()
-                            } label: {
-                                HStack {
-                                    Text(option.rawValue)
-                                    if currentSort == option {
-                                        Image(systemName: "checkmark")
-                                    }
-                                }
+                    // Sort button
+                    Button {
+                        showingSortSheet = true
+                        HapticManager.shared.mediumImpact()
+                    } label: {
+                        HStack(spacing: 4) {
+                            Image(systemName: "arrow.up.arrow.down")
+                            if sortConfig.activeSorts.count > 1 {
+                                Text("\(sortConfig.activeSorts.count)")
+                                    .font(.caption2)
+                                    .foregroundColor(.accentColor)
                             }
                         }
-                    } label: {
-                        Image(systemName: "arrow.up.arrow.down")
                     }
                 }
             }
+        }
+        .sheet(isPresented: $showingSortSheet) {
+            HierarchicalSortPickerView(sortConfig: $sortConfig)
         }
         .sheet(isPresented: $showingFilterSheet) {
             WhiskeyFilterView(
@@ -1750,12 +1999,6 @@ struct SearchResultsView: View {
         }
     }
     
-    private func formatCurrency(_ value: Double) -> String {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .currency
-        formatter.maximumFractionDigits = 0
-        return formatter.string(from: NSNumber(value: value)) ?? "$0"
-    }
 }
 
 struct CollectionView_Previews: PreviewProvider {

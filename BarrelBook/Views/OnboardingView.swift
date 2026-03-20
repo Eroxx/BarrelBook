@@ -41,7 +41,7 @@ struct OnboardingView: View {
             image: "square.stack.3d.up.fill",
             title: "Your Collection",
             subtitle: "Start with What's on Your Shelf",
-            description: "Add every bottle with proof, price, distillery, and special designations. Track open, sealed, and finished bottles separately and see your collection's total value at a glance.",
+            description: "Add every bottle with proof, price, distillery, and special designations. Track open, sealed, and finished bottles separately and see your collection's total value at a glance.\n\nYou can export your entire BarrelBook collection to a CSV file at any time from Settings.",
             accentColor: warmAmber,
             isWelcome: false
         ),
