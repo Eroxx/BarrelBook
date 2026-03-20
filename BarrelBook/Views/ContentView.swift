@@ -120,6 +120,7 @@ struct ContentView: View {
     @StateObject private var subscriptionManager = SubscriptionManager.shared
     @State private var showingSettings = false
     @State private var statisticsShowingFilteredView = false
+    @AppStorage("hasSeenOnboarding") private var hasSeenOnboarding = false
     
     var body: some View {
         VStack(spacing: 0) {
@@ -215,6 +216,12 @@ struct ContentView: View {
         }
         .fullScreenCover(isPresented: $showingSettings) {
             SettingsView()
+        }
+        .fullScreenCover(isPresented: Binding(
+            get: { !hasSeenOnboarding },
+            set: { hasSeenOnboarding = !$0 }
+        )) {
+            OnboardingView()
         }
         }
         .task {
@@ -535,19 +542,19 @@ struct HomeView: View {
                 } label: {
                     Label("Import from Spreadsheet", systemImage: "tablecells")
                         .font(.subheadline)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.primary.opacity(0.7))
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 12)
                         .background(
                             RoundedRectangle(cornerRadius: 12)
-                                .strokeBorder(Color.secondary.opacity(0.3), lineWidth: 1)
+                                .strokeBorder(Color.primary.opacity(0.25), lineWidth: 1)
                         )
                 }
                 .sheet(isPresented: $showingCSVImport) {
                     CSVImportOnboardingView()
                 }
 
-                Text("Already tracking in a spreadsheet? Import your collection directly.")
+                Text("If you already track your data in a spreadsheet, tap above to import your collection.")
                     .font(.caption2)
                     .foregroundColor(.secondary)
                     .multilineTextAlignment(.center)

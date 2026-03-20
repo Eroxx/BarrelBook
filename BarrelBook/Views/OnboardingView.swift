@@ -268,19 +268,19 @@ struct OnboardingView: View {
                     Text("Import from Spreadsheet").font(.subheadline).fontWeight(.medium)
                     Image(systemName: "tablecells")
                 }
-                .foregroundColor(.secondary)
+                .foregroundColor(.primary.opacity(0.7))
                 .frame(maxWidth: .infinity)
                 .padding()
                 .background(
                     RoundedRectangle(cornerRadius: 15)
-                        .strokeBorder(Color.secondary.opacity(0.3), lineWidth: 1.5)
+                        .strokeBorder(Color.primary.opacity(0.25), lineWidth: 1.5)
                 )
             }
             .sheet(isPresented: $showingCSVImport) {
                 CSVImportOnboardingView(onComplete: completeOnboarding)
             }
 
-            Text("Already tracking your collection in a spreadsheet? Import it directly.")
+            Text("If you already track your data in a spreadsheet, tap above to import your collection.")
                 .font(.caption)
                 .foregroundColor(.secondary)
                 .multilineTextAlignment(.center)

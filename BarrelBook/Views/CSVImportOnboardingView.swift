@@ -105,13 +105,13 @@ struct CSVImportOnboardingView: View {
             Spacer()
 
             VStack(spacing: 12) {
-                // Primary: I have my CSV ready
+                // Primary: show me how (most users need this first)
                 Button {
-                    showingFilePicker = true
+                    withAnimation { screen = .prepare }
                 } label: {
                     HStack {
-                        Text("I have my CSV ready").font(.headline)
-                        Image(systemName: "arrow.up.doc")
+                        Text("Show me how to import").font(.headline)
+                        Image(systemName: "doc.text")
                     }
                     .foregroundColor(.white)
                     .frame(maxWidth: .infinity)
@@ -120,13 +120,13 @@ struct CSVImportOnboardingView: View {
                     .cornerRadius(15)
                 }
 
-                // Secondary: I need to prepare it
+                // Secondary: already have a BarrelBook CSV
                 Button {
-                    withAnimation { screen = .prepare }
+                    showingFilePicker = true
                 } label: {
                     HStack {
-                        Text("I need to prepare my CSV").font(.subheadline).fontWeight(.medium)
-                        Image(systemName: "doc.text")
+                        Text("I already have my BarrelBook CSV").font(.subheadline).fontWeight(.medium)
+                        Image(systemName: "arrow.up.doc")
                     }
                     .foregroundColor(gold)
                     .frame(maxWidth: .infinity)
@@ -137,7 +137,7 @@ struct CSVImportOnboardingView: View {
                     )
                 }
 
-                Text("The BarrelBook template makes import easy. Takes about 2 minutes to set up.")
+                Text("You will need to use the BarrelBook template before importing. Tap above to get started.")
                     .font(.caption)
                     .foregroundColor(.secondary)
                     .multilineTextAlignment(.center)

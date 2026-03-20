@@ -132,9 +132,6 @@ struct SettingsView: View {
         .preferredColorScheme(displayColorScheme)
         .navigationViewStyle(StackNavigationViewStyle())
         .interactiveDismissDisabled() // Prevent dismissal by dragging down
-        .sheet(isPresented: $showingOnboarding) {
-            OnboardingView(onLoadDemoData: { loadDemoData() })
-        }
         .sheet(isPresented: $isExportingToCustomLocation) {
             DocumentPickerExport(
                 csvData: customExportData,
@@ -699,9 +696,9 @@ struct SettingsView: View {
                     .foregroundColor(.primary)
             }
             Button {
-                hasSeenOnboarding = false
-                showingOnboarding = true
+                UserDefaults.standard.set(false, forKey: "hasSeenOnboarding")
                 HapticManager.shared.successFeedback()
+                dismiss()
             } label: {
                 Label("Reset Onboarding Tutorial", systemImage: "arrow.counterclockwise")
             }
