@@ -757,9 +757,9 @@ I tried several whiskey catalog apps and none of them quite clicked, especially 
 
 So I built the one I actually wanted. BarrelBook lets you track your collection and its value, log tastings, manage your wishlist, build infinity bottles, and more, all in one place.
 
-I'm always open to feedback and new feature ideas. Join the Discord and let me know what you think. I read everything.
+Join the Discord (link above) and share your thoughts and feedback. Thank you!
 
-Know thy shelf. — Eric
+Know thy shelf - Eric
 """)
                     .font(.subheadline)
                     .foregroundColor(.primary)
