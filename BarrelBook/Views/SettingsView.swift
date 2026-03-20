@@ -690,6 +690,14 @@ struct SettingsView: View {
                 Label("Join us on Discord", systemImage: "bubble.left.and.bubble.right")
                     .foregroundColor(.primary)
             }
+            Link(destination: URL(string: "https://youtu.be/WQjhyPm62KA")!) {
+                Label("Video: Getting Started", systemImage: "play.rectangle.fill")
+                    .foregroundColor(.primary)
+            }
+            Link(destination: URL(string: "https://youtu.be/yY71ND7r3hs")!) {
+                Label("Video: Full Walkthrough", systemImage: "play.rectangle.fill")
+                    .foregroundColor(.primary)
+            }
             Button {
                 hasSeenOnboarding = false
                 showingOnboarding = true
@@ -758,48 +766,6 @@ Know thy shelf. — Eric
                     .fixedSize(horizontal: false, vertical: true)
             }
             .padding(.vertical, 8)
-
-            // ── Video tutorials ──────────────────────────────────────────
-            VStack(alignment: .leading, spacing: 4) {
-                Text("Video Tutorials")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-                    .textCase(.uppercase)
-                    .padding(.top, 4)
-
-                Link(destination: URL(string: "https://youtu.be/WQjhyPm62KA")!) {
-                    HStack(spacing: 10) {
-                        Image(systemName: "play.rectangle.fill")
-                            .foregroundColor(ColorManager.primaryBrandColor)
-                            .font(.title3)
-                        Text("Getting Started")
-                            .foregroundColor(.primary)
-                        Spacer()
-                        Image(systemName: "arrow.up.right")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    }
-                    .padding(.vertical, 6)
-                }
-
-                Divider()
-
-                Link(destination: URL(string: "https://youtu.be/yY71ND7r3hs")!) {
-                    HStack(spacing: 10) {
-                        Image(systemName: "play.rectangle.fill")
-                            .foregroundColor(ColorManager.primaryBrandColor)
-                            .font(.title3)
-                        Text("Full Walkthrough")
-                            .foregroundColor(.primary)
-                        Spacer()
-                        Image(systemName: "arrow.up.right")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    }
-                    .padding(.vertical, 6)
-                }
-            }
-            .padding(.vertical, 4)
 
             // ── Version ─────────────────────────────────────────────────
             HStack {
