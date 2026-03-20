@@ -495,7 +495,7 @@ struct SettingsView: View {
                     createCSVTemplate()
                     HapticManager.shared.mediumImpact()
                 } label: {
-                        Label("Download CSV Template", systemImage: "doc.badge.plus")
+                        Label("Download BarrelBook CSV Template", systemImage: "doc.badge.plus")
                         .foregroundColor(.blue)
                     }
                 .buttonStyle(PlainButtonStyle())
@@ -873,7 +873,7 @@ Know thy shelf - Eric
                                     Text("Data Management")
                                         .font(.headline)
                                 }
-                                Text(LocalizedStringKey("The app lets you add whiskeys from a **CSV file** (a spreadsheet).\n\nIf you're **starting from scratch**, use **Download CSV Template** to get a ready-made file and instructions. Fill it in on your computer, then **Import CSV** to bring those bottles into the app.\n\nIf you already have bottles in the app, you can **merge** your CSV with them instead of replacing everything.\n\n**Export CSV** backs up your collection to a file.\n\n**Delete Data** (tap to expand) lets you remove specific things—owned whiskeys, tastings, infinity bottles, wishlist, or everything—each with its own confirmation so nothing is removed by accident."))
+                                Text(LocalizedStringKey("The app lets you add whiskeys from a **CSV file** (a spreadsheet).\n\nIf you're **starting from scratch**, use **Download BarrelBook CSV Template** to get a ready-made file and instructions. Fill it in on your computer, then **Import CSV** to bring those bottles into the app.\n\nIf you already have bottles in the app, you can **merge** your CSV with them instead of replacing everything.\n\n**Export CSV** backs up your collection to a file.\n\n**Delete Data** (tap to expand) lets you remove specific things—owned whiskeys, tastings, infinity bottles, wishlist, or everything—each with its own confirmation so nothing is removed by accident."))
                                     .font(.subheadline)
                                     .fixedSize(horizontal: false, vertical: true)
                             }

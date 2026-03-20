@@ -170,7 +170,7 @@ struct CSVImportOnboardingView: View {
                         stepRow(
                             number: "1",
                             title: "Get the BarrelBook CSV Template",
-                            detail: "In BarrelBook, go to Settings → Data Management → Export CSV Template. Open the file on your Mac or PC.",
+                            detail: "In BarrelBook, go to Settings → Data Management → Download BarrelBook CSV Template. Open the file on your Mac or PC.",
                             icon: "arrow.down.doc"
                         )
                         stepRow(
