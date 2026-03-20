@@ -181,8 +181,8 @@ struct CSVImportOnboardingView: View {
                         )
                         stepRow(
                             number: "3",
-                            title: "Come back and import",
-                            detail: "Return here and tap \"I have my CSV ready\", or go to Settings → Data Management → Import CSV.",
+                            title: "Import your file",
+                            detail: "Go to Settings → Data Management → Import CSV and select your prepared file. BarrelBook will read each row and add it to your collection.",
                             icon: "arrow.up.doc"
                         )
                     }
