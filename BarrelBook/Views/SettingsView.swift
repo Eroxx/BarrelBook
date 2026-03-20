@@ -177,8 +177,8 @@ struct SettingsView: View {
         Form {
             appearanceSection
             subscriptionSection
-            favoriteStoresSection
             dataManagementSection
+            favoriteStoresSection
             helpSection
             aboutSection
             privacySection
@@ -682,6 +682,14 @@ struct SettingsView: View {
     
     private var helpSection: some View {
         Section(header: Text("Help")) {
+            Link(destination: URL(string: "mailto:barrelbookdev@gmail.com")!) {
+                Label("Contact Developer", systemImage: "envelope")
+                    .foregroundColor(.primary)
+            }
+            Link(destination: URL(string: "https://discord.gg/nfgGYnGWfA")!) {
+                Label("Join us on Discord", systemImage: "bubble.left.and.bubble.right")
+                    .foregroundColor(.primary)
+            }
             Button {
                 hasSeenOnboarding = false
                 showingOnboarding = true
@@ -694,7 +702,6 @@ struct SettingsView: View {
             } label: {
                 Label("Reset Individual Tutorials", systemImage: "lightbulb")
             }
-
         }
     }
     
