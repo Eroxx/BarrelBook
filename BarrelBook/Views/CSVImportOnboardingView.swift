@@ -120,23 +120,6 @@ struct CSVImportOnboardingView: View {
                     .cornerRadius(15)
                 }
 
-                // Secondary: already have a BarrelBook CSV
-                Button {
-                    showingFilePicker = true
-                } label: {
-                    HStack {
-                        Text("I already have my BarrelBook CSV").font(.subheadline).fontWeight(.medium)
-                        Image(systemName: "arrow.up.doc")
-                    }
-                    .foregroundColor(gold)
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(
-                        RoundedRectangle(cornerRadius: 15)
-                            .strokeBorder(gold.opacity(0.5), lineWidth: 1.5)
-                    )
-                }
-
                 Text("You will need to use the BarrelBook template before importing. Tap above to get started.")
                     .font(.caption)
                     .foregroundColor(.secondary)
