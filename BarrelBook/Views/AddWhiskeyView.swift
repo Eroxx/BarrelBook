@@ -4,6 +4,14 @@ import CoreData
 struct AddWhiskeyView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.dismiss) private var dismiss
+    @StateObject private var subscriptionManager = SubscriptionManager.shared
+    @State private var showingPaywall = false
+    @AppStorage("hasSeenAddWhiskeyTutorial") private var hasSeenAddWhiskeyTutorial = false
+    @State private var showingAddWhiskeyTutorialOverlay = false
+
+    // MARK: Bottle Scanner — remove this block + BottleScannerView.swift + LabelParser.swift to disable feature
+    @State private var showingBottleScanner = false
+    @State private var scannerFoundNothing = false
     
     @State private var name = ""
     @State private var type = ""
@@ -22,7 +30,15 @@ struct AddWhiskeyView: View {
     @State private var isOpen = false
     @State private var notes = ""
     
+    // Fetch current whiskeys to check limits
+    @FetchRequest(
+        sortDescriptors: [NSSortDescriptor(keyPath: \Whiskey.name, ascending: true)],
+        predicate: NSPredicate(format: "status == %@ OR status == nil", "owned"),
+        animation: .default)
+    private var currentWhiskeys: FetchedResults<Whiskey>
+    
     var body: some View {
+        ZStack {
         NavigationView {
             Form {
                 Section(header: Text("Basic Info")) {
@@ -127,17 +143,69 @@ struct AddWhiskeyView: View {
                         dismiss()
                     }
                 }
+                // MARK: Bottle Scanner toolbar button
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    if UIImagePickerController.isSourceTypeAvailable(.camera) {
+                        Button { showingBottleScanner = true } label: {
+                            Image(systemName: "camera")
+                        }
+                    }
+                }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Save") {
                         HapticManager.shared.mediumImpact()
-                        saveWhiskey()
+                        if subscriptionManager.canAddWhiskey(currentCount: currentWhiskeys.count) {
+                            saveWhiskey()
+                        } else {
+                            showingPaywall = true
+                        }
                     }
                     .disabled(name.isEmpty)
                 }
             }
+            // MARK: Bottle Scanner sheet + result alert
+            .sheet(isPresented: $showingBottleScanner) {
+                BottleScannerView(isPresented: $showingBottleScanner) { data in
+                    applyScan(data)
+                }
+            }
+            .alert("Couldn't Read Label", isPresented: $scannerFoundNothing) {
+                Button("OK", role: .cancel) { }
+            } message: {
+                Text("The label wasn't clear enough to read. Try again with better lighting or hold the camera closer.")
+            }
+        }
+            if showingAddWhiskeyTutorialOverlay {
+                AddWhiskeyTutorialOverlay(onDismiss: {
+                    hasSeenAddWhiskeyTutorial = true
+                    showingAddWhiskeyTutorialOverlay = false
+                    HapticManager.shared.lightImpact()
+                })
+            }
+        }
+        .onAppear {
+            if !hasSeenAddWhiskeyTutorial {
+                showingAddWhiskeyTutorialOverlay = true
+            }
+        }
+        .fullScreenCover(isPresented: $showingPaywall) {
+            PaywallView(isPresented: $showingPaywall)
         }
     }
     
+    // MARK: Bottle Scanner — apply scanned data to form fields
+    private func applyScan(_ data: ScannedBottleData) {
+        if data.isEmpty {
+            scannerFoundNothing = true
+            return
+        }
+        if let v = data.name,       name.isEmpty       { name       = v }
+        if let v = data.distillery, distillery.isEmpty { distillery = v }
+        if let v = data.type,       type.isEmpty       { type       = v }
+        if let v = data.proof,      proof.isEmpty      { proof      = v }
+        if let v = data.age,        age.isEmpty        { age        = v }
+    }
+
     // Helper function to normalize whiskey type and prevent duplicates
     private func normalizeType(_ inputType: String, existingTypes: [String]) -> String {
         return normalizeWhiskeyType(inputType, existingTypes: existingTypes)
@@ -266,6 +334,74 @@ struct AddWhiskeyView: View {
                 // Don't crash, just print the error
                 dismiss()
             }
+        }
+    }
+}
+
+// MARK: - Add Whiskey tutorial (first time adding a bottle)
+private struct AddWhiskeyTutorialOverlay: View {
+    var onDismiss: () -> Void
+    
+    var body: some View {
+        ColorManager.tutorialScrim
+            .ignoresSafeArea()
+            .onTapGesture { }
+        GeometryReader { geometry in
+            ScrollView {
+                VStack(spacing: 0) {
+                    Spacer(minLength: 0)
+                    VStack(spacing: 20) {
+                        VStack(alignment: .leading, spacing: 16) {
+                            HStack {
+                                Image(systemName: "plus.circle.fill")
+                                    .font(.title2)
+                                    .foregroundColor(ColorManager.primaryBrandColor)
+                                Text("Add a whiskey")
+                                    .font(.headline)
+                            }
+                            VStack(alignment: .leading, spacing: 10) {
+                                addWhiskeyTutorialRow(icon: "1.circle.fill", text: "**Name** is required. You must fill in at least the name for it to save to your collection. Everything else is optional.")
+                                addWhiskeyTutorialRow(icon: "2.circle.fill", text: "**Basic Info**: Enter the distillery, type, proof, age, finish, and price. All are optional but are tracked and used for sorting and filtering.")
+                                addWhiskeyTutorialRow(icon: "3.circle.fill", text: "**Inventory**: Set how many bottles you have of this whiskey (active and \"dead\"). If you have more than one, you can say how many are open. The app tracks open and closed bottles and you can sort and filter by them.")
+                                addWhiskeyTutorialRow(icon: "4.circle.fill", text: "**Bottle Notes** and **Special Attributes** (BiB, Single Barrel, Store Pick): are saved like the other fields so you can sort and filter by each one.")
+                            }
+                            .font(.subheadline)
+                        }
+                        .padding(24)
+                        .background(Color(UIColor.secondarySystemBackground))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 16)
+                                .stroke(ColorManager.tutorialCardBorder, lineWidth: 1)
+                        )
+                        .cornerRadius(16)
+                        .shadow(radius: 12)
+                        .padding(.horizontal, 24)
+                        Button(action: onDismiss) {
+                            Text("Got it")
+                                .fontWeight(.semibold)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 12)
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .tint(ColorManager.primaryBrandColor)
+                        .padding(.horizontal, 24)
+                    }
+                    .padding()
+                    Spacer(minLength: 0)
+                }
+                .frame(minHeight: geometry.size.height)
+            }
+            .padding()
+        }
+    }
+    
+    private func addWhiskeyTutorialRow(icon: String, text: String) -> some View {
+        HStack(alignment: .top, spacing: 10) {
+            Image(systemName: icon)
+                .foregroundColor(ColorManager.primaryBrandColor)
+                .font(.subheadline)
+            Text(LocalizedStringKey(text))
+                .fixedSize(horizontal: false, vertical: true)
         }
     }
 }
