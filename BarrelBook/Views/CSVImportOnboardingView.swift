@@ -156,7 +156,7 @@ struct CSVImportOnboardingView: View {
                         Text("Three quick steps and your collection is in.")
                             .font(.subheadline)
                             .foregroundColor(.secondary)
-                        Text("Already have a spreadsheet? If your columns are close to the template format, it usually takes just a few tweaks to get it import-ready.")
+                        Text("Already track your collection in a spreadsheet? It usually takes just a few tweaks to get it import-ready.")
                             .font(.caption)
                             .foregroundColor(.secondary)
                             .multilineTextAlignment(.center)
@@ -175,8 +175,8 @@ struct CSVImportOnboardingView: View {
                         )
                         stepRow(
                             number: "2",
-                            title: "Fill in your bottles",
-                            detail: "Add one row per bottle. Required columns are Name and Distillery. Everything else is optional.",
+                            title: "Map your existing data",
+                            detail: "If you already track bottles in a spreadsheet, the easiest path is to rename your existing columns to match the template. Required columns are Name and Distillery — everything else is optional.",
                             icon: "pencil"
                         )
                         stepRow(
