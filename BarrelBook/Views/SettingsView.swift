@@ -687,7 +687,7 @@ struct SettingsView: View {
                     .foregroundColor(.primary)
             }
             Link(destination: URL(string: "https://discord.gg/nfgGYnGWfA")!) {
-                Label("Join us on Discord", systemImage: "bubble.left.and.bubble.right")
+                Label("Join BarrelBook Discord", systemImage: "bubble.left.and.bubble.right")
                     .foregroundColor(.primary)
             }
             Link(destination: URL(string: "https://youtu.be/WQjhyPm62KA")!) {
