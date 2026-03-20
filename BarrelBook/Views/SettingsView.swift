@@ -631,6 +631,7 @@ struct SettingsView: View {
     }
     
     private var importExportButtons: some View {
+        VStack(spacing: 4) {
         HStack(spacing: 30) {
             Spacer()
             
@@ -662,7 +663,7 @@ struct SettingsView: View {
                         Image(systemName: "arrow.up.doc")
                             .font(.system(size: 28))
                             .padding(.bottom, 2)
-                        Text("Export CSV")
+                        Text("Export Collection")
                             .font(.caption)
                     }
                     .frame(width: 80, height: 80)
@@ -675,6 +676,14 @@ struct SettingsView: View {
             Spacer()
         }
         .padding(.vertical, 10)
+
+        Text("Export Collection saves your entire collection to a CSV file — great for backups or moving your data.")
+            .font(.caption)
+            .foregroundColor(.secondary)
+            .multilineTextAlignment(.center)
+            .padding(.horizontal, 16)
+            .padding(.bottom, 4)
+        } // end VStack
     }
     
     private var helpSection: some View {
