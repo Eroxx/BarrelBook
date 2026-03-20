@@ -554,7 +554,7 @@ struct HomeView: View {
                     CSVImportOnboardingView()
                 }
 
-                Text("If you already track your data in a spreadsheet, tap above to import your collection.")
+                Text("If you already track your data in a spreadsheet, tap above to learn how to import your collection.")
                     .font(.caption2)
                     .foregroundColor(.secondary)
                     .multilineTextAlignment(.center)
