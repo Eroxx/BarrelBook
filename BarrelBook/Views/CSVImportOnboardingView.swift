@@ -192,7 +192,7 @@ struct CSVImportOnboardingView: View {
                         Image(systemName: "lightbulb.fill")
                             .foregroundColor(gold)
                             .padding(.top, 2)
-                        Text("Tip: Column headers must match the template exactly. You can also export from a spreadsheet app like Excel or Numbers.")
+                        Text("Tip: Column headers must match the template exactly. You can also export a CSV from a spreadsheet app like Excel or Numbers and rename the columns to match.")
                             .font(.caption)
                             .foregroundColor(.secondary)
                             .fixedSize(horizontal: false, vertical: true)
