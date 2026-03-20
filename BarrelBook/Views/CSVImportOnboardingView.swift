@@ -169,14 +169,14 @@ struct CSVImportOnboardingView: View {
                     VStack(spacing: 20) {
                         stepRow(
                             number: "1",
-                            title: "Get the template",
+                            title: "Get the BarrelBook CSV Template",
                             detail: "In BarrelBook, go to Settings → Data Management → Export CSV Template. Open the file on your Mac or PC.",
                             icon: "arrow.down.doc"
                         )
                         stepRow(
                             number: "2",
                             title: "Map your existing data",
-                            detail: "If you already track bottles in a spreadsheet, the easiest path is to rename your existing columns to match the template. Required columns are Name and Distillery — everything else is optional.",
+                            detail: "The easiest thing to do is rename your existing columns and order them to match the template.",
                             icon: "pencil"
                         )
                         stepRow(
@@ -192,7 +192,7 @@ struct CSVImportOnboardingView: View {
                         Image(systemName: "lightbulb.fill")
                             .foregroundColor(gold)
                             .padding(.top, 2)
-                        Text("Tip: Column headers must match the template exactly. You can also export a CSV from a spreadsheet app like Excel or Numbers and rename the columns to match.")
+                        Text("Tip: Column headers must match the template exactly. You can also export a CSV from a spreadsheet app like Excel or Numbers and rename the columns to match the BarrelBook CSV Template.")
                             .font(.caption)
                             .foregroundColor(.secondary)
                             .fixedSize(horizontal: false, vertical: true)
