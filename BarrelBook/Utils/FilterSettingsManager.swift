@@ -79,6 +79,25 @@ class FilterSettingsManager {
         }
         return WishlistHierarchicalSortConfig(activeSorts: [WishlistSortCriterionIdentifiable(option: .nameAsc)])
     }
+
+    // MARK: - Journal Sort Persistence
+
+    private static let journalHierarchicalSortConfigKey = "journalHierarchicalSortConfig"
+
+    static func saveJournalHierarchicalSortConfig(_ config: JournalHierarchicalSortConfig) {
+        if let data = try? JSONEncoder().encode(config.activeSorts) {
+            UserDefaults.standard.set(data, forKey: journalHierarchicalSortConfigKey)
+        }
+    }
+
+    static func loadJournalHierarchicalSortConfig() -> JournalHierarchicalSortConfig {
+        if let data = UserDefaults.standard.data(forKey: journalHierarchicalSortConfigKey),
+           let sorts = try? JSONDecoder().decode([JournalSortCriterionIdentifiable].self, from: data),
+           !sorts.isEmpty {
+            return JournalHierarchicalSortConfig(activeSorts: sorts)
+        }
+        return JournalHierarchicalSortConfig(activeSorts: [JournalSortCriterionIdentifiable(optionRawValue: "dateDesc")])
+    }
     
     // Save filter options
     static func saveFilterOptions(_ options: FilterOptions) {

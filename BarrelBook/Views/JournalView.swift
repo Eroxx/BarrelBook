@@ -8,6 +8,7 @@ struct JournalSearchOptions {
     var selectedFlavorCategories: Set<FlavorCategory> = []
     var selectedSubflavors: Set<String> = []
 
+    // Legacy sort option for backwards compatibility (now unused)
     var sortOption: JournalSortOption = .dateDesc
     
     mutating func toggleServingMethod(_ method: String) {
@@ -63,10 +64,14 @@ struct JournalView: View {
     @State private var viewMode: ViewMode = .list
     @State private var selectedDate: Date = Date()
     @State private var searchOptions = JournalSearchOptions()
+    @State private var sortConfig = JournalHierarchicalSortConfig(activeSorts: [JournalSortCriterionIdentifiable(optionRawValue: "dateDesc")])
+    @State private var showingSortSheet = false
     @State private var showingFilterSheet = false
     @State private var showingSettings = false
     @State private var selectedEntry: JournalEntry?
     @FocusState private var isSearchFocused: Bool
+    @AppStorage("hasSeenJournalTutorial") private var hasSeenJournalTutorial = false
+    @State private var showingJournalTutorialOverlay = false
     
     enum ViewMode {
         case list, calendar
@@ -154,11 +159,10 @@ struct JournalView: View {
         let ratingRange = self.searchOptions.ratingRange
         let selectedServingMethods = self.searchOptions.selectedServingMethods
         let selectedFlavorCategories = self.searchOptions.selectedFlavorCategories
-
-        let sortOption = self.searchOptions.sortOption
+        let sortConfig = self.sortConfig
         
         return DispatchQueue.global(qos: .userInitiated).sync {
-            entries.filter { entry in
+            let filtered = entries.filter { entry in
                 var searchText = searchText.trimmingCharacters(in: .whitespaces)
                 
                 // Check for serving method keywords and toggle filters
@@ -257,14 +261,9 @@ struct JournalView: View {
                 
                 return matchesText && matchesRating && matchesServingMethod && matchesFlavorCategories && matchesSubflavors
             }
-            .sorted { entry1, entry2 in
-                switch searchOptions.sortOption {
-                case .dateDesc: return entry1.date ?? Date() > entry2.date ?? Date()
-                case .dateAsc: return entry1.date ?? Date() < entry2.date ?? Date()
-                case .ratingDesc: return entry1.overallRating > entry2.overallRating
-                case .ratingAsc: return entry1.overallRating < entry2.overallRating
-                }
-            }
+            
+            // Apply hierarchical sorting
+            return SortingUtils.sortJournalEntriesHierarchically(Array(filtered), by: sortConfig)
         }
     }
     
@@ -353,6 +352,7 @@ struct JournalView: View {
     }
     
     var body: some View {
+        ZStack {
         VStack(spacing: 0) {
             // Custom search bar
             HStack(spacing: 12) {
@@ -409,11 +409,6 @@ struct JournalView: View {
             }
         }
         .background(Color(UIColor.systemGroupedBackground))
-        .onTapGesture {
-            if isSearchFocused {
-                isSearchFocused = false
-            }
-        }
         .overlay(
             FloatingAddButton(action: {
                 showingAddEntry = true
@@ -438,23 +433,19 @@ struct JournalView: View {
                         Image(systemName: "line.3.horizontal.decrease.circle")
                     }
                     
-                    // Sort menu
-                    Menu {
-                        ForEach(JournalSearchOptions.JournalSortOption.allCases, id: \.self) { option in
-                            Button {
-                                searchOptions.sortOption = option
-                                HapticManager.shared.selectionFeedback()
-                            } label: {
-                                HStack {
-                                    Text(option.rawValue)
-                                    if searchOptions.sortOption == option {
-                                        Image(systemName: "checkmark")
-                                    }
-                                }
+                    // Sort button
+                    Button {
+                        showingSortSheet = true
+                        HapticManager.shared.mediumImpact()
+                    } label: {
+                        HStack(spacing: 4) {
+                            Image(systemName: "arrow.up.arrow.down")
+                            if sortConfig.activeSorts.count > 1 {
+                                Text("\(sortConfig.activeSorts.count)")
+                                    .font(.caption2)
+                                    .foregroundColor(.accentColor)
                             }
                         }
-                    } label: {
-                        Image(systemName: "arrow.up.arrow.down")
                     }
                 }
                 .opacity(UIDevice.current.userInterfaceIdiom == .pad ? 0 : 1)
@@ -486,6 +477,9 @@ struct JournalView: View {
             if let entry = editingEntry {
                 EditJournalEntryView(entry: entry)
             }
+        }
+        .sheet(isPresented: $showingSortSheet) {
+            JournalHierarchicalSortPickerView(sortConfig: $sortConfig)
         }
         .sheet(isPresented: $showingFilterSheet) {
             NavigationView {
@@ -627,6 +621,23 @@ struct JournalView: View {
                     }
             }
         }
+            if showingJournalTutorialOverlay {
+                JournalTutorialOverlay(onDismiss: {
+                    hasSeenJournalTutorial = true
+                    showingJournalTutorialOverlay = false
+                    HapticManager.shared.lightImpact()
+                })
+            }
+        }
+        .onAppear {
+            sortConfig = FilterSettingsManager.loadJournalHierarchicalSortConfig()
+            if !hasSeenJournalTutorial {
+                showingJournalTutorialOverlay = true
+            }
+        }
+        .onChange(of: sortConfig.activeSorts) { _ in
+            FilterSettingsManager.saveJournalHierarchicalSortConfig(sortConfig)
+        }
     }
     
     private var listView: some View {
@@ -636,11 +647,19 @@ struct JournalView: View {
                     selectedEntry = entry
                 }) {
                     JournalEntryRowView(entry: entry)
+                        .foregroundColor(.primary)
                 }
-                .buttonStyle(PlainButtonStyle())
-            }
-            .onDelete { indexSet in
-                deleteEntries(indexSet: indexSet)
+                .buttonStyle(.plain)
+                .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                    Button(role: .destructive) {
+                        withAnimation {
+                            viewContext.delete(entry)
+                            saveContext()
+                        }
+                    } label: {
+                        Label("Delete", systemImage: "trash")
+                    }
+                }
             }
         }
     }
@@ -678,24 +697,28 @@ struct JournalView: View {
                 }
                 .frame(maxWidth: .infinity)
             } else {
-                ScrollView {
-                    LazyVStack(spacing: 0) {
-                        ForEach(entriesOnSelectedDate, id: \.self) { entry in
-                            VStack(spacing: 0) {
-                                Button(action: {
-                                    selectedEntry = entry
-                                }) {
-                                    JournalEntryRowView(entry: entry)
-                                        .padding(.horizontal)
+                List {
+                    ForEach(entriesOnSelectedDate, id: \.self) { entry in
+                        Button(action: {
+                            selectedEntry = entry
+                        }) {
+                            JournalEntryRowView(entry: entry)
+                                .foregroundColor(.primary)
+                        }
+                        .buttonStyle(.plain)
+                        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                            Button(role: .destructive) {
+                                withAnimation {
+                                    viewContext.delete(entry)
+                                    saveContext()
                                 }
-                                .buttonStyle(PlainButtonStyle())
-                                
-                                Divider()
-                                    .padding(.horizontal)
+                            } label: {
+                                Label("Delete", systemImage: "trash")
                             }
                         }
                     }
                 }
+                .listStyle(PlainListStyle())
             }
         }
     }
@@ -740,6 +763,20 @@ struct JournalView: View {
         }
     }
     
+    private func deleteEntriesFromCalendar(indexSet: IndexSet, date: Date) {
+        let entriesOnDate = entriesOnDate(date)
+        
+        withAnimation {
+            let entriesToDelete = indexSet.map { entriesOnDate[$0] }
+            
+            // Delete from Core Data
+            for entry in entriesToDelete {
+                viewContext.delete(entry)
+            }
+            saveContext()
+        }
+    }
+    
     private func saveContext() {
         do {
             try viewContext.save()
@@ -747,6 +784,74 @@ struct JournalView: View {
             let nsError = error as NSError
             print("Error saving context: \(nsError), \(nsError.userInfo)")
             viewContext.rollback()
+        }
+    }
+}
+
+// MARK: - Journal / Tastings tutorial (first-time overlay)
+
+private struct JournalTutorialOverlay: View {
+    var onDismiss: () -> Void
+    
+    var body: some View {
+        ColorManager.tutorialScrim
+            .ignoresSafeArea()
+            .onTapGesture { }
+        GeometryReader { geometry in
+            ScrollView {
+                VStack(spacing: 0) {
+                    Spacer(minLength: 0)
+                    VStack(spacing: 20) {
+                        VStack(alignment: .leading, spacing: 16) {
+                            HStack {
+                                Image(systemName: "book.closed.fill")
+                                    .font(.title2)
+                                    .foregroundColor(ColorManager.primaryBrandColor)
+                                Text("Tastings")
+                                    .font(.headline)
+                            }
+                            VStack(alignment: .leading, spacing: 10) {
+                                journalTutorialRow(icon: "1.circle.fill", text: "Tap **+** to log a tasting. Pick a whiskey, set a rating and serving method, and add notes.")
+                                journalTutorialRow(icon: "2.circle.fill", text: "Use the **flavor wheel** to pick specific flavors (e.g. Vanilla, Oak) and set intensity for nose, palate, and finish.")
+                                journalTutorialRow(icon: "3.circle.fill", text: "Switch between **List** and **Calendar** to browse by date. Use **Sort** and **Filter** to find entries by rating, serving method, or flavors.")
+                            }
+                            .font(.subheadline)
+                        }
+                        .padding(24)
+                        .background(Color(UIColor.secondarySystemBackground))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 16)
+                                .stroke(ColorManager.tutorialCardBorder, lineWidth: 1)
+                        )
+                        .cornerRadius(16)
+                        .shadow(radius: 12)
+                        .padding(.horizontal, 24)
+                        Button(action: onDismiss) {
+                            Text("Got it")
+                                .fontWeight(.semibold)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 12)
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .tint(ColorManager.primaryBrandColor)
+                        .padding(.horizontal, 24)
+                    }
+                    .padding()
+                    Spacer(minLength: 0)
+                }
+                .frame(minHeight: geometry.size.height)
+            }
+            .padding()
+        }
+    }
+    
+    private func journalTutorialRow(icon: String, text: String) -> some View {
+        HStack(alignment: .top, spacing: 10) {
+            Image(systemName: icon)
+                .foregroundColor(ColorManager.primaryBrandColor)
+                .font(.subheadline)
+            Text(LocalizedStringKey(text))
+                .fixedSize(horizontal: false, vertical: true)
         }
     }
 }

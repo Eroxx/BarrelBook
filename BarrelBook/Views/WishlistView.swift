@@ -671,8 +671,7 @@ struct WishlistView: View {
             // Restore persisted sort config
             sortConfig = FilterSettingsManager.loadWishlistHierarchicalSortConfig()
 
-            // Reset filters to default state
-            wishlistFilterOptions = WishlistFilterOptions()
+            // Filters are intentionally left at their current state (not reset on appear)
             
             // Fetch all whiskeys to check their status
             let fetchRequest: NSFetchRequest<Whiskey> = Whiskey.fetchRequest()

@@ -7,47 +7,6 @@ extension Notification.Name {
     static let resetStatisticsView = Notification.Name("resetStatisticsView")
 }
 
-// UIKit representable to intercept tab bar taps
-struct TabBarController: UIViewControllerRepresentable {
-    var selectedIndex: Binding<Int>
-    var onReselect: (Int) -> Void
-    
-    func makeUIViewController(context: Context) -> UITabBarController {
-        let tabBarController = UITabBarController()
-        tabBarController.delegate = context.coordinator
-        return tabBarController
-    }
-    
-    func updateUIViewController(_ uiViewController: UITabBarController, context: Context) {
-        uiViewController.selectedIndex = selectedIndex.wrappedValue
-    }
-    
-    func makeCoordinator() -> Coordinator {
-        Coordinator(self)
-    }
-    
-    class Coordinator: NSObject, UITabBarControllerDelegate {
-        var parent: TabBarController
-        
-        init(_ parent: TabBarController) {
-            self.parent = parent
-        }
-        
-        func tabBarController(_ tabBarController: UITabBarController, didSelect viewController: UIViewController) {
-            parent.selectedIndex.wrappedValue = tabBarController.selectedIndex
-        }
-        
-        // This method is called when the user taps the currently selected tab
-        func tabBarController(_ tabBarController: UITabBarController, shouldSelect viewController: UIViewController) -> Bool {
-            if tabBarController.selectedViewController === viewController {
-                // User tapped the already-selected tab
-                parent.onReselect(tabBarController.viewControllers?.firstIndex(of: viewController) ?? 0)
-            }
-            return true
-        }
-    }
-}
-
 // Simple struct to globally track tab visibility
 class TabState: ObservableObject {
     static let shared = TabState()
@@ -318,87 +277,6 @@ struct ContentView: View {
     }
 }
 
-// Wrapper view to handle theme changes properly
-struct SettingsViewWrapper: View {
-    @AppStorage("colorScheme") private var colorScheme: AppColorScheme = .system
-    @Environment(\.colorScheme) private var currentColorScheme
-    @State private var viewRefreshTrigger = UUID()
-    
-    var body: some View {
-        SettingsView()
-            .onChange(of: colorScheme) { newValue in
-                // Force immediate view refresh
-                viewRefreshTrigger = UUID()
-                
-                // Force theme update through UIKit
-                DispatchQueue.main.async {
-                    guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-                          let window = windowScene.windows.first else { return }
-                    
-                    // Apply theme based on setting
-                    switch newValue {
-                    case .light:
-                        window.overrideUserInterfaceStyle = .light
-                    case .dark:
-                        window.overrideUserInterfaceStyle = .dark
-                    case .system:
-                        // First toggle to force update
-                        let currentStyle = currentColorScheme == .dark ? UIUserInterfaceStyle.light : UIUserInterfaceStyle.dark
-                        window.overrideUserInterfaceStyle = currentStyle
-                        
-                        // Then set to system after a tiny delay
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                            window.overrideUserInterfaceStyle = .unspecified
-                        }
-                    }
-                }
-            }
-            .id(viewRefreshTrigger)
-    }
-}
-
-// New simplified statistics view that manages its own navigation state
-struct BasicStatisticsView: View {
-    @StateObject private var tabState = TabState.shared
-    @State private var showingDetailView = false
-    @State private var navigationReset = UUID()
-    
-    var body: some View {
-        NavigationViewRepresentable(reset: navigationReset) {
-            StatisticsView(showingFilteredView: $showingDetailView)
-        }
-        .onChange(of: tabState.resetStatistics) { reset in
-            if reset {
-                // Force reset the navigation by updating the ID
-                navigationReset = UUID()
-                showingDetailView = false
-            }
-        }
-    }
-}
-
-// A representable that creates a UIKit navigation controller
-// This gives us more control over the navigation state
-struct NavigationViewRepresentable<Content: View>: UIViewControllerRepresentable {
-    let reset: UUID
-    let rootView: Content
-    
-    init(reset: UUID, @ViewBuilder content: () -> Content) {
-        self.reset = reset
-        self.rootView = content()
-    }
-    
-    func makeUIViewController(context: Context) -> UINavigationController {
-        let hostingController = UIHostingController(rootView: rootView)
-        let navigationController = UINavigationController(rootViewController: hostingController)
-        return navigationController
-    }
-    
-    func updateUIViewController(_ uiViewController: UINavigationController, context: Context) {
-        // When reset changes, pop to root
-        uiViewController.popToRootViewController(animated: true)
-    }
-}
 
 struct HomeView: View {
     @Environment(\.managedObjectContext) private var viewContext
