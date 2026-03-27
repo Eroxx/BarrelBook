@@ -4,6 +4,7 @@ import UIKit
 import ObjectiveC
 import CoreData
 import CoreLocation
+import CoreLocation
 
 @propertyWrapper
 struct Atomic<Value> {
@@ -103,13 +104,13 @@ struct SettingsView: View {
     @State private var showingDeleteWishlistConfirmation = false
     @State private var showingDeleteAllConfirmation = false
     @State private var showingLoadDemoDataConfirmation = false
-    @State private var demoConfirmationText = ""
     @State private var showingDemoDataInfo = false
     
     // Add new @State variables for DisclosureGroup and info alert:
     @State private var showingDeleteDataOptions = false
     @State private var showingBottleNumberingInfo = false
     @State private var showingPaywall = false
+    @AppStorage("isDemoDataActive") private var isDemoDataActive = false
     @AppStorage("hasSeenSettingsTutorial") private var hasSeenSettingsTutorial = false
     @State private var showingSettingsTutorialOverlay = false
     @State private var settingsTutorialStep = 1
@@ -176,6 +177,7 @@ struct SettingsView: View {
             appearanceSection
             subscriptionSection
             dataManagementSection
+            resetOptionsSection
             favoriteStoresSection
             helpSection
             aboutSection
@@ -479,6 +481,11 @@ struct SettingsView: View {
                 .buttonStyle(PlainButtonStyle())
             }
 
+        }
+    }
+
+    private var resetOptionsSection: some View {
+        Section(header: Text("Reset Options")) {
             // Load Demo Data
             HStack {
                 Button(action: {
@@ -506,51 +513,11 @@ struct SettingsView: View {
                     Text("Demo data loads a sample bourbon collection so you can explore every feature of BarrelBook right away.\n\nIt includes:\n• A variety of owned bottles (open, sealed & empty)\n• Tasting notes with flavor profiles and ratings\n• Wishlist items with target prices\n• An example infinity bottle\n\n⚠️ Loading demo data will permanently delete your existing collection. Use this to take BarrelBook for a test drive before adding your own bottles.")
                 }
             }
-            .sheet(isPresented: $showingLoadDemoDataConfirmation, onDismiss: { demoConfirmationText = "" }) {
-                VStack(spacing: 24) {
-                    Image(systemName: "exclamationmark.triangle.fill")
-                        .font(.system(size: 48))
-                        .foregroundColor(.orange)
-
-                    Text("Load Demo Data?")
-                        .font(.title2.bold())
-
-                    Text("This will **permanently delete** your entire collection, wishlist, tasting notes, and infinity bottles, and replace everything with a sample collection.\n\nThis cannot be undone.")
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                        .multilineTextAlignment(.center)
-
-                    VStack(spacing: 8) {
-                        Text("Type **demo** to confirm")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                        TextField("demo", text: $demoConfirmationText)
-                            .textFieldStyle(.roundedBorder)
-                            .autocorrectionDisabled()
-                            .textInputAutocapitalization(.never)
-                            .multilineTextAlignment(.center)
-                            .frame(maxWidth: 160)
-                    }
-
-                    HStack(spacing: 16) {
-                        Button("Cancel") {
-                            demoConfirmationText = ""
-                            showingLoadDemoDataConfirmation = false
-                        }
-                        .buttonStyle(.bordered)
-
-                        Button("Load Demo Data") {
-                            demoConfirmationText = ""
-                            showingLoadDemoDataConfirmation = false
-                            loadDemoData()
-                        }
-                        .buttonStyle(.borderedProminent)
-                        .tint(.red)
-                        .disabled(demoConfirmationText.lowercased() != "demo")
-                    }
-                }
-                .padding(32)
-                .presentationDetents([.medium])
+            .confirmationDialog("Load Demo Data?", isPresented: $showingLoadDemoDataConfirmation, titleVisibility: .visible) {
+                Button("Load Demo Data", role: .destructive) { loadDemoData() }
+                Button("Cancel", role: .cancel) { }
+            } message: {
+                Text("This replaces your current data with a sample bourbon collection. It can be deleted anytime from the banner at the top of the app.")
             }
 
             // Delete Data — most destructive, at the bottom
@@ -742,7 +709,21 @@ struct SettingsView: View {
     }
     
     private var helpSection: some View {
-        Section(header: Text("Help")) {
+        Section(header: Text("Help & Tutorials")) {
+            Button {
+                HapticManager.shared.successFeedback()
+                dismiss()
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    UserDefaults.standard.set(false, forKey: "hasSeenOnboarding")
+                }
+            } label: {
+                Label("Replay Onboarding Walkthrough", systemImage: "arrow.counterclockwise")
+            }
+            Button {
+                resetAllTutorials()
+            } label: {
+                Label("Reset Screen Tutorials", systemImage: "lightbulb")
+            }
             Button(action: openContactEmail) {
                 Label("Contact Developer", systemImage: "envelope")
                     .foregroundColor(.primary)
@@ -758,20 +739,6 @@ struct SettingsView: View {
             Link(destination: URL(string: "https://youtu.be/yY71ND7r3hs")!) {
                 Label("Video: Full Walkthrough", systemImage: "play.rectangle.fill")
                     .foregroundColor(.primary)
-            }
-            Button {
-                HapticManager.shared.successFeedback()
-                dismiss()
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                    UserDefaults.standard.set(false, forKey: "hasSeenOnboarding")
-                }
-            } label: {
-                Label("Reset Onboarding Tutorial", systemImage: "arrow.counterclockwise")
-            }
-            Button {
-                resetAllTutorials()
-            } label: {
-                Label("Reset Individual Tutorials", systemImage: "lightbulb")
             }
         }
     }
@@ -845,7 +812,7 @@ Know thy shelf - Eric
 
             // ── Leave a Review ──────────────────────────────────────────
             Link(destination: URL(string: "https://apps.apple.com/app/id6751058765?action=write-review")!) {
-                VStack(alignment: .leading, spacing: 2) {
+                VStack(alignment: .leading, spacing: 6) {
                     Label("Leave a Review", systemImage: "star")
                     Text("Enjoying BarrelBook? A review means a lot!")
                         .font(.caption)
@@ -1460,21 +1427,23 @@ Know thy shelf - Eric
             let filename = "BarrelBook-Export-\(timestamp).csv"
             
             // Use the app's Documents directory instead of temporary directory
-            let documentsDir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+            guard let documentsDir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else {
+                return
+            }
             let tempDir = documentsDir.appendingPathComponent("TempExports", isDirectory: true)
-            
+
             // Create the temp exports directory if it doesn't exist
             if !FileManager.default.fileExists(atPath: tempDir.path) {
                 try FileManager.default.createDirectory(at: tempDir, withIntermediateDirectories: true, attributes: nil)
             }
-            
+
             let fileURL = tempDir.appendingPathComponent(filename)
-            
+
             // Remove any existing file
             if FileManager.default.fileExists(atPath: fileURL.path) {
                 try FileManager.default.removeItem(at: fileURL)
             }
-            
+
             // Write the CSV data
             try csvContent.write(to: fileURL, atomically: true, encoding: .utf8)
             
@@ -1554,14 +1523,16 @@ Know thy shelf - Eric
         
         do {
             // Use the app's Documents directory instead of temporary directory
-            let documentsDir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+            guard let documentsDir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else {
+                return
+            }
             let tempDir = documentsDir.appendingPathComponent("TempExports", isDirectory: true)
-            
+
             // Create the temp exports directory if it doesn't exist
             if !FileManager.default.fileExists(atPath: tempDir.path) {
                 try FileManager.default.createDirectory(at: tempDir, withIntermediateDirectories: true, attributes: nil)
             }
-            
+
             let zipURL = tempDir.appendingPathComponent(filename)
             
             // Remove existing file if it exists
@@ -1818,7 +1789,9 @@ Know thy shelf - Eric
     private func showDirectDocumentPicker(csvData: String, filename: String, completion: @escaping (URL) -> Void) {
         
         // Create temporary file in Documents directory
-        let documentsDir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+        guard let documentsDir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else {
+            return
+        }
         let tempDir = documentsDir.appendingPathComponent("TempExports", isDirectory: true)
         
         // Create the temp exports directory if it doesn't exist
@@ -2510,6 +2483,7 @@ Know thy shelf - Eric
                 context.delete(bottle)
             }
             try context.save()
+            isDemoDataActive = false
             successMessage = "Successfully deleted ALL data."
             showingSuccess = true
             HapticManager.shared.successFeedback()
@@ -2525,6 +2499,7 @@ Know thy shelf - Eric
         DemoDataService.load(context: viewContext) { result in
             switch result {
             case .success:
+                self.isDemoDataActive = true
                 self.successMessage = "Demo data loaded. You now have a sample collection, tastings, and wishlist."
                 self.showingSuccess = true
                 HapticManager.shared.successFeedback()
@@ -2590,7 +2565,7 @@ Know thy shelf - Eric
         if subscriptionManager.isSubscribed {
             return "Unlimited whiskeys, tastings, and premium features"
         } else {
-            return "10 whiskeys • 5 tastings/month • Basic stats"
+            return "5 whiskeys • 5 tastings/month • Basic stats"
         }
     }
     
@@ -2836,6 +2811,40 @@ struct LoadingOverlay: ViewModifier {
                 .background(Color(.systemBackground))
                 .cornerRadius(10)
                 .shadow(radius: 10)
+            }
+        }
+    }
+}
+
+// MARK: - Store Row View (used by SettingsView favorite stores section)
+
+struct StoreRowView: View {
+    @ObservedObject var store: Store
+    @StateObject private var locationManager = LocationManager()
+
+    private var distance: String? {
+        guard let userLocation = locationManager.location else { return nil }
+        let storeLocation = CLLocation(latitude: store.latitude, longitude: store.longitude)
+        let meters = userLocation.distance(from: storeLocation)
+        return String(format: "%.1f miles away", meters * 0.000621371)
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            HStack {
+                Text(store.name ?? "Unknown Store")
+                    .font(.headline)
+                Spacer()
+                if let distance = distance {
+                    Text(distance)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+            }
+            if let address = store.address {
+                Text(address)
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
             }
         }
     }
