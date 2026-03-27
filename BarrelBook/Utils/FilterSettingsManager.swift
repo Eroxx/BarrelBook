@@ -5,6 +5,8 @@ import SwiftUI
 class FilterSettingsManager {
     // UserDefaults keys
     private static let currentSortKey = "currentSort"
+    private static let hierarchicalSortConfigKey = "hierarchicalSortConfig"
+    private static let wishlistHierarchicalSortConfigKey = "wishlistHierarchicalSortConfig"
     private static let selectedTypesKey = "selectedTypes" // New key for type persistence
     // Three-state toggles keys
     private static let bibStateKey = "bibState"
@@ -40,6 +42,42 @@ class FilterSettingsManager {
             return savedSort
         }
         return .nameAsc
+    }
+
+    // Save full hierarchical sort config for Collection
+    static func saveHierarchicalSortConfig(_ config: HierarchicalSortConfig) {
+        if let data = try? JSONEncoder().encode(config.activeSorts) {
+            UserDefaults.standard.set(data, forKey: hierarchicalSortConfigKey)
+        }
+    }
+
+    // Load full hierarchical sort config for Collection
+    static func loadHierarchicalSortConfig() -> HierarchicalSortConfig {
+        if let data = UserDefaults.standard.data(forKey: hierarchicalSortConfigKey),
+           let sorts = try? JSONDecoder().decode([SortCriterionIdentifiable].self, from: data),
+           !sorts.isEmpty {
+            return HierarchicalSortConfig(activeSorts: sorts)
+        }
+        // Fall back to legacy single-sort
+        let legacy = loadCurrentSort()
+        return HierarchicalSortConfig(activeSorts: [SortCriterionIdentifiable(option: legacy)])
+    }
+
+    // Save full hierarchical sort config for Wishlist
+    static func saveWishlistHierarchicalSortConfig(_ config: WishlistHierarchicalSortConfig) {
+        if let data = try? JSONEncoder().encode(config.activeSorts) {
+            UserDefaults.standard.set(data, forKey: wishlistHierarchicalSortConfigKey)
+        }
+    }
+
+    // Load full hierarchical sort config for Wishlist
+    static func loadWishlistHierarchicalSortConfig() -> WishlistHierarchicalSortConfig {
+        if let data = UserDefaults.standard.data(forKey: wishlistHierarchicalSortConfigKey),
+           let sorts = try? JSONDecoder().decode([WishlistSortCriterionIdentifiable].self, from: data),
+           !sorts.isEmpty {
+            return WishlistHierarchicalSortConfig(activeSorts: sorts)
+        }
+        return WishlistHierarchicalSortConfig(activeSorts: [WishlistSortCriterionIdentifiable(option: .nameAsc)])
     }
     
     // Save filter options

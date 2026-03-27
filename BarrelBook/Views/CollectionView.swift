@@ -418,9 +418,8 @@ struct CollectionView: View {
             FilterSettingsManager.saveFilterOptions(filterOptions)
         }
         
-        // Also load the saved sort config (for now, using legacy single-sort as default)
-        let savedSort = FilterSettingsManager.loadCurrentSort()
-        sortConfig = HierarchicalSortConfig(activeSorts: [SortCriterionIdentifiable(option: savedSort)])
+        // Load the full hierarchical sort config (falls back to legacy single sort if not set)
+        sortConfig = FilterSettingsManager.loadHierarchicalSortConfig()
     }
     
     @State private var shouldMaintainNavigation = false
@@ -509,7 +508,7 @@ struct CollectionView: View {
                                                 .font(.title3)
                                                 .fontWeight(.semibold)
                                                 .foregroundColor(.primary)
-                                            Text("Add your first bottle to get started")
+                                            Text("Add your first bottle here, or, head to the Home tab to learn how to import a spreadsheet or load sample data.")
                                                 .font(.subheadline)
                                                 .foregroundColor(.secondary)
                                                 .multilineTextAlignment(.center)
@@ -805,7 +804,9 @@ struct CollectionView: View {
         }
         .onChange(of: sortConfig.activeSorts) { _ in
             updateFilteredWhiskeys()
-            // Save the first sort option for backwards compatibility
+            // Save full hierarchical config
+            FilterSettingsManager.saveHierarchicalSortConfig(sortConfig)
+            // Also save first sort for backwards compatibility
             if let firstSort = sortConfig.activeSorts.first?.option {
                 FilterSettingsManager.saveCurrentSort(firstSort)
             }
@@ -834,7 +835,11 @@ struct CollectionView: View {
                         HapticManager.shared.lightImpact()
                     }
                 } else {
-                    showingAddInfinityBottle = true
+                    if subscriptionManager.hasAccess {
+                        showingAddInfinityBottle = true
+                    } else {
+                        showingPaywall = true
+                    }
                     HapticManager.shared.lightImpact()
                 }
             }

@@ -237,6 +237,33 @@ extension Whiskey {
         return chain
     }
     
+    /// Heuristic: whether this whiskey was likely renamed recently (for activity display).
+    var didNameChangeRecently: Bool {
+        if isOpen || isTasted || isCaskStrength || isBiB || isSiB || isStorePick {
+            if let addedDate = addedDate, let modDate = modificationDate {
+                let hoursSinceAdded = Calendar.current.dateComponents([.hour], from: addedDate, to: modDate).hour ?? 0
+                if hoursSinceAdded <= 1 { return false }
+            }
+        }
+        if let entries = journalEntries as? Set<JournalEntry>, !entries.isEmpty {
+            let whiskeyCurrName = name ?? ""
+            for entry in entries {
+                let entryDate = entry.date ?? Date.distantPast
+                if let modDate = modificationDate,
+                   let daysBetween = Calendar.current.dateComponents([.day], from: entryDate, to: modDate).day,
+                   daysBetween > 0, !whiskeyCurrName.isEmpty {
+                    return true
+                }
+            }
+        }
+        if let addedDate = addedDate, let modDate = modificationDate {
+            let daysSinceAdded = Calendar.current.dateComponents([.day], from: addedDate, to: modDate).day ?? 0
+            if daysSinceAdded > 30 { return true }
+        }
+        if let name = name, name.count > 3 { return false }
+        return false
+    }
+    
     // Check if this is the most recent bottle in the chain
     var isCurrentBottle: Bool {
         return replacedBy == nil

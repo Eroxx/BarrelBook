@@ -8,12 +8,14 @@
 
 /* Begin PBXBuildFile section */
 		DAB9DE552E4E5ED2008294EF /* BarrelBookConfiguration.storekit in Resources */ = {isa = PBXBuildFile; fileRef = DAB9DE542E4E5ED2008294EF /* BarrelBookConfiguration.storekit */; };
+		DAD266422F743C6500502188 /* TVRemote.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAD266412F743C6500502188 /* TVRemote.swift */; };
 		DAE824552F61C9F500AA673B /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DAE824542F61C9F500AA673B /* StoreKit.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		DA6D2FB22D7F556D00C84192 /* BarrelBook.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BarrelBook.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DAB9DE542E4E5ED2008294EF /* BarrelBookConfiguration.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = BarrelBookConfiguration.storekit; sourceTree = "<group>"; };
+		DAD266412F743C6500502188 /* TVRemote.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TVRemote.swift; path = ../TVRemote/TVRemote.swift; sourceTree = SOURCE_ROOT; };
 		DAE824542F61C9F500AA673B /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
@@ -53,6 +55,7 @@
 		DA6D2FA92D7F556D00C84192 = {
 			isa = PBXGroup;
 			children = (
+				DAD266412F743C6500502188 /* TVRemote.swift */,
 				DAB9DE542E4E5ED2008294EF /* BarrelBookConfiguration.storekit */,
 				DA6D2FB42D7F556D00C84192 /* BarrelBook */,
 				DAE824532F61C9F500AA673B /* Frameworks */,
@@ -162,6 +165,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DAD266422F743C6500502188 /* TVRemote.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -304,6 +308,7 @@
 				INFOPLIST_FILE = BarrelBook/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = BarrelBook;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.food-and-drink";
+				INFOPLIST_KEY_NSCameraUsageDescription = "";
 				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "BarrelBook needs your location to find nearby liquor stores";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "BarrelBook needs your location to find nearby liquor stores";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -316,7 +321,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.2;
+				MARKETING_VERSION = 1.1;
 				"OTHER_CODE_SIGN_FLAGS[sdk=*]" = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.ericlinder.barrelbookapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -348,6 +353,7 @@
 				INFOPLIST_FILE = BarrelBook/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = BarrelBook;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.food-and-drink";
+				INFOPLIST_KEY_NSCameraUsageDescription = "";
 				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "BarrelBook needs your location to find nearby liquor stores";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "BarrelBook needs your location to find nearby liquor stores";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -360,7 +366,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.2;
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.ericlinder.barrelbookapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";

@@ -99,7 +99,8 @@ struct ActivityItem: Identifiable {
     
     enum ActivityType {
         case whiskeyAdded    // New whiskey added to collection
-        case whiskeyEdited   // Whiskey information edited
+        case bottleOpened    // Bottle opened (dateOpened on BottleInstance)
+        case bottleFinished  // Bottle finished/dead (dateFinished on BottleInstance)
         case journalEntry    // Whiskey tasting or marked as tasted
         case wishlistAdded   // Whiskey added to wishlist
     }
@@ -114,6 +115,7 @@ class ToolbarVisibilityManager: ObservableObject {
 }
 
 struct ContentView: View {
+    @Environment(\.managedObjectContext) private var viewContext
     @State private var selectedTab: TabSelection = .home
     @StateObject private var tabState = TabState.shared
     @StateObject private var navigationState = NavigationStateManager.shared
@@ -121,12 +123,26 @@ struct ContentView: View {
     @State private var showingSettings = false
     @State private var statisticsShowingFilteredView = false
     @AppStorage("hasSeenOnboarding") private var hasSeenOnboarding = false
-    
+    @AppStorage("isDemoDataActive") private var isDemoDataActive = false
+    @AppStorage("colorScheme") private var storedColorScheme: AppColorScheme = .system
+
+    /// Converts the stored preference to a SwiftUI ColorScheme so the
+    /// modifier below takes effect on the very first render — before
+    /// onAppear fires and sets the UIKit window style.
+    private var preferredScheme: ColorScheme? {
+        switch storedColorScheme {
+        case .light:  return .light
+        case .dark:   return .dark
+        case .system: return nil
+        }
+    }
+
     var body: some View {
         VStack(spacing: 0) {
-            // Trial status banner - removed
-            // TrialStatusBanner()
-            
+            if isDemoDataActive {
+                contentViewDemoBanner
+            }
+
             TabView(selection: $selectedTab) {
                 NavigationView {
                     HomeView(selectedTab: $selectedTab)
@@ -219,13 +235,85 @@ struct ContentView: View {
         }
         .fullScreenCover(isPresented: Binding(
             get: { !hasSeenOnboarding },
-            set: { hasSeenOnboarding = !$0 }
+            set: { _ in } // prevent dismiss — only completeOnboarding() can close this
         )) {
-            OnboardingView()
+            OnboardingView(onLoadDemoData: { loadDemoData() })
+                .interactiveDismissDisabled(true)
         }
+        }
+        .preferredColorScheme(preferredScheme)   // applied before first render
+        .onAppear {
+            applyStoredColorScheme()              // UIKit safety net for sheets/covers
         }
         .task {
             await subscriptionManager.updateSubscriptionStatus()
+        }
+    }
+
+    /// Apply the persisted appearance preference to the UIWindow on every launch.
+    private func applyStoredColorScheme() {
+        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+              let window = windowScene.windows.first else { return }
+        switch storedColorScheme {
+        case .light:  window.overrideUserInterfaceStyle = .light
+        case .dark:   window.overrideUserInterfaceStyle = .dark
+        case .system: window.overrideUserInterfaceStyle = .unspecified
+        }
+    }
+
+    private func loadDemoData() {
+        DemoDataService.load(context: viewContext) { _ in
+            isDemoDataActive = true
+            HapticManager.shared.successFeedback()
+        }
+    }
+
+    // MARK: - Demo Banner (persistent, all tabs)
+
+    @State private var showingDeleteDemoConfirmation = false
+
+    private var contentViewDemoBanner: some View {
+        HStack(spacing: 12) {
+            Image(systemName: "flask.fill")
+                .font(.subheadline)
+                .foregroundColor(Color(red: 0.84, green: 0.63, blue: 0.24))
+            Text("You're viewing BarrelBook's demo data")
+                .font(.subheadline)
+                .foregroundColor(.primary)
+            Spacer()
+            Button("Delete") {
+                showingDeleteDemoConfirmation = true
+            }
+            .font(.subheadline.weight(.semibold))
+            .foregroundColor(Color(red: 0.84, green: 0.63, blue: 0.24))
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 8)
+        .background(Color(red: 0.84, green: 0.63, blue: 0.24).opacity(0.12))
+        .overlay(alignment: .bottom) {
+            Divider().opacity(0.4)
+        }
+        .confirmationDialog("Delete sample data?", isPresented: $showingDeleteDemoConfirmation, titleVisibility: .visible) {
+            Button("Delete Sample Data", role: .destructive) { deleteDemoData() }
+            Button("Cancel", role: .cancel) { }
+        } message: {
+            Text("This will remove all sample bottles, tastings, and wishlist items.")
+        }
+    }
+
+    private func deleteDemoData() {
+        do {
+            let whiskeys = try viewContext.fetch(Whiskey.fetchRequest())
+            whiskeys.forEach { viewContext.delete($0) }
+            let entries = try viewContext.fetch(JournalEntry.fetchRequest())
+            entries.forEach { viewContext.delete($0) }
+            let bottles = try viewContext.fetch(InfinityBottle.fetchRequest())
+            bottles.forEach { viewContext.delete($0) }
+            try viewContext.save()
+            isDemoDataActive = false
+            HapticManager.shared.successFeedback()
+        } catch {
+            HapticManager.shared.errorFeedback()
         }
     }
 }
@@ -327,18 +415,14 @@ struct HomeView: View {
         animation: .default)
     private var wishlistWhiskeys: FetchedResults<Whiskey>
     
-    // Fetch current month's journal entries
+    // Fetch all journal entries to track free-tier tasting limit
     @FetchRequest(
         sortDescriptors: [NSSortDescriptor(keyPath: \JournalEntry.date, ascending: false)],
-        predicate: {
-            let calendar = Calendar.current
-            let startOfMonth = calendar.dateInterval(of: .month, for: Date())?.start ?? Date()
-            return NSPredicate(format: "date >= %@", startOfMonth as CVarArg)
-        }(),
         animation: .default)
-    private var currentMonthJournalEntries: FetchedResults<JournalEntry>
+    private var allJournalEntries: FetchedResults<JournalEntry>
     
     @StateObject private var subscriptionManager = SubscriptionManager.shared
+    @Environment(\.colorScheme) private var colorScheme
     @Binding var selectedTab: TabSelection
     @State private var showingAddWhiskey = false
     @State private var showingAddJournal = false
@@ -350,8 +434,12 @@ struct HomeView: View {
     @State private var selectedActivity: ActivityItem? = nil
     @State private var showingPaywall = false
     @AppStorage("hasSeenEmptyStateTip") private var hasSeenEmptyStateTip = false
+    @AppStorage("isDemoDataActive") private var isDemoDataActive = false
     @State private var showingLoadDemoConfirmation = false
     @State private var showingCSVImport = false
+    @State private var showingSpotlightInfo = false
+    @State private var spotlightNavWhiskey: Whiskey? = nil
+    @State private var spotlightJournalWhiskey: Whiskey? = nil
 
     private var isCollectionEmpty: Bool { whiskeys.isEmpty }
 
@@ -371,10 +459,10 @@ struct HomeView: View {
                     actionCardsSection
                     UsageCounterView(
                         currentWhiskeyCount: whiskeys.count,
-                        currentMonthTastingCount: currentMonthJournalEntries.count
+                        currentTastingCount: allJournalEntries.count
                     )
+                    bottleSpotlightSection
                     recentActivitySection
-                    quickStatsSection
                 }
             }
             .padding()
@@ -393,12 +481,20 @@ struct HomeView: View {
         .sheet(isPresented: $showingAddWhiskey) {
             AddWhiskeyView()
         }
-        .sheet(isPresented: $showingAddJournal) {
+        .sheet(isPresented: $showingAddJournal, onDismiss: { selectedWhiskey = nil }) {
             // If a whiskey is selected, pre-select it for the journal entry
             if let whiskey = selectedWhiskey {
                 AddJournalEntryView(preSelectedWhiskey: whiskey)
             } else {
                 AddJournalEntryView()
+            }
+        }
+        .sheet(isPresented: Binding(
+            get: { spotlightJournalWhiskey != nil },
+            set: { if !$0 { spotlightJournalWhiskey = nil } }
+        )) {
+            if let whiskey = spotlightJournalWhiskey {
+                AddJournalEntryView(preSelectedWhiskey: whiskey)
             }
         }
         .sheet(isPresented: $showingAddWishlist) {
@@ -421,10 +517,19 @@ struct HomeView: View {
                         )
                     ) { EmptyView() }
                 }
+                if let whiskey = spotlightNavWhiskey {
+                    NavigationLink(
+                        destination: WhiskeyDetailView(whiskey: whiskey),
+                        isActive: Binding(
+                            get: { spotlightNavWhiskey != nil },
+                            set: { if !$0 { spotlightNavWhiskey = nil } }
+                        )
+                    ) { EmptyView() }
+                }
             }
         )
     }
-    
+
 
     // MARK: - Empty State & First-run Tip
 
@@ -522,17 +627,14 @@ struct HomeView: View {
                                 .strokeBorder(ColorManager.primaryBrandColor.opacity(0.30), lineWidth: 1)
                         )
                 }
-                .alert("Load Demo Data?", isPresented: $showingLoadDemoConfirmation) {
-                    Button("Cancel", role: .cancel) { }
-                    Button("Load Demo Data", role: .destructive) {
+                .sheet(isPresented: $showingLoadDemoConfirmation) {
+                    LoadDemoConfirmationSheet {
                         loadDemoData()
                         hasSeenEmptyStateTip = true
                     }
-                } message: {
-                    Text("This loads a sample bourbon collection so you can explore every feature of BarrelBook.\n\n⚠️ This will replace any existing data. It can be deleted anytime in Settings.")
                 }
 
-                Text("Sample data can be deleted anytime in Settings → Data Management")
+                Text("Sample data can be deleted anytime from the banner on this screen")
                     .font(.caption2)
                     .foregroundColor(.secondary)
                     .multilineTextAlignment(.center)
@@ -568,19 +670,219 @@ struct HomeView: View {
     // MARK: - Demo Data
     private func loadDemoData() {
         DemoDataService.load(context: viewContext) { _ in
+            isDemoDataActive = true
             HapticManager.shared.successFeedback()
+        }
+    }
+
+    // MARK: - Bottle Spotlight
+
+    private var todaySpotlightWhiskey: Whiskey? {
+        let eligible = whiskeys.filter { !$0.isCompletelyDead }
+        guard !eligible.isEmpty else { return nil }
+        let dayIndex = Calendar.current.ordinality(of: .day, in: .era, for: Date()) ?? 1
+        return eligible[dayIndex % eligible.count]
+    }
+
+    private var bottleSpotlightSection: some View {
+        Group {
+            if let bottle = todaySpotlightWhiskey {
+                VStack(alignment: .leading, spacing: 10) {
+                    // Header row
+                    HStack(spacing: 6) {
+                        Text("✦")
+                            .font(.caption2)
+                            .foregroundColor(ColorManager.primaryBrandColor)
+                        Text("BOTTLE SPOTLIGHT")
+                            .font(.caption)
+                            .fontWeight(.semibold)
+                            .foregroundColor(ColorManager.primaryBrandColor)
+                            .tracking(0.8)
+                        Button {
+                            showingSpotlightInfo = true
+                        } label: {
+                            Image(systemName: "info.circle")
+                                .font(.caption)
+                                .foregroundColor(ColorManager.primaryBrandColor.opacity(0.7))
+                        }
+                        .buttonStyle(.plain)
+                        Spacer()
+                        Text("Changes daily")
+                            .font(.caption2)
+                            .foregroundColor(ColorManager.secondaryText)
+                    }
+                    .alert("Bottle Spotlight", isPresented: $showingSpotlightInfo) {
+                        Button("Got it", role: .cancel) {}
+                    } message: {
+                        Text("A different bottle from your collection is featured here each day — a nudge to revisit something on your shelf you may not have poured recently.")
+                    }
+
+                    Divider()
+                        .background(ColorManager.primaryBrandColor.opacity(0.25))
+
+                    // Bottle name + price — tappable to go to detail
+                    Button {
+                        spotlightNavWhiskey = bottle
+                    } label: {
+                        HStack(alignment: .firstTextBaseline) {
+                            Text(bottle.name ?? "")
+                                .font(.title3)
+                                .fontWeight(.semibold)
+                                .foregroundColor(ColorManager.primaryText)
+                                .multilineTextAlignment(.leading)
+                            Spacer()
+                            if bottle.price > 0 {
+                                Text(String(format: "$%.0f", bottle.price))
+                                    .font(.subheadline)
+                                    .fontWeight(.medium)
+                                    .foregroundColor(ColorManager.secondaryText)
+                            }
+                        }
+                    }
+                    .buttonStyle(.plain)
+
+                    // Distillery · Type · Proof as chips
+                    HStack(spacing: 8) {
+                        if let distillery = bottle.distillery, !distillery.isEmpty {
+                            Text(distillery)
+                                .font(.caption)
+                                .fontWeight(.medium)
+                                .foregroundColor(ColorManager.secondaryText)
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 3)
+                                .background(ColorManager.secondaryText.opacity(0.12))
+                                .cornerRadius(6)
+                        }
+                        if let type = bottle.type, !type.isEmpty {
+                            Text(type)
+                                .font(.caption)
+                                .fontWeight(.medium)
+                                .foregroundColor(ColorManager.secondaryText)
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 3)
+                                .background(ColorManager.secondaryText.opacity(0.12))
+                                .cornerRadius(6)
+                        }
+                        if bottle.proof > 0 {
+                            Text(String(format: "%.0f Proof", bottle.proof))
+                                .font(.caption)
+                                .fontWeight(.medium)
+                                .foregroundColor(ColorManager.secondaryText)
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 3)
+                                .background(ColorManager.secondaryText.opacity(0.12))
+                                .cornerRadius(6)
+                        }
+                    }
+
+                    // Status + rating row
+                    HStack(spacing: 8) {
+                        // Bottle status chip
+                        let instances = (bottle.bottleInstances as? Set<BottleInstance>) ?? []
+                        let activeCount = instances.filter { !$0.isDead }.count
+                        let hasOpen = instances.contains { $0.isOpen && !$0.isDead }
+                        let allDead = !instances.isEmpty && activeCount == 0
+
+                        let statusLabel = allDead ? "Finished" : (hasOpen ? "Open" : "Sealed")
+                        let statusColor: Color = hasOpen ? ColorManager.primaryBrandColor : .secondary
+                        let statusBg: Color = hasOpen ? ColorManager.primaryBrandColor.opacity(0.15) : Color.secondary.opacity(0.12)
+
+                        HStack(spacing: 4) {
+                            Circle()
+                                .fill(statusColor)
+                                .frame(width: 6, height: 6)
+                            Text(statusLabel)
+                                .font(.caption)
+                                .fontWeight(.medium)
+                                .foregroundColor(statusColor)
+                        }
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 3)
+                        .background(statusBg)
+                        .cornerRadius(6)
+
+                        // Bottle count (only if more than 1)
+                        if activeCount > 1 {
+                            Text("\(activeCount) bottles")
+                                .font(.caption)
+                                .fontWeight(.medium)
+                                .foregroundColor(ColorManager.secondaryText)
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 3)
+                                .background(ColorManager.secondaryText.opacity(0.12))
+                                .cornerRadius(6)
+                        }
+
+                        // Rating or Untasted
+                        let rating = bottle.personalRating
+                        if rating > 0 {
+                            HStack(spacing: 4) {
+                                Image(systemName: "star.fill")
+                                    .font(.caption)
+                                    .foregroundColor(ColorManager.primaryBrandColor)
+                                Text(String(format: "%.1f", rating))
+                                    .font(.caption)
+                                    .fontWeight(.medium)
+                                    .foregroundColor(ColorManager.primaryText)
+                            }
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 3)
+                            .background(ColorManager.primaryBrandColor.opacity(0.12))
+                            .cornerRadius(6)
+                        } else {
+                            Text("Untasted")
+                                .font(.caption)
+                                .fontWeight(.medium)
+                                .foregroundColor(ColorManager.secondaryText)
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 3)
+                                .background(ColorManager.secondaryText.opacity(0.12))
+                                .cornerRadius(6)
+                        }
+                    }
+
+                    // Add Tasting button
+                    Button {
+                        if subscriptionManager.canAddTasting(currentCount: allJournalEntries.count) {
+                            spotlightJournalWhiskey = bottle
+                        } else {
+                            showingPaywall = true
+                        }
+                    } label: {
+                        Text("Add Tasting")
+                            .font(.subheadline)
+                            .fontWeight(.medium)
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 10)
+                            .background(ColorManager.primaryBrandColor.opacity(0.75))
+                            .cornerRadius(8)
+                    }
+                }
+                .padding()
+                .background(
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(colorScheme == .dark
+                            ? Color(red: 0.14, green: 0.09, blue: 0.04)
+                            : Color(red: 1.00, green: 0.96, blue: 0.90))
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .strokeBorder(ColorManager.primaryBrandColor.opacity(colorScheme == .dark ? 0.45 : 0.35), lineWidth: 1.5)
+                )
+                .shadow(color: ColorManager.primaryBrandColor.opacity(colorScheme == .dark ? 0.12 : 0.08), radius: 8, x: 0, y: 2)
+            }
         }
     }
 
     // Main Action Cards Section
     private var actionCardsSection: some View {
-        VStack(spacing: 16) {
-            HStack(spacing: 16) {
-                // Add Whiskey Card
+        VStack(spacing: 0) {
+            HStack(spacing: 0) {
                 ActionCard(
-                    icon: "🥃", // Whiskey glass emoji
+                    icon: "🥃",
                     isEmoji: true,
-                    title: "ADD NEW WHISKEY",
+                    title: "Add New Whiskey",
                     action: {
                         if subscriptionManager.canAddWhiskey(currentCount: whiskeys.count) {
                             showingAddWhiskey = true
@@ -589,14 +891,18 @@ struct HomeView: View {
                         }
                     }
                 )
-                
-                // Add Tasting Card (renamed from Journal)
+
+                Rectangle()
+                    .fill(ColorManager.primaryBrandColor.opacity(0.3))
+                    .frame(width: 1)
+
                 ActionCard(
                     icon: "text.badge.plus",
                     isEmoji: false,
-                    title: "ADD NEW TASTING",
+                    title: "Add New Tasting",
                     action: {
-                        if subscriptionManager.canAddTastingThisMonth(currentMonthCount: currentMonthJournalEntries.count) {
+                        selectedWhiskey = nil
+                        if subscriptionManager.canAddTasting(currentCount: allJournalEntries.count) {
                             showingAddJournal = true
                         } else {
                             showingPaywall = true
@@ -604,14 +910,16 @@ struct HomeView: View {
                     }
                 )
             }
-            
-            // Wishlist Actions
-            HStack(spacing: 16) {
-                // View Wishlist
+
+            Rectangle()
+                .fill(ColorManager.primaryBrandColor.opacity(0.3))
+                .frame(height: 1)
+
+            HStack(spacing: 0) {
                 ActionCard(
                     icon: "heart.fill",
                     isEmoji: false,
-                    title: "VIEW WISHLIST",
+                    title: "View Wishlist",
                     action: {
                         if subscriptionManager.hasAccess {
                             selectedTab = .wishlist
@@ -620,13 +928,16 @@ struct HomeView: View {
                         }
                     }
                 )
-                
-                // Add to Wishlist
+
+                Rectangle()
+                    .fill(ColorManager.primaryBrandColor.opacity(0.3))
+                    .frame(width: 1)
+
                 ActionCard(
                     icon: "plus.circle",
                     isEmoji: false,
-                    title: "ADD TO WISHLIST",
-                    action: { 
+                    title: "Add to Wishlist",
+                    action: {
                         if subscriptionManager.hasAccess {
                             showingAddWishlist = true
                         } else {
@@ -636,6 +947,17 @@ struct HomeView: View {
                 )
             }
         }
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(colorScheme == .dark
+                    ? Color(red: 0.17, green: 0.12, blue: 0.08)
+                    : Color(red: 0.97, green: 0.94, blue: 0.90))
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .strokeBorder(ColorManager.primaryBrandColor.opacity(colorScheme == .dark ? 0.45 : 0.35), lineWidth: 1.5)
+        )
+        .shadow(color: ColorManager.primaryBrandColor.opacity(colorScheme == .dark ? 0.12 : 0.08), radius: 8, x: 0, y: 2)
     }
     
     // Calculate total collection value
@@ -688,61 +1010,35 @@ struct HomeView: View {
             }
         }
         
-        // Add recently EDITED whiskeys (based on modificationDate)
-        let oneMinute: TimeInterval = 60
-        let recentlyEditedWhiskeys = whiskeys.filter { 
-            guard $0.status == "owned",
-                  let mod = $0.modificationDate,
-                  let add = $0.addedDate else { return false }
-            // Only show as "edited" if modification is meaningfully after add (avoids CSV import showing as edit)
-            return mod.timeIntervalSince(add) > oneMinute
-        }
-        .sorted { ($0.modificationDate ?? Date.distantPast) > ($1.modificationDate ?? Date.distantPast) }
-        .prefix(3)
-        
-        for whiskey in recentlyEditedWhiskeys {
-            let date = whiskey.modificationDate ?? Date()
-            
-            // Determine what changed based on the modification date
-            var title = "Edited \(whiskey.name ?? "Unknown Whiskey")"
-            var icon = "pencil.circle.fill"
-            var isTastedToggle = false
-            
-            // Check for specific toggle changes
-            if let lastModification = whiskey.modificationDate {
-                // If the modification was very recent (within the last hour), try to determine what changed
-                let oneHourAgo = Calendar.current.date(byAdding: .hour, value: -1, to: Date()) ?? Date()
-                if lastModification > oneHourAgo {
-                    // First, check if name was changed - we need to infer this from the history
-                    if whiskey.didNameChangeRecently {
-                        title = "Renamed to: \(whiskey.name ?? "Unknown Whiskey")"
-                        icon = "character.cursor.ibeam"
-                    }
-                    // Then check toggle properties only if name didn't change
-                    else if whiskey.isOpen {
-                        title = "Opened \(whiskey.name ?? "Unknown Whiskey")"
-                        icon = "lock.open.fill"
-                    } else if whiskey.isTasted {
-                        title = "Marked as Tasted: \(whiskey.name ?? "Unknown Whiskey")"
-                        icon = "checkmark.circle.fill"
-                        isTastedToggle = true
-                    }
+        // Add OPENED and FINISHED events from bottle instances (explicit dates, fully reliable)
+        let ownedWhiskeys = Array(whiskeys.filter { $0.status == "owned" })
+        for whiskey in ownedWhiskeys {
+            guard let instances = whiskey.bottleInstances as? Set<BottleInstance> else { continue }
+            let multiBottle = instances.count > 1
+            let name = whiskey.name ?? "Unknown Whiskey"
+            for instance in instances {
+                if let dateOpened = instance.dateOpened {
+                    let title = multiBottle
+                        ? "Opened Bottle \(instance.bottleNumber): \(name)"
+                        : "Opened: \(name)"
+                    activities.append(ActivityItem(
+                        id: UUID(), icon: "lock.open.fill", title: title,
+                        timeAgo: AppFormatters.formatDateShort(dateOpened),
+                        date: dateOpened, whiskey: whiskey, isJournal: false,
+                        activityType: .bottleOpened
+                    ))
                 }
-            }
-            
-            // Don't add tasted toggle as a separate whiskey edit activity
-            // It will be added in the journal entries section
-            if !isTastedToggle {
-                activities.append(ActivityItem(
-                    id: UUID(),
-                    icon: icon,
-                    title: title,
-                    timeAgo: AppFormatters.formatDateShort(date),
-                    date: date,
-                    whiskey: whiskey,
-                    isJournal: false,
-                    activityType: .whiskeyEdited
-                ))
+                if let dateFinished = instance.dateFinished {
+                    let title = multiBottle
+                        ? "Finished Bottle \(instance.bottleNumber): \(name)"
+                        : "Finished: \(name)"
+                    activities.append(ActivityItem(
+                        id: UUID(), icon: "checkmark.seal.fill", title: title,
+                        timeAgo: AppFormatters.formatDateShort(dateFinished),
+                        date: dateFinished, whiskey: whiskey, isJournal: false,
+                        activityType: .bottleFinished
+                    ))
+                }
             }
         }
         
@@ -834,7 +1130,7 @@ struct HomeView: View {
                 NavigationLink(destination: RecentActivityView()) {
                     Text("See All")
                         .font(.subheadline)
-                        .foregroundColor(.blue)
+                        .foregroundColor(ColorManager.primaryBrandColor)
                 }
             }
             Divider().padding(.bottom, 8)
@@ -920,112 +1216,6 @@ struct HomeView: View {
         return totalPPP / Double(validWhiskeys.count)
     }
     
-    // Quick Stats Section
-    private var quickStatsSection: some View {
-        return VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                Text("Quick Stats")
-                    .font(.title2)
-                    .fontWeight(.bold)
-                
-                Spacer()
-                
-                Button(action: {
-                    TabState.shared.clearStatisticsActive()
-                    withAnimation {
-                        DispatchQueue.main.async {
-                            selectedTab = .statistics
-                        }
-                    }
-                }) {
-                    Text("See All")
-                        .font(.subheadline)
-                        .foregroundColor(.blue)
-                }
-            }
-            
-            Divider()
-                .padding(.bottom, 8)
-            
-            // Key Stats
-            VStack(spacing: 12) {
-                HStack {
-                    Text("Collection:")
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                    
-                    Spacer()
-                    
-                    let currentWhiskeys = whiskeys.filter { $0.status == "owned" }
-                    // Calculate total bottles using the numberOfBottles property which is more reliable
-                    let totalBottles = currentWhiskeys.reduce(0) { total, whiskey in
-                        return total + Int(whiskey.numberOfBottles)
-                    }
-                    Text("\(currentWhiskeys.count) whiskeys (\(totalBottles) bottles)")
-                        .font(.subheadline)
-                        .fontWeight(.semibold)
-                }
-                
-                HStack {
-                    Text("Total Value:")
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                    
-                    Spacer()
-                    
-                    PrivacyAwareValueText(value: totalCollectionValue)
-                }
-                
-                HStack {
-                    Text("Avg PPP:")
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                    
-                    Spacer()
-                    
-                    Text(AppFormatters.formatCurrency(calculateAveragePPP(), maxFractionDigits: 2))
-                        .font(.subheadline)
-                        .fontWeight(.semibold)
-                }
-                
-                HStack {
-                    Text("Tasted:")
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                    
-                    Spacer()
-                    
-                    Text("\(countTastedWhiskeys()) bottles")
-                        .font(.subheadline)
-                        .fontWeight(.semibold)
-                }
-                
-                HStack {
-                    Text("Wishlist:")
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                    
-                    Spacer()
-                    
-                    Text(getWishlistCountText())
-                        .font(.subheadline)
-                        .fontWeight(.semibold)
-                }
-            }
-        }
-        .padding()
-        .background(ColorManager.background)
-        .cornerRadius(12)
-        .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
-    }
-    
-    // Helper method to get wishlist count text
-    private func getWishlistCountText() -> String {
-        // Use the dedicated wishlist fetch request instead of filtering
-        let count = wishlistWhiskeys.count
-        return "\(count) whiskeys"
-    }
-    
     // Helper function to count total active bottles
     private func getTotalActiveBottles(whiskeys: FetchedResults<Whiskey>) -> Int {
         let currentWhiskeys = whiskeys.filter { $0.status == "owned" }
@@ -1055,47 +1245,40 @@ struct ActionCard: View {
     let isEmoji: Bool
     let title: String
     let action: () -> Void
-    
-    // Whiskey-themed color for icons only
+
+    @Environment(\.colorScheme) private var colorScheme
     private let primaryColor = ColorManager.primaryBrandColor
+
+    private var cardBackground: Color {
+        colorScheme == .dark
+            ? Color(red: 0.17, green: 0.12, blue: 0.08)
+            : Color(red: 0.97, green: 0.94, blue: 0.90)
+    }
     
     var body: some View {
         Button {
             HapticManager.shared.mediumImpact()
             action()
         } label: {
-            VStack(spacing: 8) {
+            VStack(spacing: 10) {
                 // Icon - either emoji or SF Symbol
                 if isEmoji {
                     Text(icon)
-                        .font(.system(size: 32))
-                        .padding(.top, 4)
-                        .frame(height: 40)
+                        .font(.system(size: 30))
                 } else {
                     Image(systemName: icon)
-                        .font(.system(size: 28))
+                        .font(.system(size: 26))
                         .foregroundColor(primaryColor)
-                        .padding(.top, 8)
-                        .frame(height: 40)
                 }
-                
-                // Action Button with standard iOS styling
-                VStack {
-                    Text(title)
-                        .font(.headline)
-                        .foregroundColor(.white)
-                        .padding(.vertical, 8)
-                        .frame(maxWidth: .infinity, minHeight: 36)
-                        .background(Color.blue)
-                        .cornerRadius(8)
-                }
-                .padding(.horizontal, 12)
-                .padding(.bottom, 8)
+
+                Text(title)
+                    .font(.subheadline)
+                    .fontWeight(.semibold)
+                    .foregroundColor(ColorManager.primaryText)
+                    .multilineTextAlignment(.center)
             }
-            .frame(maxWidth: .infinity, minHeight: 110)
-            .background(ColorManager.background)
-            .cornerRadius(12)
-            .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
+            .frame(maxWidth: .infinity, minHeight: 100)
+            .padding(.vertical, 16)
         }
         .buttonStyle(PlainButtonStyle())
         .frame(maxWidth: .infinity)
@@ -1165,7 +1348,8 @@ struct RecentActivityView: View {
                 HStack(spacing: 10) {
                     filterButton(type: nil, label: "All")
                     filterButton(type: .whiskeyAdded, label: "Added")
-                    filterButton(type: .whiskeyEdited, label: "Edited")
+                    filterButton(type: .bottleOpened, label: "Opened")
+                    filterButton(type: .bottleFinished, label: "Finished")
                     filterButton(type: .journalEntry, label: "Tastings")
                     filterButton(type: .wishlistAdded, label: "Wishlist")
                 }
@@ -1324,65 +1508,40 @@ struct RecentActivityView: View {
                 }
             }
             
-            // For edited whiskeys (excluding the initial addition)
-            let date = whiskey.modificationDate ?? Date()
-            
-            // Only include activities within the selected date range
-            if let earliest = earliestDate, date < earliest {
-                continue
-            }
-            
-            // Apply activity type filter if one is selected
-            if let filter = activityFilter, filter != .whiskeyAdded && filter != .whiskeyEdited {
-                continue
-            }
-            
-            // Skip if this is just the initial creation (addedDate is the same as modificationDate)
-            if let addedDate = whiskey.addedDate, 
-               Calendar.current.isDate(addedDate, inSameDayAs: date) {
-                continue
-            }
-            
-            // Determine what changed based on the modification date
-            var title = "Edited \(whiskey.name ?? "Unknown Whiskey")"
-            var icon = "pencil.circle.fill"
-            var isTastedToggle = false
-            
-            // Check for specific toggle changes
-            if let lastModification = whiskey.modificationDate {
-                // If the modification was very recent (within the last hour), try to determine what changed
-                let oneHourAgo = Calendar.current.date(byAdding: .hour, value: -1, to: Date()) ?? Date()
-                if lastModification > oneHourAgo {
-                    // First, check if name was changed - we need to infer this from the history
-                    if whiskey.didNameChangeRecently {
-                        title = "Renamed to: \(whiskey.name ?? "Unknown Whiskey")"
-                        icon = "character.cursor.ibeam"
-                    }
-                    // Then check toggle properties only if name didn't change
-                    else if whiskey.isOpen {
-                        title = "Opened \(whiskey.name ?? "Unknown Whiskey")"
-                        icon = "lock.open.fill"
-                    } else if whiskey.isTasted {
-                        title = "Marked as Tasted: \(whiskey.name ?? "Unknown Whiskey")"
-                        icon = "checkmark.circle.fill"
-                        isTastedToggle = true
-                    }
+        }
+
+        // OPENED and FINISHED events from bottle instances (explicit dates — fully reliable)
+        for whiskey in ownedWhiskeys {
+            guard let instances = whiskey.bottleInstances as? Set<BottleInstance> else { continue }
+            let multiBottle = instances.count > 1
+            let name = whiskey.name ?? "Unknown Whiskey"
+            for instance in instances {
+                if let dateOpened = instance.dateOpened {
+                    if let earliest = earliestDate, dateOpened < earliest { continue }
+                    if let filter = activityFilter, filter != .bottleOpened { continue }
+                    let title = multiBottle
+                        ? "Opened Bottle \(instance.bottleNumber): \(name)"
+                        : "Opened: \(name)"
+                    activities.append(ActivityItem(
+                        id: UUID(), icon: "lock.open.fill", title: title,
+                        timeAgo: AppFormatters.formatDateShort(dateOpened),
+                        date: dateOpened, whiskey: whiskey, isJournal: false,
+                        activityType: .bottleOpened
+                    ))
                 }
-            }
-            
-            // Don't add tasted toggle as a separate whiskey edit activity
-            // It will be added in the journal entries section
-            if !isTastedToggle {
-                activities.append(ActivityItem(
-                    id: UUID(),
-                    icon: icon,
-                    title: title,
-                    timeAgo: AppFormatters.formatDateShort(date),
-                    date: date,
-                    whiskey: whiskey,
-                    isJournal: false,
-                    activityType: .whiskeyEdited
-                ))
+                if let dateFinished = instance.dateFinished {
+                    if let earliest = earliestDate, dateFinished < earliest { continue }
+                    if let filter = activityFilter, filter != .bottleFinished { continue }
+                    let title = multiBottle
+                        ? "Finished Bottle \(instance.bottleNumber): \(name)"
+                        : "Finished: \(name)"
+                    activities.append(ActivityItem(
+                        id: UUID(), icon: "checkmark.seal.fill", title: title,
+                        timeAgo: AppFormatters.formatDateShort(dateFinished),
+                        date: dateFinished, whiskey: whiskey, isJournal: false,
+                        activityType: .bottleFinished
+                    ))
+                }
             }
         }
         
@@ -1532,9 +1691,9 @@ struct PrivacyAwareValueText: View {
 struct UsageCounterView: View {
     @StateObject private var subscriptionManager = SubscriptionManager.shared
     let currentWhiskeyCount: Int
-    let currentMonthTastingCount: Int
+    let currentTastingCount: Int
     @State private var showingPaywall = false
-    
+
     var body: some View {
         if !subscriptionManager.hasAccess {
             VStack(spacing: 12) {
@@ -1543,23 +1702,23 @@ struct UsageCounterView: View {
                         Text("BarrelBook Essentials")
                             .font(.headline)
                             .fontWeight(.semibold)
-                        
-                        Text("Free tier includes 10 whiskeys & 5 tastings/month")
+
+                        Text("Free tier includes 5 bottles & 2 tasting notes")
                             .font(.caption)
                             .foregroundColor(.secondary)
-                        
+
                         HStack(spacing: 16) {
                             UsageCounter(
-                                label: "Whiskeys",
+                                label: "Bottles",
                                 current: currentWhiskeyCount,
                                 limit: subscriptionManager.whiskeyLimit,
                                 icon: "🥃"
                             )
-                            
+
                             UsageCounter(
                                 label: "Tastings",
-                                current: currentMonthTastingCount,
-                                limit: subscriptionManager.monthlyTastingLimit,
+                                current: currentTastingCount,
+                                limit: subscriptionManager.tastingLimit,
                                 icon: "📝"
                             )
                         }

@@ -9,6 +9,16 @@ struct ColorManager {
         Color("PrimaryBrandColor")
     }
     
+    /// Scrim behind tutorial overlays (warm dark amber). Use for all tutorial steps so page 1 and page 2 match.
+    static var tutorialScrim: Color {
+        Color(red: 0.18, green: 0.10, blue: 0.04).opacity(0.55)
+    }
+    
+    /// Border for tutorial cards. Use for all tutorial steps so page 1 and page 2 match.
+    static var tutorialCardBorder: Color {
+        primaryBrandColor.opacity(0.25)
+    }
+    
     // MARK: - Background Colors
     
     /// Primary background for views

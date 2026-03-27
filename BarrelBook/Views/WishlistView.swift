@@ -667,7 +667,10 @@ struct WishlistView: View {
                 showingWishlistTutorialOverlay = true
                 wishlistTutorialStep = 1
             }
-            
+
+            // Restore persisted sort config
+            sortConfig = FilterSettingsManager.loadWishlistHierarchicalSortConfig()
+
             // Reset filters to default state
             wishlistFilterOptions = WishlistFilterOptions()
             
@@ -693,6 +696,9 @@ struct WishlistView: View {
             
             // Refresh all objects
             viewContext.refreshAllObjects()
+        }
+        .onChange(of: sortConfig.activeSorts) { _ in
+            FilterSettingsManager.saveWishlistHierarchicalSortConfig(sortConfig)
         }
         .onReceive(NotificationCenter.default.publisher(for: Notification.Name("WishlistUpdated"))) { _ in
             // Force immediate UI update
@@ -810,11 +816,14 @@ private struct WishlistTutorialOverlay: View {
                         .font(.headline)
                 }
                 VStack(alignment: .leading, spacing: 10) {
-                    Text(LocalizedStringKey("Track bottles you’re hunting for. Add name, target price, and priority; tap **Save** when you’re done."))
-                    Text("You can filter by store, sort, and edit or remove items anytime.")
+                    Text(LocalizedStringKey("Track bottles you’re hunting for. Add a name, target price, and priority; attach stores so you remember where you spotted it."))
                         .font(.subheadline)
+                    Text(LocalizedStringKey("When you find a bottle, tap **Move to Collection** on its detail page to add it to your collection in one tap."))
+                        .font(.subheadline)
+                    Text("Filter by store, sort by priority or price, and edit or remove items anytime.")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
                 }
-                .font(.subheadline)
             }
             .padding(24)
             .background(Color(UIColor.secondarySystemBackground))
