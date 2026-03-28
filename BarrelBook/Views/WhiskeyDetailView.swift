@@ -61,6 +61,7 @@ struct WhiskeyDetailView: View {
     @StateObject private var subscriptionManager = SubscriptionManager.shared
 
     @AppStorage("hasSeenBottleViewTutorial") private var hasSeenBottleViewTutorial = false
+    @AppStorage("hasSeenBottleViewTutorialPart2") private var hasSeenBottleViewTutorialPart2 = false
     @AppStorage("bottleDetailVisitCount") private var bottleDetailVisitCount = 0
     @AppStorage("hasSeenWebReviewsTip") private var hasSeenWebReviewsTip = false
     @State private var showingBottleViewTutorial = false
@@ -853,7 +854,13 @@ struct WhiskeyDetailView: View {
                         }
                     },
                     onDismiss: {
-                        hasSeenBottleViewTutorial = true
+                        if tutorialStep <= 3 {
+                            // Completed part 1 (steps 1–3)
+                            hasSeenBottleViewTutorial = true
+                        } else {
+                            // Completed part 2 (steps 4–5)
+                            hasSeenBottleViewTutorialPart2 = true
+                        }
                         showingBottleViewTutorial = false
                         tutorialStep = 1
                         HapticManager.shared.lightImpact()
@@ -884,23 +891,36 @@ struct WhiskeyDetailView: View {
             cleanupInvalidBottleInstances()
             locationManager.requestLocation()
             verifyBottleCounts()
+            if !whiskey.isWishlist {
+                bottleDetailVisitCount += 1
+            }
             if !hasSeenBottleViewTutorial && !whiskey.isWishlist {
+                // Part 1: steps 1–3 on very first bottle visit
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                     withAnimation(.easeInOut(duration: 0.4)) {
                         scrollProxy.scrollTo("bottleCardsSection", anchor: .top)
                     }
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.45) {
+                        tutorialStep = 1
+                        showingBottleViewTutorial = true
+                    }
+                }
+            } else if hasSeenBottleViewTutorial && !hasSeenBottleViewTutorialPart2 && !whiskey.isWishlist && bottleDetailVisitCount >= 3 {
+                // Part 2: steps 4–5 on the 3rd+ visit, after part 1 is done
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    withAnimation(.easeInOut(duration: 0.4)) {
+                        scrollProxy.scrollTo("bottleHistorySection", anchor: .top)
+                    }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.45) {
+                        tutorialStep = 4
                         showingBottleViewTutorial = true
                     }
                 }
             }
-            if !whiskey.isWishlist && !hasSeenWebReviewsTip {
-                bottleDetailVisitCount += 1
-                if bottleDetailVisitCount >= 3 {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
-                        withAnimation(.spring(response: 0.4)) {
-                            showingWebReviewsTip = true
-                        }
+            if !whiskey.isWishlist && !hasSeenWebReviewsTip && bottleDetailVisitCount >= 3 && hasSeenBottleViewTutorialPart2 {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+                    withAnimation(.spring(response: 0.4)) {
+                        showingWebReviewsTip = true
                     }
                 }
             }
@@ -3524,6 +3544,9 @@ private struct BottleViewTutorialOverlay: View {
     var onScrollTo: (String) -> Void
     var onDismiss: () -> Void
 
+    /// The last step index for this session (3 for part 1, 5 for part 2)
+    private var maxStep: Int { step <= 3 ? 3 : 5 }
+
     private struct TutorialStep {
         let icon: String
         let title: String
@@ -3578,7 +3601,7 @@ private struct BottleViewTutorialOverlay: View {
     ]
 
     private var current: TutorialStep { steps[min(step - 1, steps.count - 1)] }
-    private var isLastStep: Bool { step >= steps.count }
+    private var isLastStep: Bool { step >= maxStep }
 
     var body: some View {
         ZStack {
@@ -3598,7 +3621,7 @@ private struct BottleViewTutorialOverlay: View {
                                     Text(current.title)
                                         .font(.headline)
                                     Spacer()
-                                    Text("Step \(step) of \(steps.count)")
+                                    Text("Step \(step <= 3 ? step : step - 3) of \(maxStep <= 3 ? 3 : 2)")
                                         .font(.caption)
                                         .foregroundColor(.secondary)
                                 }

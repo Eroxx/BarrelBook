@@ -339,21 +339,21 @@ struct DemoDataService {
                 let proof, price: Double
                 let priority: Int16
                 let rarity: WhiskeyRarity
-                let store: Store
+                let store: Store?
             }
             let wishlistSeeds: [WishlistSeed] = [
                 WishlistSeed(name: "George T. Stagg",         type: "Bourbon", distillery: "Buffalo Trace",  proof: 142.5, price: 99.99,  priority: 5, rarity: .unicorn,  store: store1),
                 WishlistSeed(name: "William Larue Weller",    type: "Bourbon", distillery: "Buffalo Trace",  proof: 136.2, price: 89.99,  priority: 5, rarity: .unicorn,  store: store1),
-                WishlistSeed(name: "Pappy Van Winkle 15 Year",type: "Bourbon", distillery: "Buffalo Trace",  proof: 107,   price: 299.99, priority: 3, rarity: .unicorn,  store: store2),
-                WishlistSeed(name: "Van Winkle Lot B 12 Year",type: "Bourbon", distillery: "Buffalo Trace",  proof: 90.4,  price: 149.99, priority: 3, rarity: .unicorn,  store: store2),
+                WishlistSeed(name: "Pappy Van Winkle 15 Year",type: "Bourbon", distillery: "Buffalo Trace",  proof: 107,   price: 299.99, priority: 3, rarity: .unicorn,  store: nil),
+                WishlistSeed(name: "Van Winkle Lot B 12 Year",type: "Bourbon", distillery: "Buffalo Trace",  proof: 90.4,  price: 149.99, priority: 3, rarity: .unicorn,  store: nil),
                 WishlistSeed(name: "Weller 12 Year",          type: "Bourbon", distillery: "Buffalo Trace",  proof: 90,    price: 39.99,  priority: 4, rarity: .rare,     store: store3),
                 WishlistSeed(name: "Stagg Jr.",                type: "Bourbon", distillery: "Buffalo Trace",  proof: 131.1, price: 49.99,  priority: 5, rarity: .rare,     store: store1),
-                WishlistSeed(name: "EH Taylor Small Batch",   type: "Bourbon", distillery: "Buffalo Trace",  proof: 100,   price: 44.99,  priority: 4, rarity: .rare,     store: store3),
+                WishlistSeed(name: "EH Taylor Small Batch",   type: "Bourbon", distillery: "Buffalo Trace",  proof: 100,   price: 44.99,  priority: 4, rarity: .rare,     store: nil),
                 WishlistSeed(name: "WhistlePig 15 Year",      type: "Rye",     distillery: "WhistlePig",     proof: 92,    price: 149.99, priority: 3, rarity: .uncommon, store: store4),
                 WishlistSeed(name: "Springbank 12 Year",      type: "Scotch",  distillery: "Springbank",     proof: 92,    price: 84.99,  priority: 3, rarity: .uncommon, store: store4),
                 WishlistSeed(name: "Redbreast 21 Year",       type: "Irish",   distillery: "Midleton",       proof: 80,    price: 249.99, priority: 2, rarity: .rare,     store: store2),
-                WishlistSeed(name: "Yamazaki 12 Year",        type: "Japanese",distillery: "Suntory",        proof: 86,    price: 149.99, priority: 4, rarity: .rare,     store: store3),
-                WishlistSeed(name: "Blanton's Straight from the Barrel", type: "Bourbon", distillery: "Buffalo Trace", proof: 128.6, price: 129.99, priority: 5, rarity: .unicorn, store: store1),
+                WishlistSeed(name: "Yamazaki 12 Year",        type: "Japanese",distillery: "Suntory",        proof: 86,    price: 149.99, priority: 4, rarity: .rare,     store: nil),
+                WishlistSeed(name: "Blanton's Straight from the Barrel", type: "Bourbon", distillery: "Buffalo Trace", proof: 128.6, price: 129.99, priority: 5, rarity: .rare, store: store1),
             ]
             for seed in wishlistSeeds {
                 let w = Whiskey(context: ctx)
@@ -368,7 +368,9 @@ struct DemoDataService {
                 w.rarity = seed.rarity.rawValue
                 w.addedDate = cal.date(byAdding: .day, value: -Int.random(in: 5...90), to: now) ?? now
                 w.modificationDate = now
-                w.addToStores(seed.store)
+                if let store = seed.store {
+                    w.addToStores(store)
+                }
             }
 
             // MARK: - Journal Entries
