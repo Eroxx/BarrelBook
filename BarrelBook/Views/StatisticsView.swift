@@ -1919,10 +1919,6 @@ struct ProofAnalysisStats: View {
             // Proof Ranges
             let proofRanges = calculateProofRanges()
             
-            Text("Proof Distribution")
-                .font(.subheadline)
-                .foregroundColor(.secondary)
-                .padding(.top, 8)
             
             if #available(iOS 16.0, *), !proofRanges.isEmpty {
                 HStack(alignment: .bottom, spacing: 6) {
@@ -2045,10 +2041,6 @@ struct PriceAnalysisStats: View {
             // Price Ranges
             let priceRanges = calculatePriceRanges()
             
-            Text("Price Distribution")
-                .font(.subheadline)
-                .foregroundColor(.secondary)
-                .padding(.top, 8)
             
             if #available(iOS 16.0, *), !priceRanges.isEmpty {
                 HStack(alignment: .bottom, spacing: 6) {
