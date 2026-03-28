@@ -87,19 +87,14 @@ struct WishlistRowView: View {
                     .padding(.top, 2)
             }
 
-            // Store pills — plain HStack so they align flush with rows above
+            // Stores — plain text with separators, flush with rows above
             if let stores = whiskey.stores as? Set<Store>, !stores.isEmpty {
-                HStack(spacing: 4) {
-                    ForEach(Array(stores).sorted { ($0.name ?? "") < ($1.name ?? "") }, id: \.self) { store in
-                        Text(store.name ?? "Unknown Store")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                            .padding(.horizontal, 6)
-                            .padding(.vertical, 2)
-                            .background(Color.secondary.opacity(0.1))
-                            .cornerRadius(4)
-                    }
-                }
+                let names = Array(stores)
+                    .sorted { ($0.name ?? "") < ($1.name ?? "") }
+                    .compactMap { $0.name }
+                Text(names.joined(separator: " · "))
+                    .font(.caption)
+                    .foregroundColor(.secondary)
             }
         }
         .padding(.vertical, 4)
