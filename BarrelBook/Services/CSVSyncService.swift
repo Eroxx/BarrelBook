@@ -278,7 +278,7 @@ class CSVSyncService {
     // Keys for UserDefaults
     private let syncFileURLKey = "csvSyncFileURL"
     private let syncFileBookmarkKey = "csvSyncBookmarkData"
-    private let lastSyncDateKey = "lastCSVSyncDate"
+    private let lastSyncDateKey = "csvLastSyncDate"
     private let deletedWhiskeysKey = "deletedWhiskeysKey"
     private let deletedWhiskeyNamesKey = "com.barrelbook.deletedWhiskeyNames"
     
@@ -828,7 +828,9 @@ class CSVSyncService {
         let csvString = try CSVService.shared.exportWhiskeys(whiskeys)
         
         // First create the file in our own app documents directory
-        let tempDocumentsDir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+        guard let tempDocumentsDir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else {
+            return
+        }
         let tempExportsDir = tempDocumentsDir.appendingPathComponent("TempExports", isDirectory: true)
         
         // Create directory if it doesn't exist
@@ -1806,7 +1808,7 @@ class CSVSyncService {
             
             // SPECIAL CASE: After creating a new sync file, we should update the CSV file at least once
             // This ensures that any initial edits are captured
-            if lastSyncDate == nil || Date().timeIntervalSince(lastSyncDate!) < 300 { // 5 minutes
+            if lastSyncDate == nil || Date().timeIntervalSince(lastSyncDate ?? Date()) < 300 { // 5 minutes
                 print("⚠️ New sync file detected (no previous sync or sync less than 5 minutes ago) - forcing update")
                 return true
             }

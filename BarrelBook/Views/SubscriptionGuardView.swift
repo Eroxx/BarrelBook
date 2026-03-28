@@ -50,15 +50,14 @@ struct SubscriptionGuardView<Content: View>: View {
                 .multilineTextAlignment(.center)
                 .padding(.horizontal)
             
-            // Trial info
             if showTrialInfo {
                 VStack(spacing: 8) {
-                    Text("Start your free 7-day trial")
+                    Text("One-time purchase · $7.99")
                         .font(.headline)
                         .fontWeight(.semibold)
                         .foregroundColor(ColorManager.primaryBrandColor)
                     
-                    Text("No commitment • Cancel anytime")
+                    Text("Unlock forever · No subscription")
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                 }
@@ -124,52 +123,6 @@ struct LockedFeatureOverlay: View {
                     .cornerRadius(8)
                 }
             }
-            .fullScreenCover(isPresented: $showingPaywall) {
-                PaywallView(isPresented: $showingPaywall)
-            }
-        }
-    }
-}
-
-// Trial status banner
-struct TrialStatusBanner: View {
-    @StateObject private var subscriptionManager = SubscriptionManager.shared
-    @State private var showingPaywall = false
-    
-    var body: some View {
-        if subscriptionManager.isInTrialPeriod {
-            HStack {
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("Free Trial")
-                        .font(.headline)
-                        .fontWeight(.bold)
-                    
-                    Text("\(subscriptionManager.trialDaysRemaining) days remaining")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                }
-                
-                Spacer()
-                
-                Button("Upgrade") {
-                    showingPaywall = true
-                }
-                .font(.caption)
-                .fontWeight(.semibold)
-                .padding(.horizontal, 12)
-                .padding(.vertical, 6)
-                .background(ColorManager.primaryBrandColor)
-                .foregroundColor(.white)
-                .cornerRadius(8)
-            }
-            .padding()
-            .background(Color.yellow.opacity(0.1))
-            .overlay(
-                Rectangle()
-                    .frame(height: 1)
-                    .foregroundColor(Color.yellow.opacity(0.3)),
-                alignment: .bottom
-            )
             .fullScreenCover(isPresented: $showingPaywall) {
                 PaywallView(isPresented: $showingPaywall)
             }

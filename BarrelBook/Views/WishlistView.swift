@@ -673,14 +673,9 @@ struct WishlistView: View {
 
             // Filters are intentionally left at their current state (not reset on appear)
             
-            // Fetch all whiskeys to check their status
+            // Fetch only wishlist items
             let fetchRequest: NSFetchRequest<Whiskey> = Whiskey.fetchRequest()
             do {
-                let allWhiskeys = try viewContext.fetch(fetchRequest)
-                
-                for whiskey in allWhiskeys {
-                }
-                
                 // Fetch only wishlist items
                 let wishlistFetch: NSFetchRequest<Whiskey> = Whiskey.fetchRequest()
                 wishlistFetch.predicate = NSPredicate(format: "status == %@", "wishlist")
