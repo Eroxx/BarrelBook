@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>NSCameraUsageDescription</key>
-	<string>BarrelBook uses your camera to scan bottle labels and automatically fill in the whiskey details.</string>
+	<string>BarrelBook uses your camera to scan whiskey bottle labels when adding a bottle to your collection. For example, pointing the camera at a bottle of Eagle Rare 10 Year will automatically extract the name, distillery (Buffalo Trace), proof (90), and age statement — eliminating manual entry. All image analysis is performed on-device using OCR; no photos are stored, saved to your photo library, or transmitted anywhere.</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>
