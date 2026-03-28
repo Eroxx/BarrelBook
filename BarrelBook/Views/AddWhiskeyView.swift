@@ -143,10 +143,16 @@ struct AddWhiskeyView: View {
                         dismiss()
                     }
                 }
-                // MARK: Bottle Scanner toolbar button
+                // MARK: Bottle Scanner toolbar button (premium)
                 ToolbarItem(placement: .navigationBarTrailing) {
                     if UIImagePickerController.isSourceTypeAvailable(.camera) {
-                        Button { showingBottleScanner = true } label: {
+                        Button {
+                            if subscriptionManager.hasAccess {
+                                showingBottleScanner = true
+                            } else {
+                                showingPaywall = true
+                            }
+                        } label: {
                             Image(systemName: "camera")
                         }
                     }
@@ -165,7 +171,10 @@ struct AddWhiskeyView: View {
             }
             // MARK: Bottle Scanner sheet + result alert
             .sheet(isPresented: $showingBottleScanner) {
-                BottleScannerView(isPresented: $showingBottleScanner) { data in
+                BottleScannerView(
+                    isPresented: $showingBottleScanner,
+                    onSaveAndScanNext: { data in saveAndScanNext(data) }
+                ) { data in
                     applyScan(data)
                 }
             }
@@ -199,11 +208,11 @@ struct AddWhiskeyView: View {
             scannerFoundNothing = true
             return
         }
-        if let v = data.name,       name.isEmpty       { name       = v }
-        if let v = data.distillery, distillery.isEmpty { distillery = v }
-        if let v = data.type,       type.isEmpty       { type       = v }
-        if let v = data.proof,      proof.isEmpty      { proof      = v }
-        if let v = data.age,        age.isEmpty        { age        = v }
+        if let v = data.primaryName, name.isEmpty   { name   = v }
+        if let v = data.type,        type.isEmpty   { type   = v }
+        if let v = data.proof,       proof.isEmpty  { proof  = v }
+        if let v = data.age,         age.isEmpty    { age    = v }
+        if let v = data.finish,      finish.isEmpty { finish = v }
     }
 
     // Helper function to normalize whiskey type and prevent duplicates
@@ -251,7 +260,7 @@ struct AddWhiskeyView: View {
         print("🧹 Cleaned up duplicate whiskey types")
     }
     
-    private func saveWhiskey() {
+    private func saveWhiskey(thenDismiss: Bool = true) {
         withAnimation {
             // Get all existing types from the context to prevent duplicates
             let fetchRequest: NSFetchRequest<Whiskey> = Whiskey.fetchRequest()
@@ -323,18 +332,34 @@ struct AddWhiskeyView: View {
                 newWhiskey.renumberBottles()
                 
                 HapticManager.shared.successFeedback()
-                
+
                 // Post notification to refresh collection view
                 NotificationCenter.default.post(name: NSNotification.Name("WhiskeyUpdated"), object: newWhiskey)
-                
-                dismiss()
+
+                if thenDismiss { dismiss() }
             } catch {
                 HapticManager.shared.errorFeedback()
                 print("Error saving new whiskey: \(error)")
                 // Don't crash, just print the error
-                dismiss()
+                if thenDismiss { dismiss() }
             }
         }
+    }
+
+    // MARK: - Save current entry then reset form for next scan (sheet stays open)
+
+    private func saveAndScanNext(_ data: ScannedBottleData) {
+        applyScan(data)
+        guard !name.isEmpty else { return }
+        saveWhiskey(thenDismiss: false)
+        // Reset all form fields so the next scan starts clean
+        name = "";  type = "";  age = "";  proof = ""
+        finish = ""; distillery = ""; notes = ""
+        activeBottles = 1; openBottles = 0; deadBottles = 0
+        price = ""
+        isBiB = false; isSiB = false
+        isStorePick = false; storePickName = ""
+        // showingBottleScanner stays true — BottleScannerView resets its own state
     }
 }
 

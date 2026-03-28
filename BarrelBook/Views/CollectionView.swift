@@ -588,8 +588,14 @@ struct CollectionView: View {
                                 // No modifier for non-name sorts
                             }
                         } else {
-                            // Show infinity bottles
-                            InfinityBottlesView(infinityBottles: infinityBottles)
+                            // Show infinity bottles (premium feature)
+                            if subscriptionManager.hasAccess {
+                                InfinityBottlesView(infinityBottles: infinityBottles)
+                            } else {
+                                SubscriptionGuardView(feature: "the Infinity Bottle tracker") {
+                                    EmptyView()
+                                }
+                            }
                         }
                     }
                     

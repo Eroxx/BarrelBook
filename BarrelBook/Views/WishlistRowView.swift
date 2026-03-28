@@ -5,7 +5,7 @@ struct WishlistRowView: View {
     let whiskey: Whiskey
     
     var body: some View {
-        ZStack(alignment: .trailing) {
+        ZStack(alignment: .topTrailing) {
             // Main content
             VStack(alignment: .leading, spacing: 4) {
                 // Top row: Name

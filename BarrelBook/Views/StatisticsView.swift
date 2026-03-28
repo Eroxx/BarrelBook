@@ -378,11 +378,11 @@ struct CategoryView: View {
     
     private func coverageColor(_ percentage: Double) -> Color {
         if percentage < 30 {
-            return ColorManager.progressLow
+            return Color(red: 0.52, green: 0.26, blue: 0.05)
         } else if percentage < 70 {
-            return ColorManager.progressMedium
+            return Color(red: 0.70, green: 0.38, blue: 0.07)
         } else {
-            return ColorManager.progressHigh
+            return Color(red: 0.86, green: 0.53, blue: 0.13)
         }
     }
 }
@@ -561,6 +561,9 @@ extension EnvironmentValues {
 
 struct StatisticsView: View {
     @Environment(\.managedObjectContext) private var viewContext
+    @StateObject private var subscriptionManager = SubscriptionManager.shared
+    @AppStorage("colorScheme") private var storedColorScheme: AppColorScheme = .system
+    @State private var showingPaywall = false
     @FetchRequest(
         entity: Whiskey.entity(),
         sortDescriptors: [NSSortDescriptor(keyPath: \Whiskey.name, ascending: true)],
@@ -573,80 +576,166 @@ struct StatisticsView: View {
     @State private var showingSettings = false
     @State private var scrollPosition: CGFloat = 0
     @State private var lastScrolledSection: String?
+    @AppStorage("hasSeenStatisticsTutorial") private var hasSeenStatisticsTutorial = false
+    @State private var showingStatisticsTutorialOverlay = false
     
     var body: some View {
         ScrollViewReader { proxy in
             ZStack {
                 ScrollView {
                     VStack(spacing: 24) {
-                        // Collection Overview Card
-                        StatCard(title: "Collection Overview") {
-                            CombinedCollectionStats(
-                                whiskeys: whiskeys, 
+
+                        // 1. Collection Value — hero card (CollectionValueSection has its own card styling)
+                        CollectionValueSection(whiskeys: whiskeys)
+                            .id("value")
+
+                        // 2. Quick Stats Row — 4 pills
+                        QuickStatsRow(whiskeys: whiskeys)
+
+                        // 3. Special Attributes
+                        StatCard(title: "Special Attributes") {
+                            SpecialAttributesGrid(
+                                whiskeys: whiskeys,
                                 onAttributeSelected: { attribute, value in
                                     selectedFilter = WhiskeyFilter(
                                         type: .attribute(attribute, value),
                                         displayName: attribute,
-                                        section: .collectionOverview
-                                    )
-                                    showingFilteredView = true
-                                }, 
-                                onDistillerySelected: { distillery in
-                                    selectedFilter = WhiskeyFilter(
-                                        type: .distillery(distillery),
-                                        displayName: "Distillery: \(distillery)",
                                         section: .specialAttributes
                                     )
                                     showingFilteredView = true
                                 }
                             )
                         }
-                        .id("overview")
-                        
-                        // Collection Composition Card
-                        StatCard(title: "Collection Composition") {
-                            WhiskeyTypeStats(whiskeys: whiskeys, onTypeSelected: { type in
-                                selectedFilter = WhiskeyFilter(
-                                    type: .type(type),
-                                    displayName: "Type: \(type)",
-                                    section: .collectionComposition
-                                )
-                                showingFilteredView = true
-                            })
+                        .id("attributes")
+
+                        // 4. Top Distilleries
+                        StatCard(title: "Top Distilleries") {
+                            TopDistilleriesGrid(
+                                whiskeys: whiskeys,
+                                onDistillerySelected: { distillery in
+                                    selectedFilter = WhiskeyFilter(
+                                        type: .distillery(distillery),
+                                        displayName: "Distillery: \(distillery)",
+                                        section: .topDistilleries
+                                    )
+                                    showingFilteredView = true
+                                }
+                            )
                         }
-                        .id("composition")
-                        
-                        // Proof Analysis Card
-                        StatCard(title: "Proof Analysis") {
-                            ProofAnalysisStats(whiskeys: whiskeys, onProofRangeSelected: { min, max, label in
-                                selectedFilter = WhiskeyFilter(
-                                    type: .proof(min, max),
-                                    displayName: "Proof: \(label)",
-                                    section: .proofAnalysis
-                                )
-                                showingFilteredView = true
-                            })
+                        .id("distilleries")
+
+                        // 5. Tasting Activity (velocity pills + most active month)
+                        if subscriptionManager.hasAccess {
+                            StatCard(title: "Tasting Activity", systemImage: "wineglass") {
+                                ActivityTimelineStats(whiskeys: whiskeys, section: .tastingVelocity)
+                            }
+                            .id("tasting-activity")
+                        } else {
+                            PremiumFeatureCard(
+                                title: "Tasting Activity",
+                                description: "Track tasting velocity and see your most active months"
+                            ) {
+                                showingPaywall = true
+                            }
                         }
-                        .id("proof")
-                        
-                        // Price Analysis Card
-                        StatCard(title: "Price Analysis") {
-                            PriceAnalysisStats(whiskeys: whiskeys, onPriceRangeSelected: { min, max, label in
-                                selectedFilter = WhiskeyFilter(
-                                    type: .price(min, max),
-                                    displayName: "Price: \(label)",
-                                    section: .priceAnalysis
-                                )
-                                showingFilteredView = true
-                            })
+
+                        // 6. Collection by Type
+                        if subscriptionManager.hasAccess {
+                            StatCard(title: "Collection by Type") {
+                                WhiskeyTypeStats(whiskeys: whiskeys, onTypeSelected: { type in
+                                    selectedFilter = WhiskeyFilter(
+                                        type: .type(type),
+                                        displayName: "Type: \(type)",
+                                        section: .collectionComposition
+                                    )
+                                    showingFilteredView = true
+                                })
+                            }
+                            .id("composition")
+                        } else {
+                            PremiumFeatureCard(
+                                title: "Collection by Type",
+                                description: "Detailed breakdown of whiskey types in your collection"
+                            ) {
+                                showingPaywall = true
+                            }
                         }
-                        .id("price")
-                        
-                        // Tasting Coverage Card
-                        StatCard(title: "Tasting Coverage") {
-                            TastingCoverageStats(context: viewContext, whiskeys: whiskeys, selectedFilter: $selectedFilter, showingFilteredView: $showingFilteredView)
+
+                        // 7. Proof Distribution
+                        if subscriptionManager.hasAccess {
+                            StatCard(title: "Proof Distribution") {
+                                ProofAnalysisStats(whiskeys: whiskeys, onProofRangeSelected: { min, max, label in
+                                    selectedFilter = WhiskeyFilter(
+                                        type: .proof(min, max),
+                                        displayName: "Proof: \(label)",
+                                        section: .proofAnalysis
+                                    )
+                                    showingFilteredView = true
+                                })
+                            }
+                            .id("proof")
+                        } else {
+                            PremiumFeatureCard(
+                                title: "Proof Distribution",
+                                description: "Analyze proof distribution and trends in your collection"
+                            ) {
+                                showingPaywall = true
+                            }
+                        }
+
+                        // 8. Price Distribution
+                        if subscriptionManager.hasAccess {
+                            StatCard(title: "Price Distribution") {
+                                PriceAnalysisStats(whiskeys: whiskeys, onPriceRangeSelected: { min, max, label in
+                                    selectedFilter = WhiskeyFilter(
+                                        type: .price(min, max),
+                                        displayName: "Price: \(label)",
+                                        section: .priceAnalysis
+                                    )
+                                    showingFilteredView = true
+                                })
+                            }
+                            .id("price")
+                        } else {
+                            PremiumFeatureCard(
+                                title: "Price Distribution",
+                                description: "Track spending patterns and value insights"
+                            ) {
+                                showingPaywall = true
+                            }
+                        }
+
+                        // 9. Tasting Coverage
+                        Group {
+                            if subscriptionManager.hasAccess {
+                                StatCard(title: "Tasting Coverage") {
+                                    TastingCoverageStats(context: viewContext, whiskeys: whiskeys, selectedFilter: $selectedFilter, showingFilteredView: $showingFilteredView)
+                                }
+                            } else {
+                                PremiumFeatureCard(
+                                    title: "Tasting Coverage",
+                                    description: "Track which whiskeys you've tasted and analyze patterns"
+                                ) {
+                                    showingPaywall = true
+                                }
+                            }
                         }
                         .id("tasting")
+
+                        // 10 & 11. Spend Over Time + Collection Growth charts
+                        if subscriptionManager.hasAccess {
+                            StatCard(title: "Collection History", systemImage: "chart.bar.fill") {
+                                ActivityTimelineStats(whiskeys: whiskeys, section: .collectionCharts)
+                            }
+                            .id("timeline")
+                        } else {
+                            PremiumFeatureCard(
+                                title: "Collection History",
+                                description: "Track collection growth and spending over time"
+                            ) {
+                                showingPaywall = true
+                            }
+                        }
                     }
                     .padding()
                     .background(
@@ -667,7 +756,7 @@ struct StatisticsView: View {
                         }
                     }
                 }
-                
+
                 // Navigation link for filtered view
                 NavigationLink(
                     destination: FilteredCollectionView(filter: selectedFilter),
@@ -675,13 +764,29 @@ struct StatisticsView: View {
                 ) {
                     EmptyView()
                 }
+                if showingStatisticsTutorialOverlay {
+                    StatisticsTutorialOverlay(onDismiss: {
+                        hasSeenStatisticsTutorial = true
+                        showingStatisticsTutorialOverlay = false
+                        HapticManager.shared.lightImpact()
+                    })
+                }
+            }
+            .onAppear {
+                if !hasSeenStatisticsTutorial {
+                    showingStatisticsTutorialOverlay = true
+                }
             }
             .onChange(of: selectedFilter) { filter in
                 if let filter = filter {
                     // Store the current section before navigating
                     switch filter.section {
                     case .collectionOverview:
-                        lastScrolledSection = "overview"
+                        lastScrolledSection = "attributes"
+                    case .specialAttributes:
+                        lastScrolledSection = "attributes"
+                    case .topDistilleries:
+                        lastScrolledSection = "distilleries"
                     case .collectionComposition:
                         lastScrolledSection = "composition"
                     case .proofAnalysis:
@@ -690,8 +795,6 @@ struct StatisticsView: View {
                         lastScrolledSection = "price"
                     case .tastingCoverage, .coverageByType:
                         lastScrolledSection = "tasting"
-                    default:
-                        break
                     }
                 }
             }
@@ -715,6 +818,79 @@ struct StatisticsView: View {
         }
         .sheet(isPresented: $showingSettings) {
             SettingsView()
+        }
+        .fullScreenCover(isPresented: $showingPaywall) {
+            PaywallView(isPresented: $showingPaywall)
+        }
+        .preferredColorScheme(storedColorScheme == .dark ? .dark : storedColorScheme == .light ? .light : nil)
+    }
+}
+
+// MARK: - Statistics tutorial (first-time overlay: tap to filter)
+private struct StatisticsTutorialOverlay: View {
+    var onDismiss: () -> Void
+    
+    var body: some View {
+        ColorManager.tutorialScrim
+            .ignoresSafeArea()
+            .onTapGesture { }
+        GeometryReader { geometry in
+            ScrollView {
+                VStack(spacing: 0) {
+                    Spacer(minLength: 0)
+                    VStack(spacing: 20) {
+            VStack(alignment: .leading, spacing: 16) {
+                HStack {
+                    Image(systemName: "chart.bar.fill")
+                        .font(.title2)
+                        .foregroundColor(ColorManager.primaryBrandColor)
+                    Text("Statistics")
+                        .font(.headline)
+                }
+                VStack(alignment: .leading, spacing: 10) {
+                    Text("Almost everything here is **tappable**. Tap to see that subset of your collection.")
+                        .font(.subheadline)
+                    statisticsTutorialRow(icon: "1.circle.fill", text: "**Collection Overview** — tap Special Attributes (e.g. Cask Strength, Barrel Proof) or a distillery to view those bottles.")
+                    statisticsTutorialRow(icon: "2.circle.fill", text: "**Composition, Proof & Price** — tap a type, proof range, or price bar to filter by that segment.")
+                    statisticsTutorialRow(icon: "3.circle.fill", text: "**Tasting Coverage** — tap a type or coverage bar to see which bottles you’ve tasted (or haven’t) in that category.")
+                }
+                .font(.subheadline)
+            }
+            .padding(24)
+            .background(Color(UIColor.secondarySystemBackground))
+            .overlay(
+                RoundedRectangle(cornerRadius: 16)
+                    .stroke(ColorManager.tutorialCardBorder, lineWidth: 1)
+            )
+            .cornerRadius(16)
+            .shadow(radius: 12)
+            .padding(.horizontal, 24)
+            Button(action: onDismiss) {
+                Text("Got it")
+                    .fontWeight(.semibold)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 12)
+            }
+            .buttonStyle(.borderedProminent)
+            .tint(ColorManager.primaryBrandColor)
+            .padding(.horizontal, 24)
+                    }
+                    .padding()
+                    Spacer(minLength: 0)
+                }
+                .frame(minHeight: geometry.size.height)
+            }
+            .padding()
+        }
+    }
+    
+    private func statisticsTutorialRow(icon: String, text: String) -> some View {
+        HStack(alignment: .top, spacing: 10) {
+            Image(systemName: icon)
+                .foregroundColor(ColorManager.primaryBrandColor)
+                .font(.subheadline)
+            Text(LocalizedStringKey(text))
+                .fixedSize(horizontal: false, vertical: true)
         }
     }
 }
@@ -860,11 +1036,11 @@ struct CombinedCollectionStats: View {
                         action: { onAttributeSelected("Store Picks", true) }
                     )
                     
-                    // High Proof
+                    // Barrel Proof
                     AttributeButton(
-                        title: "High Proof",
+                        title: "Barrel Proof",
                         count: highProofCount,
-                        action: { onAttributeSelected("High Proof", true) }
+                        action: { onAttributeSelected("Barrel Proof", true) }
                     )
                 }
             }
@@ -894,13 +1070,67 @@ struct CombinedCollectionStats: View {
             }
         }
     }
-    
-    // Format currency values
-    private func formatCurrency(_ value: Double) -> String {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .currency
-        formatter.maximumFractionDigits = 0
-        return formatter.string(from: NSNumber(value: value)) ?? "$0"
+
+}
+
+// MARK: - Special Attributes Grid (used by new StatisticsView layout)
+/// Shows the 6 special-attribute tappable pills (Cask Strength, BiB, SiB, Store Pick, Barrel Proof, Tasted).
+struct SpecialAttributesGrid: View {
+    let whiskeys: FetchedResults<Whiskey>
+    let onAttributeSelected: (String, Bool) -> Void
+
+    private var caskStrengthCount: Int { whiskeys.filter { $0.isCaskStrength }.count }
+    private var biBCount: Int          { whiskeys.filter { $0.isBiB }.count }
+    private var siBCount: Int          { whiskeys.filter { $0.isSiB }.count }
+    private var storePickCount: Int    { whiskeys.filter { $0.isStorePick }.count }
+    private var highProofCount: Int    { whiskeys.filter { $0.proof > 100 }.count }
+    private var tastedCount: Int       { whiskeys.filter { ($0.journalEntries?.count ?? 0) > 0 || $0.isTasted }.count }
+
+    var body: some View {
+        LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
+            AttributeButton(title: "Cask Strength",   count: caskStrengthCount, action: { onAttributeSelected("Cask Strength",   true) })
+            AttributeButton(title: "Bottled in Bond", count: biBCount,          action: { onAttributeSelected("Bottled in Bond", true) })
+            AttributeButton(title: "Single Barrel",   count: siBCount,          action: { onAttributeSelected("Single Barrel",   true) })
+            AttributeButton(title: "Store Picks",     count: storePickCount,    action: { onAttributeSelected("Store Picks",     true) })
+            AttributeButton(title: "Barrel Proof",      count: highProofCount,    action: { onAttributeSelected("Barrel Proof",      true) })
+            AttributeButton(title: "Bottles Tasted",  count: tastedCount,       action: { onAttributeSelected("Tasted",          true) })
+        }
+    }
+}
+
+// MARK: - Top Distilleries Grid (used by new StatisticsView layout)
+/// Shows up to 6 distilleries sorted by bottle count.
+struct TopDistilleriesGrid: View {
+    let whiskeys: FetchedResults<Whiskey>
+    let onDistillerySelected: (String) -> Void
+
+    private var distilleries: [TypeCount] {
+        var counts: [String: Int] = [:]
+        for w in whiskeys {
+            if let d = w.distillery, !d.isEmpty { counts[d, default: 0] += 1 }
+        }
+        return counts.map { TypeCount(type: $0.key, count: $0.value) }
+            .sorted { $0.count > $1.count }
+    }
+
+    var body: some View {
+        let top = distilleries.prefix(6)
+        if top.isEmpty {
+            Text("No distillery data yet")
+                .foregroundColor(ColorManager.secondaryText)
+                .italic()
+                .frame(maxWidth: .infinity, alignment: .leading)
+        } else {
+            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 8) {
+                ForEach(Array(top)) { item in
+                    DistilleryButton(
+                        name: item.type,
+                        count: item.count,
+                        action: { onDistillerySelected(item.type) }
+                    )
+                }
+            }
+        }
     }
 }
 
@@ -1070,7 +1300,7 @@ struct FilteredCollectionView: View {
                     filterPredicate = NSPredicate(format: "isSiB == %@", NSNumber(value: value))
                 case "Store Picks", "Store Pick":
                     filterPredicate = NSPredicate(format: "isStorePick == %@", NSNumber(value: value))
-                case "High Proof":
+                case "Barrel Proof":
                     filterPredicate = NSPredicate(format: "proof > 100")
                 case "Tasted":
                     filterPredicate = NSPredicate(format: "(SUBQUERY(journalEntries, $entry, $entry != nil).@count > 0) OR (isTasted == %@)", NSNumber(value: true))
@@ -1206,17 +1436,18 @@ struct FilteredCollectionView: View {
                 loadTopTypes()
             }
             
+            #if DEBUG
             // Add debug logging to verify correct filtering
             if case let .tastedStatus(isTasted) = filter?.type {
                 print("FilteredCollectionView: Filtering for \(isTasted ? "tasted" : "untasted") whiskeys")
                 print("FilteredCollectionView: Found \(filteredWhiskeys.count) matching whiskeys")
-                
+
                 // Print the first few whiskeys to verify they match the filter
                 let sampleWhiskeys = Array(filteredWhiskeys.prefix(3))
                 for whiskey in sampleWhiskeys {
                     print("Sample whiskey: \(whiskey.name ?? "Unknown") - isTasted=\(whiskey.isTasted), journalEntries=\(whiskey.journalEntries?.count ?? 0)")
                 }
-                
+
                 // Print all whiskeys to verify they match the filter
                 print("All filtered whiskeys:")
                 for whiskey in filteredWhiskeys {
@@ -1225,7 +1456,7 @@ struct FilteredCollectionView: View {
                     let isActuallyTasted = hasJournalEntries || isTastedProperty
                     print("  - \(whiskey.name ?? "Unknown"): isTasted=\(isTastedProperty), journalEntries=\(hasJournalEntries), isActuallyTasted=\(isActuallyTasted)")
                 }
-                
+
                 // Check if the 1792 12 year is in the results
                 let targetWhiskey = filteredWhiskeys.first { $0.name?.contains("1792 12 year") ?? false }
                 if let targetWhiskey = targetWhiskey {
@@ -1234,7 +1465,7 @@ struct FilteredCollectionView: View {
                     print("DEBUG: journalEntries count: \(targetWhiskey.journalEntries?.count ?? 0)")
                 } else {
                     print("DEBUG: 1792 12 year not found in filtered results")
-                    
+
                     // Check if it's in the original whiskeys
                     let originalWhiskeys = Array(whiskeys)
                     let originalTargetWhiskey = originalWhiskeys.first { $0.name?.contains("1792 12 year") ?? false }
@@ -1242,7 +1473,7 @@ struct FilteredCollectionView: View {
                         print("DEBUG: Found 1792 12 year in original whiskeys")
                         print("DEBUG: isTasted property: \(originalTargetWhiskey.isTasted)")
                         print("DEBUG: journalEntries count: \(originalTargetWhiskey.journalEntries?.count ?? 0)")
-                        
+
                         // Check if it should be included based on our filtering logic
                         let hasJournalEntries = (originalTargetWhiskey.journalEntries?.count ?? 0) > 0
                         let isTastedProperty = originalTargetWhiskey.isTasted
@@ -1252,12 +1483,12 @@ struct FilteredCollectionView: View {
                         print("DEBUG: 1792 12 year not found in original whiskeys")
                     }
                 }
-                
+
                 // Check if the Core Data predicate is working correctly
                 print("DEBUG: Checking Core Data predicate results")
                 let allWhiskeys = Array(whiskeys)
                 print("DEBUG: Total whiskeys from Core Data: \(allWhiskeys.count)")
-                
+
                 // Count how many whiskeys match our manual filtering criteria
                 let manuallyFilteredCount = allWhiskeys.filter { whiskey in
                     let hasJournalEntries = (whiskey.journalEntries?.count ?? 0) > 0
@@ -1265,28 +1496,29 @@ struct FilteredCollectionView: View {
                     let isActuallyTasted = hasJournalEntries || isTastedProperty
                     return isActuallyTasted == isTasted
                 }.count
-                
+
                 print("DEBUG: Manually filtered count: \(manuallyFilteredCount)")
                 print("DEBUG: Difference between Core Data and manual filtering: \(abs(manuallyFilteredCount - filteredWhiskeys.count))")
             }
-            
+
             // Add debug logging to verify correct filtering
             if case let .subtype(parentType, subtypeValue) = filter?.type {
                 print("Filtering with subtype: \(parentType) - \(subtypeValue)")
                 print("Found \(filteredWhiskeys.count) matching whiskeys")
-                
+
                 // Print the first few whiskeys to verify they match the filter
                 let sampleWhiskeys = Array(filteredWhiskeys.prefix(3))
                 for whiskey in sampleWhiskeys {
                     print("Sample whiskey: \(whiskey.name ?? "Unknown") - Type: \(whiskey.type ?? "Unknown")")
                 }
-                
+
                 // Verify all whiskeys match the parent type
                 let wrongTypeCount = filteredWhiskeys.filter { $0.type != parentType }.count
                 if wrongTypeCount > 0 {
                     print("WARNING: \(wrongTypeCount) whiskeys don't match parent type \(parentType)")
                 }
             }
+            #endif
         }
     }
     
@@ -1298,14 +1530,23 @@ struct FilteredCollectionView: View {
         if let currentFilter = filter {
             switch currentFilter.type {
             case .type(let type):
+                #if DEBUG
                 print("DEBUG: Applying type filter for: \(type)")
+                #endif
                 filtered = filtered.filter { $0.type == type }
+                #if DEBUG
                 print("DEBUG: After type filter: \(filtered.count) whiskeys")
+                #endif
             case .proof(let min, let max):
+                #if DEBUG
                 print("DEBUG: Applying proof filter: \(min)-\(max)")
+                #endif
                 filtered = filtered.filter { $0.proof >= min && (max == Double.infinity || $0.proof < max) }
+                #if DEBUG
                 print("DEBUG: After proof filter: \(filtered.count) whiskeys")
+                #endif
             case .attribute(let attribute, _):
+                #if DEBUG
                 print("DEBUG: Applying attribute filter: \(attribute)")
                 // Handle attribute filtering...
                 if attribute.hasSuffix("in Other Types") {
@@ -1315,19 +1556,30 @@ struct FilteredCollectionView: View {
                     print("DEBUG: Handling regular attribute filter")
                     // Handle regular attributes...
                 }
+                #endif
             case .distillery(let distillery):
+                #if DEBUG
                 print("DEBUG: Applying distillery filter: \(distillery)")
+                #endif
                 filtered = filtered.filter { $0.distillery == distillery }
+                #if DEBUG
                 print("DEBUG: After distillery filter: \(filtered.count) whiskeys")
+                #endif
             case .finishType(let finishType):
+                #if DEBUG
                 print("DEBUG: Applying finish type filter: \(finishType)")
-                filtered = filtered.filter { 
-                    ($0.finish?.contains(finishType) ?? false) || 
+                #endif
+                filtered = filtered.filter {
+                    ($0.finish?.contains(finishType) ?? false) ||
                     ($0.name?.localizedCaseInsensitiveContains(finishType) ?? false)
                 }
+                #if DEBUG
                 print("DEBUG: After finish type filter: \(filtered.count) whiskeys")
+                #endif
             case .subtype(let parent, let child):
+                #if DEBUG
                 print("DEBUG: Applying subtype filter: \(parent) - \(child)")
+                #endif
                 filtered = filtered.filter { whiskey in
                     guard whiskey.type == parent else { return false }
                     switch child {
@@ -1346,11 +1598,15 @@ struct FilteredCollectionView: View {
                         return true
                     }
                 }
+                #if DEBUG
                 print("DEBUG: After subtype filter: \(filtered.count) whiskeys")
+                #endif
             case .tastedStatus(_):
                 // Only apply tasted status filter for tasting-related views
                 if displayTitle.contains("Tasting Coverage") {
+                    #if DEBUG
                     print("DEBUG: Applying tasted status filter for tasting coverage view")
+                    #endif
                     filtered = filtered.filter { whiskey in
                         switch filterType {
                         case .tasted:
@@ -1364,13 +1620,21 @@ struct FilteredCollectionView: View {
                         }
                     }
                 } else {
+                    #if DEBUG
                     print("DEBUG: Skipping tasted status filter for non-tasting view")
+                    #endif
                 }
+                #if DEBUG
                 print("DEBUG: After tasted filter: \(filtered.count) whiskeys")
+                #endif
             case .price(let min, let max):
+                #if DEBUG
                 print("DEBUG: Applying price filter: \(min)-\(max)")
+                #endif
                 filtered = filtered.filter { $0.price >= min && (max == Double.infinity || $0.price < max) }
+                #if DEBUG
                 print("DEBUG: After price filter: \(filtered.count) whiskeys")
+                #endif
             }
         }
         
@@ -1381,12 +1645,14 @@ struct FilteredCollectionView: View {
     private func loadTopTypes() {
         topTypes = getTopTypes(count: 3)
         
+        #if DEBUG
         // Log what we're doing to help debug
         print("Filtering for Other Types. Top types excluded: \(topTypes)")
-        
+
         if case .attribute(let attribute, _) = filter?.type {
             print("Attribute filter: \(attribute)")
         }
+        #endif
     }
     
     // Get top whiskey types by count
@@ -1507,7 +1773,7 @@ struct CollectionOverviewStats: View {
             HStack(spacing: 20) {
                 StatCounter(
                     value: "\(whiskeys.filter { $0.proof > 100 }.count)",
-                    label: "High Proof"
+                    label: "Barrel Proof"
                 )
                 
                 StatCounter(
@@ -1523,36 +1789,83 @@ struct CollectionOverviewStats: View {
 struct WhiskeyTypeStats: View {
     let whiskeys: FetchedResults<Whiskey>
     let onTypeSelected: (String) -> Void
-    
+
+    private let defaultVisible = 5
+    @State private var showAll = false
+
     var body: some View {
         let typeData = calculateTypeBreakdown()
-        
+        let maxCount = typeData.map(\.count).max() ?? 1
+        let visible = showAll ? typeData : Array(typeData.prefix(defaultVisible))
+        let hiddenCount = typeData.count - defaultVisible
+
         if typeData.isEmpty {
             Text("No type data available")
                 .foregroundColor(.secondary)
                 .italic()
         } else {
-            // Clean list of whiskey types
-            VStack(alignment: .leading, spacing: 12) {
-                ForEach(typeData) { item in
+            VStack(alignment: .leading, spacing: 10) {
+                ForEach(visible) { item in
                     Button(action: {
                         HapticManager.shared.selectionFeedback()
                         onTypeSelected(item.type)
                     }) {
-                        HStack {
-                            Circle()
-                                .fill(colorForIndex(typeData.firstIndex(where: { $0.id == item.id }) ?? 0))
-                                .frame(width: 12, height: 12)
-                            Text(item.type)
-                                .font(.subheadline)
-                                .foregroundColor(.primary)
-                            Spacer()
-                            Text("\(item.count)")
-                                .foregroundColor(.secondary)
-                                .font(.subheadline)
+                        VStack(alignment: .leading, spacing: 4) {
+                            HStack {
+                                Text(item.type)
+                                    .font(.subheadline)
+                                    .foregroundColor(.primary)
+                                Spacer()
+                                Text("\(item.count)")
+                                    .font(.subheadline)
+                                    .foregroundColor(.secondary)
+                            }
+                            GeometryReader { geo in
+                                ZStack(alignment: .leading) {
+                                    RoundedRectangle(cornerRadius: 3)
+                                        .fill(Color(.systemFill))
+                                        .frame(height: 6)
+                                    RoundedRectangle(cornerRadius: 3)
+                                        .fill(
+                                            LinearGradient(
+                                                colors: [
+                                                    ColorManager.primaryBrandColor,
+                                                    ColorManager.primaryBrandColor.opacity(0.6)
+                                                ],
+                                                startPoint: .leading,
+                                                endPoint: .trailing
+                                            )
+                                        )
+                                        .frame(
+                                            width: geo.size.width * CGFloat(item.count) / CGFloat(maxCount),
+                                            height: 6
+                                        )
+                                }
+                            }
+                            .frame(height: 6)
                         }
-                        .padding(.vertical, 4)
                         .contentShape(Rectangle())
+                    }
+                    .buttonStyle(PlainButtonStyle())
+                }
+
+                // Show more / Show less toggle
+                if hiddenCount > 0 {
+                    Button(action: {
+                        HapticManager.shared.selectionFeedback()
+                        withAnimation(.easeInOut(duration: 0.2)) {
+                            showAll.toggle()
+                        }
+                    }) {
+                        HStack(spacing: 4) {
+                            Text(showAll ? "Show less" : "Show \(hiddenCount) more")
+                                .font(.subheadline)
+                                .foregroundColor(ColorManager.primaryBrandColor)
+                            Image(systemName: showAll ? "chevron.up" : "chevron.down")
+                                .font(.caption)
+                                .foregroundColor(ColorManager.primaryBrandColor)
+                        }
+                        .padding(.top, 2)
                     }
                     .buttonStyle(PlainButtonStyle())
                 }
@@ -1575,8 +1888,24 @@ struct WhiskeyTypeStats: View {
             .sorted { $0.count > $1.count }
     }
     
-    private func colorForIndex(_ index: Int) -> Color {
-        return ColorManager.chartColor(at: index)
+}
+
+// Bar shape with rounded top corners only
+private struct TopRoundedRectangle: Shape {
+    var radius: CGFloat = 5
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        let r = min(radius, rect.height / 2, rect.width / 2)
+        path.move(to: CGPoint(x: rect.minX, y: rect.maxY))
+        path.addLine(to: CGPoint(x: rect.minX, y: rect.minY + r))
+        path.addQuadCurve(to: CGPoint(x: rect.minX + r, y: rect.minY),
+                          control: CGPoint(x: rect.minX, y: rect.minY))
+        path.addLine(to: CGPoint(x: rect.maxX - r, y: rect.minY))
+        path.addQuadCurve(to: CGPoint(x: rect.maxX, y: rect.minY + r),
+                          control: CGPoint(x: rect.maxX, y: rect.minY))
+        path.addLine(to: CGPoint(x: rect.maxX, y: rect.maxY))
+        path.closeSubpath()
+        return path
     }
 }
 
@@ -1596,42 +1925,50 @@ struct ProofAnalysisStats: View {
                 .padding(.top, 8)
             
             if #available(iOS 16.0, *), !proofRanges.isEmpty {
-                VStack(alignment: .leading, spacing: 8) {
-                    HStack(alignment: .bottom, spacing: 4) {
-                        ForEach(proofRanges) { range in
-                            let maxCount = proofRanges.map(\.count).max() ?? 1
-                            let height = 150.0 * Double(range.count) / Double(maxCount)
-                            
-                            Button {
-                                HapticManager.shared.selectionFeedback()
-                                onProofRangeSelected(range.min, range.max, range.label)
-                            } label: {
-                                VStack {
-                                    Rectangle()
-                                        .fill(ColorManager.priceLow.gradient)
-                                        .frame(height: height)
-                                    
-                                    Text(range.label)
-                                        .font(.caption)
-                                        .foregroundColor(.primary)
-                                }
-                                .contentShape(Rectangle())
+                HStack(alignment: .bottom, spacing: 6) {
+                    ForEach(proofRanges) { range in
+                        let maxCount = proofRanges.map(\.count).max() ?? 1
+                        let barHeight = 148.0 * Double(range.count) / Double(max(maxCount, 1))
+
+                        Button {
+                            HapticManager.shared.selectionFeedback()
+                            onProofRangeSelected(range.min, range.max, range.label)
+                        } label: {
+                            VStack(spacing: 3) {
+                                Spacer(minLength: 0)
+                                // Count floats above bar
+                                Text(range.count > 0 ? "\(range.count)" : " ")
+                                    .font(.system(size: 11, weight: .medium))
+                                    .foregroundColor(.secondary)
+                                // Rounded-top bar
+                                TopRoundedRectangle(radius: 5)
+                                    .fill(
+                                        LinearGradient(
+                                            colors: [
+                                                Color(red: 0.86, green: 0.53, blue: 0.13),
+                                                Color(red: 0.48, green: 0.22, blue: 0.04)
+                                            ],
+                                            startPoint: .top,
+                                            endPoint: .bottom
+                                        )
+                                    )
+                                    .frame(height: max(barHeight, range.count > 0 ? 4 : 0))
+                                // Axis label
+                                Text(range.label)
+                                    .font(.system(size: 9.5))
+                                    .foregroundColor(.primary)
+                                    .multilineTextAlignment(.center)
+                                    .fixedSize(horizontal: false, vertical: true)
                             }
-                            .buttonStyle(PlainButtonStyle())
-                            .frame(maxWidth: .infinity)
+                            .contentShape(Rectangle())
                         }
-                    }
-                    .frame(height: 180)
-                    
-                    HStack {
-                        ForEach(proofRanges) { range in
-                            Text("\(range.count)")
-                                .font(.caption2)
-                                .foregroundColor(.secondary)
-                                .frame(maxWidth: .infinity)
-                        }
+                        .buttonStyle(PlainButtonStyle())
+                        .frame(maxWidth: .infinity)
                     }
                 }
+                .frame(height: 210)
+                // Baseline
+                Divider()
             } else {
                 // Fallback for iOS 15 or empty data
                 VStack(alignment: .leading, spacing: 8) {
@@ -1714,42 +2051,50 @@ struct PriceAnalysisStats: View {
                 .padding(.top, 8)
             
             if #available(iOS 16.0, *), !priceRanges.isEmpty {
-                VStack(alignment: .leading, spacing: 8) {
-                    HStack(alignment: .bottom, spacing: 4) {
-                        ForEach(priceRanges) { range in
-                            let maxCount = priceRanges.map(\.count).max() ?? 1
-                            let height = 150.0 * Double(range.count) / Double(maxCount)
-                            
-                            Button {
-                                HapticManager.shared.selectionFeedback()
-                                onPriceRangeSelected(range.min, range.max, range.label)
-                            } label: {
-                                VStack {
-                                    Rectangle()
-                                        .fill(ColorManager.priceLow.gradient)
-                                        .frame(height: height)
-                                    
-                                    Text(range.label)
-                                        .font(.caption)
-                                        .foregroundColor(.primary)
-                                }
-                                .contentShape(Rectangle())
+                HStack(alignment: .bottom, spacing: 6) {
+                    ForEach(priceRanges) { range in
+                        let maxCount = priceRanges.map(\.count).max() ?? 1
+                        let barHeight = 148.0 * Double(range.count) / Double(max(maxCount, 1))
+
+                        Button {
+                            HapticManager.shared.selectionFeedback()
+                            onPriceRangeSelected(range.min, range.max, range.label)
+                        } label: {
+                            VStack(spacing: 3) {
+                                Spacer(minLength: 0)
+                                // Count floats above bar
+                                Text(range.count > 0 ? "\(range.count)" : " ")
+                                    .font(.system(size: 11, weight: .medium))
+                                    .foregroundColor(.secondary)
+                                // Rounded-top bar — richer gold to distinguish from proof
+                                TopRoundedRectangle(radius: 5)
+                                    .fill(
+                                        LinearGradient(
+                                            colors: [
+                                                Color(red: 0.92, green: 0.68, blue: 0.18),
+                                                Color(red: 0.58, green: 0.30, blue: 0.06)
+                                            ],
+                                            startPoint: .top,
+                                            endPoint: .bottom
+                                        )
+                                    )
+                                    .frame(height: max(barHeight, range.count > 0 ? 4 : 0))
+                                // Axis label
+                                Text(range.label)
+                                    .font(.system(size: 9.5))
+                                    .foregroundColor(.primary)
+                                    .multilineTextAlignment(.center)
+                                    .fixedSize(horizontal: false, vertical: true)
                             }
-                            .buttonStyle(PlainButtonStyle())
-                            .frame(maxWidth: .infinity)
+                            .contentShape(Rectangle())
                         }
-                    }
-                    .frame(height: 180)
-                    
-                    HStack {
-                        ForEach(priceRanges) { range in
-                            Text("\(range.count)")
-                                .font(.caption2)
-                                .foregroundColor(.secondary)
-                                .frame(maxWidth: .infinity)
-                        }
+                        .buttonStyle(PlainButtonStyle())
+                        .frame(maxWidth: .infinity)
                     }
                 }
+                .frame(height: 210)
+                // Baseline
+                Divider()
             } else {
                 // Fallback for iOS 15 or empty data
                 VStack(alignment: .leading, spacing: 8) {
@@ -2103,60 +2448,60 @@ struct TastingCoverageStats: View {
             }
             
             // Increment type counts
-            typeMap[type]!.total += 1
+            typeMap[type]?.total += 1
             if isTasted {
-                typeMap[type]!.tasted += 1
+                typeMap[type]?.tasted += 1
             }
-            
+
             // Now handle attributes - initialize all attribute counters if needed
             let attributeTypes = ["Finished", "Single Barrel", "Bottled in Bond", "Store Pick", "No Special Attributes"]
             for attrType in attributeTypes {
-                if typeMap[type]!.attributes[attrType] == nil {
-                    typeMap[type]!.attributes[attrType] = (total: 0, tasted: 0)
+                if typeMap[type]?.attributes[attrType] == nil {
+                    typeMap[type]?.attributes[attrType] = (total: 0, tasted: 0)
                 }
             }
-            
+
             // Track if this whiskey has any special attributes
             var hasSpecialAttributes = false
-            
+
             // Check each attribute independently and update counts
             if whiskey.finish != nil && !whiskey.finish!.isEmpty {
                 hasSpecialAttributes = true
-                typeMap[type]!.attributes["Finished"]!.total += 1
+                typeMap[type]?.attributes["Finished"]?.total += 1
                 if isTasted {
-                    typeMap[type]!.attributes["Finished"]!.tasted += 1
+                    typeMap[type]?.attributes["Finished"]?.tasted += 1
                 }
             }
-            
+
             if whiskey.isSiB {
                 hasSpecialAttributes = true
-                typeMap[type]!.attributes["Single Barrel"]!.total += 1
+                typeMap[type]?.attributes["Single Barrel"]?.total += 1
                 if isTasted {
-                    typeMap[type]!.attributes["Single Barrel"]!.tasted += 1
+                    typeMap[type]?.attributes["Single Barrel"]?.tasted += 1
                 }
             }
-            
+
             if whiskey.isBiB {
                 hasSpecialAttributes = true
-                typeMap[type]!.attributes["Bottled in Bond"]!.total += 1
+                typeMap[type]?.attributes["Bottled in Bond"]?.total += 1
                 if isTasted {
-                    typeMap[type]!.attributes["Bottled in Bond"]!.tasted += 1
+                    typeMap[type]?.attributes["Bottled in Bond"]?.tasted += 1
                 }
             }
-            
+
             if whiskey.isStorePick {
                 hasSpecialAttributes = true
-                typeMap[type]!.attributes["Store Pick"]!.total += 1
+                typeMap[type]?.attributes["Store Pick"]?.total += 1
                 if isTasted {
-                    typeMap[type]!.attributes["Store Pick"]!.tasted += 1
+                    typeMap[type]?.attributes["Store Pick"]?.tasted += 1
                 }
             }
-            
+
             // If no special attributes, count in the "No Special Attributes" category
             if !hasSpecialAttributes {
-                typeMap[type]!.attributes["No Special Attributes"]!.total += 1
+                typeMap[type]?.attributes["No Special Attributes"]?.total += 1
                 if isTasted {
-                    typeMap[type]!.attributes["No Special Attributes"]!.tasted += 1
+                    typeMap[type]?.attributes["No Special Attributes"]?.tasted += 1
                 }
             }
         }
@@ -2532,53 +2877,60 @@ struct TastingCoverageStats: View {
     
     private func coverageColor(_ percentage: Double) -> Color {
         if percentage < 30 {
-            return ColorManager.progressLow
+            return Color(red: 0.52, green: 0.26, blue: 0.05)
         } else if percentage < 70 {
-            return ColorManager.progressMedium
+            return Color(red: 0.70, green: 0.38, blue: 0.07)
         } else {
-            return ColorManager.progressHigh
+            return Color(red: 0.86, green: 0.53, blue: 0.13)
         }
     }
-    
+
     private func typeRow(for typeStat: TypeStatistic) -> some View {
         VStack(alignment: .leading, spacing: 4) {
-            // Type header row (collapsible)
-            Button(action: {
-                if typeStat.name == "Other" {
-                    // For "Other", we want to filter by all types not in the top types
-                    let topTypes = typeStatistics.filter { $0.name != "Other" }.prefix(3).map { $0.name }
-                    let otherTypesFilter = WhiskeyFilter(
-                        type: .attribute("Other Types", true),
-                        displayName: "Other Types",
-                        section: .coverageByType
-                    )
-                    selectedFilter = otherTypesFilter
-                    showingFilteredView = true
-                    HapticManager.shared.selectionFeedback()
-                } else {
-                    // If already expanded, clicking again should filter by this type
-                    if isExpanded(typeStat.name) {
-                        // Filter by this type
+            HStack(spacing: 0) {
+                // Chevron: ONLY toggles expand/collapse
+                Button(action: {
+                    if typeStat.name != "Other" {
+                        withAnimation(.easeInOut(duration: 0.2)) {
+                            toggleExpanded(typeStat.name)
+                        }
+                        HapticManager.shared.selectionFeedback()
+                    }
+                }) {
+                    Image(systemName: isExpanded(typeStat.name) ? "chevron.down" : "chevron.right")
+                        .foregroundColor(.secondary)
+                        .font(.caption)
+                        .frame(width: 28, height: 44)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(PlainButtonStyle())
+
+                // Row content: navigates to filtered collection
+                Button(action: {
+                    if typeStat.name == "Other" {
+                        selectedFilter = WhiskeyFilter(
+                            type: .attribute("Other Types", true),
+                            displayName: "Other Types",
+                            section: .coverageByType
+                        )
+                    } else {
                         selectedFilter = WhiskeyFilter(
                             type: .type(typeStat.name),
                             displayName: typeStat.name,
                             section: .coverageByType
                         )
-                        showingFilteredView = true
-                        HapticManager.shared.selectionFeedback()
-                    } else {
-                        // Otherwise just toggle expansion
-                        toggleExpanded(typeStat.name)
                     }
+                    showingFilteredView = true
+                    HapticManager.shared.selectionFeedback()
+                }) {
+                    TypeHeaderRow(
+                        typeStat: typeStat,
+                        isExpanded: isExpanded(typeStat.name)
+                    )
+                    .contentShape(Rectangle())
                 }
-            }) {
-                TypeHeaderRow(
-                    typeStat: typeStat,
-                    isExpanded: isExpanded(typeStat.name)
-                )
-                .contentShape(Rectangle())
+                .buttonStyle(PlainButtonStyle())
             }
-            .buttonStyle(PlainButtonStyle())
             
             // Subtype rows (when expanded)
             if isExpanded(typeStat.name) && !typeStat.subtypes.isEmpty {
@@ -2682,7 +3034,7 @@ struct TastingProgressCircle: View {
             
             Circle()
                 .trim(from: 0, to: CGFloat(min(percentage / 100, 1.0)))
-                .stroke(Color.blue, style: StrokeStyle(lineWidth: 10, lineCap: .round))
+                .stroke(ColorManager.primaryBrandColor, style: StrokeStyle(lineWidth: 10, lineCap: .round))
                 .frame(width: 120, height: 120)
                 .rotationEffect(.degrees(-90))
                 .animation(.linear, value: percentage)
@@ -2721,11 +3073,11 @@ struct TastingActionButtons: View {
                     .foregroundColor(.white)
                     .padding(.horizontal, 12)
                     .padding(.vertical, 6)
-                    .background(Color.blue)
+                    .background(ColorManager.primaryBrandColor)
                     .cornerRadius(8)
                     .contentShape(Rectangle())
             }
-            
+
             Button(action: {
                 HapticManager.shared.selectionFeedback()
                 selectedFilter = WhiskeyFilter(
@@ -2740,7 +3092,7 @@ struct TastingActionButtons: View {
                     .foregroundColor(.white)
                     .padding(.horizontal, 12)
                     .padding(.vertical, 6)
-                    .background(Color.orange)
+                    .background(ColorManager.primaryBrandColor.opacity(0.55))
                     .cornerRadius(8)
                     .contentShape(Rectangle())
             }
@@ -2761,21 +3113,16 @@ struct TypeHeaderRow: View {
     // Pre-calculate coverage color
     private var coverageColor: Color {
         if percentage < 30 {
-            return ColorManager.progressLow
+            return Color(red: 0.52, green: 0.26, blue: 0.05)
         } else if percentage < 70 {
-            return ColorManager.progressMedium
+            return Color(red: 0.70, green: 0.38, blue: 0.07)
         } else {
-            return ColorManager.progressHigh
+            return Color(red: 0.86, green: 0.53, blue: 0.13)
         }
     }
     
     var body: some View {
         HStack(spacing: 8) {
-            Image(systemName: isExpanded ? "chevron.down" : "chevron.right")
-                .foregroundColor(.secondary)
-                .font(.caption)
-                .frame(width: 16, height: 16)
-            
             Text(typeStat.name)
                 .font(.subheadline)
                 .fontWeight(.semibold)
@@ -2849,11 +3196,11 @@ struct SubtypeRow: View {
     
     private func coverageColor(_ percentage: Double) -> Color {
         if percentage < 30 {
-            return .red
+            return Color(red: 0.52, green: 0.26, blue: 0.05)
         } else if percentage < 70 {
-            return .orange
+            return Color(red: 0.70, green: 0.38, blue: 0.07)
         } else {
-            return .green
+            return Color(red: 0.86, green: 0.53, blue: 0.13)
         }
     }
 }
@@ -2942,6 +3289,60 @@ struct RecommendationRow: View {
     }
 }
 
+// MARK: - Quick Stats Row
+/// A horizontal row of 4 pill cards showing at-a-glance collection counts.
+struct QuickStatsRow: View {
+    let whiskeys: FetchedResults<Whiskey>
+
+    private var uniqueCount: Int { whiskeys.count }
+
+    private var totalInventory: Int {
+        whiskeys.reduce(0) { $0 + Int($1.numberOfBottles) }
+    }
+
+    private var tastedCount: Int {
+        whiskeys.filter { ($0.journalEntries?.count ?? 0) > 0 || $0.isTasted }.count
+    }
+
+    private var deadCount: Int {
+        whiskeys.reduce(0) { $0 + Int($1.deadBottleCount) }
+    }
+
+    var body: some View {
+        HStack(spacing: 10) {
+            quickPill(label: "Unique Bottles", value: "\(uniqueCount)", dimmed: false)
+            quickPill(label: "In Collection", value: "\(totalInventory)", dimmed: false)
+            quickPill(label: "Tasted", value: "\(tastedCount)", dimmed: false)
+            quickPill(label: "Dead Bottles", value: "\(deadCount)", dimmed: true)
+        }
+    }
+
+    @ViewBuilder
+    private func quickPill(label: String, value: String, dimmed: Bool) -> some View {
+        VStack(spacing: 4) {
+            Text(value)
+                .font(.title3)
+                .fontWeight(.bold)
+                .foregroundColor(dimmed ? ColorManager.secondaryText : ColorManager.primaryBrandColor)
+                .lineLimit(1)
+                .minimumScaleFactor(0.6)
+            Text(label)
+                .font(.system(size: 10))
+                .foregroundColor(ColorManager.secondaryText)
+                .multilineTextAlignment(.center)
+                .lineLimit(2)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 12)
+        .padding(.horizontal, 4)
+        .background(ColorManager.secondaryBackground)
+        .cornerRadius(12)
+    }
+}
+
+// MARK: - Previews
+
 struct StatisticsView_Previews: PreviewProvider {
     static var previews: some View {
         StatisticsView(showingFilteredView: .constant(false))
@@ -2965,7 +3366,7 @@ struct PriceOverviewStats: View {
                         .foregroundColor(.secondary)
                     Divider()
                         .frame(width: 60)
-                    Text(formatCurrency(averagePrice))
+                    Text(AppFormatters.formatCurrency(averagePrice))
                         .font(.title)
                         .fontWeight(.bold)
                         .lineLimit(1)
@@ -2982,7 +3383,7 @@ struct PriceOverviewStats: View {
                         .foregroundColor(.secondary)
                     Divider()
                         .frame(width: 60)
-                    Text(formatCurrency(totalValue))
+                    Text(AppFormatters.formatCurrency(totalValue))
                         .font(.title)
                         .fontWeight(.bold)
                         .lineLimit(1)
@@ -2999,7 +3400,7 @@ struct PriceOverviewStats: View {
                         .foregroundColor(.secondary)
                     Divider()
                         .frame(width: 60)
-                    Text(formatPricePerProof(averagePricePerProof))
+                    Text(AppFormatters.formatCurrency(averagePricePerProof, maxFractionDigits: 2))
                         .font(.title)
                         .fontWeight(.bold)
                         .lineLimit(1)
@@ -3023,7 +3424,7 @@ struct PriceOverviewStats: View {
                         
                         Spacer()
                         
-                        Text(formatCurrency(item.averagePrice))
+                        Text(AppFormatters.formatCurrency(item.averagePrice))
                             .font(.subheadline)
                             .foregroundColor(.secondary)
                     }
@@ -3072,19 +3473,6 @@ struct PriceOverviewStats: View {
         }.sorted { $0.count > $1.count }
     }
     
-    private func formatCurrency(_ value: Double) -> String {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .currency
-        formatter.maximumFractionDigits = 0
-        return formatter.string(from: NSNumber(value: value)) ?? "$0"
-    }
-    
-    private func formatPricePerProof(_ value: Double) -> String {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .currency
-        formatter.maximumFractionDigits = 2
-        return formatter.string(from: NSNumber(value: value)) ?? "$0.00"
-    }
 }
 
 struct TypePriceData: Identifiable {
@@ -3096,4 +3484,417 @@ struct TypePriceData: Identifiable {
 
 // StatDetailView is now implemented in its own file (StatDetailView.swift)
 
+// Premium Feature Card for Statistics
+struct PremiumFeatureCard: View {
+    let title: String
+    let description: String
+    let action: () -> Void
+    
+    var body: some View {
+        Button(action: action) {
+            VStack(spacing: 16) {
+                // Lock icon
+                Image(systemName: "lock.fill")
+                    .font(.system(size: 32))
+                    .foregroundColor(.gray)
+                
+                VStack(spacing: 8) {
+                    Text(title)
+                        .font(.headline)
+                        .fontWeight(.semibold)
+                        .multilineTextAlignment(.center)
+                    
+                    Text(description)
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                        .multilineTextAlignment(.center)
+                }
+                
+                VStack(spacing: 4) {
+                    Text("Upgrade to Premium")
+                        .font(.caption)
+                        .fontWeight(.semibold)
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 8)
+                        .background(ColorManager.primaryBrandColor)
+                        .foregroundColor(.white)
+                        .cornerRadius(20)
+                    
+                    Text("Unlimited everything • Advanced analytics")
+                        .font(.caption2)
+                        .foregroundColor(.secondary)
+                        .multilineTextAlignment(.center)
+                }
+            }
+            .padding(24)
+            .frame(maxWidth: .infinity)
+            .background(
+                RoundedRectangle(cornerRadius: 16)
+                    .fill(Color(.systemGray6))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 16)
+                            .stroke(Color(.systemGray4), lineWidth: 1)
+                    )
+            )
+        }
+        .buttonStyle(PlainButtonStyle())
+    }
+}
 
+// MARK: - Activity Timeline Stats
+struct ActivityTimelineStats: View {
+    enum Section {
+        case tastingVelocity   // velocity pills + most active month
+        case collectionCharts  // spend + growth charts
+        case all               // original behaviour
+    }
+
+    let whiskeys: FetchedResults<Whiskey>
+    var section: Section = .all
+    @State private var selectedDays: Int = 7
+    @State private var showingTastingList = false
+
+    private var allEntries: [JournalEntry] {
+        whiskeys.flatMap { $0.journalEntries?.allObjects as? [JournalEntry] ?? [] }
+    }
+
+    private var allInstances: [BottleInstance] {
+        whiskeys.flatMap { $0.bottleInstances?.allObjects as? [BottleInstance] ?? [] }
+    }
+
+    // MARK: Tasting velocity
+    private func tastings(inLast days: Int) -> Int {
+        guard let cutoff = Calendar.current.date(byAdding: .day, value: -days, to: Date()) else { return 0 }
+        return allEntries.filter { ($0.date ?? .distantPast) >= cutoff }.count
+    }
+
+    private func entriesInLast(days: Int) -> [JournalEntry] {
+        guard let cutoff = Calendar.current.date(byAdding: .day, value: -days, to: Date()) else { return [] }
+        return allEntries
+            .filter { ($0.date ?? .distantPast) >= cutoff }
+            .sorted { ($0.date ?? .distantPast) > ($1.date ?? .distantPast) }
+    }
+
+    // MARK: Most active month
+    private var mostActiveMonth: (label: String, count: Int)? {
+        let calendar = Calendar.current
+        var counts: [Date: Int] = [:]
+        for entry in allEntries {
+            guard let date = entry.date else { continue }
+            let comps = calendar.dateComponents([.year, .month], from: date)
+            if let start = calendar.date(from: comps) { counts[start, default: 0] += 1 }
+        }
+        guard let best = counts.max(by: { $0.value < $1.value }) else { return nil }
+        let fmt = DateFormatter()
+        fmt.dateFormat = "MMMM yyyy"
+        return (fmt.string(from: best.key), best.value)
+    }
+
+    // MARK: Collection growth (last 12 months)
+    struct MonthPoint: Identifiable {
+        let id = UUID()
+        let month: Date
+        let count: Int
+    }
+
+    private var collectionGrowth: [MonthPoint] {
+        let calendar = Calendar.current
+        var counts: [Date: Int] = [:]
+        for instance in allInstances {
+            guard let date = instance.dateAdded else { continue }
+            let comps = calendar.dateComponents([.year, .month], from: date)
+            if let start = calendar.date(from: comps) { counts[start, default: 0] += 1 }
+        }
+        return (0..<12).reversed().compactMap { offset -> MonthPoint? in
+            guard let date = calendar.date(byAdding: .month, value: -offset, to: Date()),
+                  let start = calendar.date(from: calendar.dateComponents([.year, .month], from: date))
+            else { return nil }
+            return MonthPoint(month: start, count: counts[start] ?? 0)
+        }
+    }
+
+    // MARK: Spend by month (last 12 months)
+    struct SpendPoint: Identifiable {
+        let id = UUID()
+        let month: Date
+        let amount: Double
+    }
+
+    private var spendByMonth: [SpendPoint] {
+        let calendar = Calendar.current
+        var spend: [Date: Double] = [:]
+        for instance in allInstances {
+            guard let date = instance.dateAdded, instance.price > 0 else { continue }
+            let comps = calendar.dateComponents([.year, .month], from: date)
+            if let start = calendar.date(from: comps) { spend[start, default: 0] += instance.price }
+        }
+        return (0..<12).reversed().compactMap { offset -> SpendPoint? in
+            guard let date = calendar.date(byAdding: .month, value: -offset, to: Date()),
+                  let start = calendar.date(from: calendar.dateComponents([.year, .month], from: date))
+            else { return nil }
+            return SpendPoint(month: start, amount: spend[start] ?? 0)
+        }
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 20) {
+
+            // ── Tasting velocity (shown for .tastingVelocity and .all) ──────────
+            if section == .tastingVelocity || section == .all {
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack(spacing: 10) {
+                        VelocityPill(label: "7 days",  count: tastings(inLast: 7))  { selectedDays = 7;  showingTastingList = true }
+                        VelocityPill(label: "30 days", count: tastings(inLast: 30)) { selectedDays = 30; showingTastingList = true }
+                        VelocityPill(label: "90 days", count: tastings(inLast: 90)) { selectedDays = 90; showingTastingList = true }
+                    }
+                }
+                .sheet(isPresented: $showingTastingList) {
+                    RecentTastingsListView(entries: entriesInLast(days: selectedDays), days: selectedDays)
+                }
+
+                // ── Most active month ─────────────────────────
+                if let best = mostActiveMonth {
+                    Divider()
+                    VStack(alignment: .leading, spacing: 4) {
+                        Label("Most Active Month", systemImage: "calendar.badge.clock")
+                            .font(.subheadline).fontWeight(.semibold).foregroundColor(.secondary)
+                        HStack(spacing: 6) {
+                            Text(best.label).fontWeight(.semibold)
+                            Text("·").foregroundColor(.secondary)
+                            Text("\(best.count) \(best.count == 1 ? "tasting" : "tastings")")
+                                .foregroundColor(.secondary)
+                        }
+                        .font(.body)
+                    }
+                }
+            }
+
+            // ── Collection growth chart (shown for .collectionCharts and .all) ──
+            if section == .collectionCharts || section == .all {
+                let growth = collectionGrowth
+                let totalBottles = growth.reduce(0) { $0 + $1.count }
+                let peakMonthCount = growth.map(\.count).max() ?? 0
+                let isBulkImport = totalBottles > 5 && peakMonthCount > 0 &&
+                    Double(peakMonthCount) / Double(max(totalBottles, 1)) >= 0.7
+
+                if growth.contains(where: { $0.count > 0 }) {
+                    Divider()
+                    VStack(alignment: .leading, spacing: 8) {
+                        Label("Bottles Added — Last 12 Months", systemImage: "tray.and.arrow.down")
+                            .font(.subheadline).fontWeight(.semibold).foregroundColor(.secondary)
+
+                        if isBulkImport {
+                            // Bulk import detected — chart would be misleading
+                            HStack(spacing: 12) {
+                                Image(systemName: "calendar.badge.exclamationmark")
+                                    .font(.title2)
+                                    .foregroundColor(.secondary)
+                                Text("Most of your bottles were added at the same time, so this chart isn't meaningful yet. As you add new bottles over time it will fill in.")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                                    .fixedSize(horizontal: false, vertical: true)
+                            }
+                            .padding()
+                            .background(Color(UIColor.tertiarySystemGroupedBackground))
+                            .cornerRadius(10)
+                        } else {
+                            Chart(growth) { point in
+                                BarMark(
+                                    x: .value("Month", point.month, unit: .month),
+                                    y: .value("Bottles", point.count)
+                                )
+                                .foregroundStyle(Color.accentColor.gradient)
+                                .cornerRadius(4)
+                            }
+                            .chartXAxis {
+                                AxisMarks(values: .stride(by: .month)) { value in
+                                    if let date = value.as(Date.self) {
+                                        AxisValueLabel {
+                                            Text(date, format: .dateTime.month(.abbreviated))
+                                                .font(.system(size: 9))
+                                        }
+                                    }
+                                }
+                            }
+                            .chartYAxis {
+                                AxisMarks(values: .automatic(desiredCount: 4)) { _ in
+                                    AxisGridLine()
+                                    AxisValueLabel()
+                                }
+                            }
+                            .frame(height: 150)
+
+                        }
+                    }
+                }
+
+                // ── Spend over time chart ─────────────────────
+                let spend = spendByMonth
+                let totalSpend = spend.reduce(0.0) { $0 + $1.amount }
+                let peakMonthSpend = spend.map(\.amount).max() ?? 0
+                let isSpendBulkImport = totalSpend > 0 && peakMonthSpend > 0 &&
+                    peakMonthSpend / max(totalSpend, 1) >= 0.7 && allInstances.count > 5
+
+                if spend.contains(where: { $0.amount > 0 }) {
+                    Divider()
+                    VStack(alignment: .leading, spacing: 8) {
+                        Label("Spend — Last 12 Months", systemImage: "dollarsign.circle")
+                            .font(.subheadline).fontWeight(.semibold).foregroundColor(.secondary)
+
+                        if isSpendBulkImport {
+                            HStack(spacing: 12) {
+                                Image(systemName: "calendar.badge.exclamationmark")
+                                    .font(.title2)
+                                    .foregroundColor(.secondary)
+                                Text("Most of your bottles were added at the same time, so spend history isn't meaningful yet. It will fill in as you add new bottles over time.")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                                    .fixedSize(horizontal: false, vertical: true)
+                            }
+                            .padding()
+                            .background(Color(UIColor.tertiarySystemGroupedBackground))
+                            .cornerRadius(10)
+                        } else {
+                            Chart(spend) { point in
+                                BarMark(
+                                    x: .value("Month", point.month, unit: .month),
+                                    y: .value("Amount", point.amount)
+                                )
+                                .foregroundStyle(Color.orange.gradient)
+                                .cornerRadius(4)
+                            }
+                            .chartXAxis {
+                                AxisMarks(values: .stride(by: .month)) { value in
+                                    if let date = value.as(Date.self) {
+                                        AxisValueLabel {
+                                            Text(date, format: .dateTime.month(.abbreviated))
+                                                .font(.system(size: 9))
+                                        }
+                                    }
+                                }
+                            }
+                            .chartYAxis {
+                                AxisMarks(values: .automatic(desiredCount: 4)) { value in
+                                    AxisGridLine()
+                                    if let amount = value.as(Double.self) {
+                                        AxisValueLabel {
+                                            Text("$\(Int(amount))")
+                                                .font(.system(size: 10))
+                                        }
+                                    }
+                                }
+                            }
+                            .frame(height: 150)
+                        } // end else (not bulk import)
+                    }
+                }
+            }
+        }
+    }
+}
+
+// MARK: - Velocity Pill
+struct VelocityPill: View {
+    let label: String
+    let count: Int
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            VStack(spacing: 4) {
+                Text("\(count)")
+                    .font(.title2).fontWeight(.bold)
+                    .foregroundColor(count > 0 ? .accentColor : .secondary)
+                Text(label)
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 12)
+            .background(Color(UIColor.tertiarySystemGroupedBackground))
+            .cornerRadius(10)
+            .overlay(
+                RoundedRectangle(cornerRadius: 10)
+                    .stroke(count > 0 ? Color.accentColor.opacity(0.3) : Color.clear, lineWidth: 1)
+            )
+        }
+        .buttonStyle(.plain)
+    }
+}
+
+// MARK: - Recent Tastings List
+struct RecentTastingsListView: View {
+    let entries: [JournalEntry]
+    let days: Int
+    @Environment(\.dismiss) private var dismiss
+    @AppStorage("colorScheme") private var storedColorScheme: AppColorScheme = .system
+
+    private var title: String {
+        switch days {
+        case 7:  return "Last 7 Days"
+        case 30: return "Last 30 Days"
+        case 90: return "Last 90 Days"
+        default: return "Recent Tastings"
+        }
+    }
+
+    var body: some View {
+        NavigationStack {
+            Group {
+                if entries.isEmpty {
+                    VStack(spacing: 16) {
+                        Image(systemName: "wineglass")
+                            .font(.system(size: 48))
+                            .foregroundColor(.secondary)
+                        Text("No tastings in the \(title.lowercased())")
+                            .font(.headline)
+                            .foregroundColor(.secondary)
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                } else {
+                    List(entries, id: \.id) { entry in
+                        VStack(alignment: .leading, spacing: 6) {
+                            HStack {
+                                Text(entry.whiskey?.name ?? "Unknown Whiskey")
+                                    .font(.headline)
+                                Spacer()
+                                if entry.overallRating > 0 {
+                                    HStack(spacing: 3) {
+                                        Image(systemName: "star.fill")
+                                            .font(.caption)
+                                            .foregroundColor(.accentColor)
+                                        Text(String(format: "%.1f", entry.overallRating))
+                                            .font(.subheadline)
+                                            .fontWeight(.semibold)
+                                            .foregroundColor(.accentColor)
+                                    }
+                                }
+                            }
+                            if let date = entry.date {
+                                Text(date, style: .date)
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                            }
+                            if let notes = entry.notes, !notes.isEmpty {
+                                Text(notes)
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                                    .lineLimit(2)
+                            }
+                        }
+                        .padding(.vertical, 4)
+                    }
+                    .listStyle(.insetGrouped)
+                }
+            }
+            .navigationTitle(title)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Done") { dismiss() }
+                }
+            }
+        }
+        .preferredColorScheme(storedColorScheme == .dark ? .dark : storedColorScheme == .light ? .light : nil)
+    }
+}

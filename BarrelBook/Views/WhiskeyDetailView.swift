@@ -22,9 +22,6 @@ extension UserDefaults {
     }
 }
 
-// Add typealias for BottleInstance with a different name
-typealias BottleInstanceType = NSManagedObject
-
 struct WhiskeyDetailView: View {
     @ObservedObject var whiskey: Whiskey
     @Environment(\.managedObjectContext) private var viewContext
@@ -61,7 +58,21 @@ struct WhiskeyDetailView: View {
     // Use the AlertManager for alert state
     @StateObject private var alertManager = AlertManager.shared
     @StateObject private var locationManager = LocationManager.shared
-    
+    @StateObject private var subscriptionManager = SubscriptionManager.shared
+
+    @AppStorage("hasSeenBottleViewTutorial") private var hasSeenBottleViewTutorial = false
+    @AppStorage("bottleDetailVisitCount") private var bottleDetailVisitCount = 0
+    @AppStorage("hasSeenWebReviewsTip") private var hasSeenWebReviewsTip = false
+    @State private var showingBottleViewTutorial = false
+    @State private var tutorialStep = 1
+    @State private var showingWebReviewsTip = false
+    @State private var showingPaywall = false
+
+    @FetchRequest(
+        sortDescriptors: [NSSortDescriptor(keyPath: \JournalEntry.date, ascending: false)],
+        animation: .default)
+    private var allJournalEntries: FetchedResults<JournalEntry>
+
     @FetchRequest private var journalEntries: FetchedResults<JournalEntry>
     @FetchRequest private var bottleInstances: FetchedResults<BottleInstance>
     
@@ -224,6 +235,7 @@ struct WhiskeyDetailView: View {
     }
     
     var body: some View {
+        ScrollViewReader { scrollProxy in
         ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
                     // Title with edit icon
@@ -451,7 +463,8 @@ struct WhiskeyDetailView: View {
                     // Rename and modify the section to handle all bottle additions
                     if !whiskey.isWishlist {
                         BottleHistorySection(whiskey: whiskey)
-                        
+                            .id("bottleHistorySection")
+
                         // Add back the bottle cards view
                         VStack(alignment: .leading, spacing: 16) {
                             Text("Individual Bottles")
@@ -516,7 +529,8 @@ struct WhiskeyDetailView: View {
                         .padding()
                         .background(Color(.systemGroupedBackground))
                         .cornerRadius(10)
-                        
+                        .id("bottleCardsSection")
+
                         // Add Additional Bottles button
                         Button(action: { showingAddPurchaseSheet = true }) {
                             HStack {
@@ -611,25 +625,39 @@ struct WhiskeyDetailView: View {
                                 .padding(.bottom, 4)
                             
                             if isEditingNotes {
-                                TextEditor(text: $editedNotes)
-                                    .frame(minHeight: 100)
-                                    .padding(4)
-                                    .background(Color(.systemGray6))
-                                    .cornerRadius(8)
-                                
+                                ZStack(alignment: .topLeading) {
+                                    if editedNotes.isEmpty {
+                                        Text("Describe the nose, palate, and finish…")
+                                            .font(.body)
+                                            .foregroundColor(Color(.placeholderText))
+                                            .padding(.horizontal, 8)
+                                            .padding(.vertical, 12)
+                                            .allowsHitTesting(false)
+                                    }
+                                    TextEditor(text: $editedNotes)
+                                        .frame(minHeight: 100)
+                                }
+                                .padding(4)
+                                .background(Color(.systemGray6))
+                                .cornerRadius(8)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 8)
+                                        .strokeBorder(ColorManager.primaryBrandColor.opacity(0.40), lineWidth: 1.5)
+                                )
+
                                 HStack {
                                     Button("Cancel") {
                                         isEditingNotes = false
                                         editedNotes = whiskey.notes ?? ""
                                     }
                                     .foregroundColor(.red)
-                                    
+
                                     Spacer()
-                                    
+
                                     Button("Save") {
                                         saveNotes()
                                     }
-                                    .foregroundColor(.blue)
+                                    .foregroundColor(ColorManager.primaryBrandColor)
                                     .fontWeight(.bold)
                                 }
                                 .padding(.top, 8)
@@ -660,7 +688,8 @@ struct WhiskeyDetailView: View {
                         .background(Color(.systemBackground))
                         .clipShape(RoundedRectangle(cornerRadius: 10))
                         .shadow(color: Color(.systemGray4), radius: 3)
-                        
+                        .id("notesSection")
+
                         // Tastings Section
                         VStack(alignment: .leading, spacing: 8) {
                             Text("TASTINGS")
@@ -679,7 +708,13 @@ struct WhiskeyDetailView: View {
                                 }
                             }
                             
-                            Button(action: { showingAddJournalSheet = true }) {
+                            Button {
+                                if subscriptionManager.canAddTasting(currentCount: allJournalEntries.count) {
+                                    showingAddJournalSheet = true
+                                } else {
+                                    showingPaywall = true
+                                }
+                            } label: {
                                 Text("Add Tasting")
                                     .foregroundColor(.blue)
                                     .frame(maxWidth: .infinity, alignment: .center)
@@ -690,28 +725,74 @@ struct WhiskeyDetailView: View {
                         .background(Color(.systemBackground))
                         .clipShape(RoundedRectangle(cornerRadius: 10))
                         .shadow(color: Color(.systemGray4), radius: 3)
-                        
+                        .id("tastingsSection")
+
+                        // Web Reviews Tip Banner (shown after 3rd bottle detail visit)
+                        if showingWebReviewsTip {
+                            HStack(alignment: .top, spacing: 12) {
+                                Image(systemName: "safari.fill")
+                                    .foregroundColor(ColorManager.primaryBrandColor)
+                                    .font(.title3)
+                                    .padding(.top, 2)
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text("Did you know?")
+                                        .font(.subheadline)
+                                        .fontWeight(.semibold)
+                                    Text("You can search the web for expert reviews and save them directly to any bottle — they stay here alongside your own notes.")
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                        .fixedSize(horizontal: false, vertical: true)
+                                }
+                                Spacer()
+                                Button(action: {
+                                    withAnimation(.spring(response: 0.3)) {
+                                        showingWebReviewsTip = false
+                                        hasSeenWebReviewsTip = true
+                                    }
+                                    HapticManager.shared.lightImpact()
+                                }) {
+                                    Image(systemName: "xmark")
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                        .padding(6)
+                                        .background(Color(.systemGray5))
+                                        .clipShape(Circle())
+                                }
+                            }
+                            .padding()
+                            .background(ColorManager.primaryBrandColor.opacity(0.07))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .stroke(ColorManager.primaryBrandColor.opacity(0.2), lineWidth: 1)
+                            )
+                            .cornerRadius(12)
+                            .transition(.move(edge: .top).combined(with: .opacity))
+                        }
+
                         // External Content Section
                         VStack(alignment: .leading, spacing: 8) {
                             Text("EXTERNAL CONTENT")
                                 .font(.subheadline)
                                 .foregroundColor(.secondary)
                                 .padding(.bottom, 4)
-                            
+
                             let webContent = fetchAllWebContent()
                             if webContent.isEmpty {
-                                VStack {
-                                    Text("No web reviews yet")
+                                VStack(spacing: 8) {
+                                    Text("Find expert reviews, articles, and tasting notes from around the web — saved here, attached to this bottle.")
+                                        .font(.subheadline)
                                         .foregroundColor(.secondary)
+                                        .multilineTextAlignment(.center)
                                         .frame(maxWidth: .infinity, alignment: .center)
-                                        .padding()
-                                    
+                                        .padding(.horizontal)
+                                        .padding(.top, 4)
+
                                     Button(action: { showingWebSearch = true }) {
                                         Text("Search Web for Reviews")
                                             .foregroundColor(.blue)
                                             .frame(maxWidth: .infinity, alignment: .center)
                                     }
-                                    .padding(.top, 8)
+                                    .padding(.top, 4)
                                 }
                             } else {
                                 List(webContent, id: \.id) { content in
@@ -728,6 +809,7 @@ struct WhiskeyDetailView: View {
                         .background(Color(.systemBackground))
                         .clipShape(RoundedRectangle(cornerRadius: 10))
                         .shadow(color: Color(.systemGray4), radius: 3)
+                        .id("externalContentSection")
                     }
                 }
                 .padding()
@@ -747,6 +829,9 @@ struct WhiskeyDetailView: View {
         .sheet(isPresented: $showingAddJournalSheet) {
             AddJournalEntryView(preSelectedWhiskey: whiskey)
         }
+        .fullScreenCover(isPresented: $showingPaywall) {
+            PaywallView(isPresented: $showingPaywall)
+        }
         .sheet(isPresented: $showingAddReplacementSheet) {
             AddReplacementBottleView(originalWhiskey: whiskey)
         }
@@ -758,6 +843,24 @@ struct WhiskeyDetailView: View {
             WishlistToCollectionView(wishlistWhiskey: whiskey)
         }
         // Add an ID modifier to prevent duplicate initializations
+        .overlay(alignment: .center) {
+            if showingBottleViewTutorial {
+                BottleViewTutorialOverlay(
+                    step: $tutorialStep,
+                    onScrollTo: { sectionID in
+                        withAnimation(.easeInOut(duration: 0.4)) {
+                            scrollProxy.scrollTo(sectionID, anchor: .top)
+                        }
+                    },
+                    onDismiss: {
+                        hasSeenBottleViewTutorial = true
+                        showingBottleViewTutorial = false
+                        tutorialStep = 1
+                        HapticManager.shared.lightImpact()
+                    }
+                )
+            }
+        }
         .id(viewID)
         .onAppear {
             print("DEBUG: WhiskeyDetailView onAppear for \(whiskey.name ?? "unknown")")
@@ -781,13 +884,43 @@ struct WhiskeyDetailView: View {
             cleanupInvalidBottleInstances()
             locationManager.requestLocation()
             verifyBottleCounts()
+            if !hasSeenBottleViewTutorial && !whiskey.isWishlist {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    withAnimation(.easeInOut(duration: 0.4)) {
+                        scrollProxy.scrollTo("bottleCardsSection", anchor: .top)
+                    }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.45) {
+                        showingBottleViewTutorial = true
+                    }
+                }
+            }
+            if !whiskey.isWishlist && !hasSeenWebReviewsTip {
+                bottleDetailVisitCount += 1
+                if bottleDetailVisitCount >= 3 {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+                        withAnimation(.spring(response: 0.4)) {
+                            showingWebReviewsTip = true
+                        }
+                    }
+                }
+            }
         }
         .onDisappear {
             print("DEBUG: WhiskeyDetailView onDisappear for \(whiskey.name ?? "unknown")")
-            
+
             // Clean up the initialized views set when the view disappears
             if let id = whiskey.id?.uuidString {
                 Self.initializedViews.remove(id)
+            }
+        }
+        // onAppear doesn't re-fire when a sheet dismisses (view never left).
+        // Refresh the managed object as soon as the edit sheet closes so the
+        // detail view always shows the latest saved values.
+        .onChange(of: showingEditSheet) { isShowing in
+            if !isShowing {
+                if let context = whiskey.managedObjectContext {
+                    context.refresh(whiskey, mergeChanges: true)
+                }
             }
         }
         // Use the AlertManager's published property for the alert
@@ -815,8 +948,9 @@ struct WhiskeyDetailView: View {
         .onChange(of: whiskey) { _ in
             cleanupInvalidBottleInstances()
         }
+        } // end ScrollViewReader
     }
-    
+
     // Convert wishlist item to owned
     private func convertToOwned() {
         if whiskey.isWishlist {
@@ -2829,15 +2963,23 @@ struct BottleHistorySection: View {
                     isExpanded.toggle()
                 }
             }) {
-                HStack {
-                    Text("INVENTORY HISTORY")
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                    
+                HStack(alignment: .top) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("INVENTORY HISTORY")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                        if !isExpanded {
+                            Text("Purchases, opens, finishes & total investment")
+                                .font(.caption)
+                                .foregroundColor(.secondary.opacity(0.7))
+                        }
+                    }
+
                     Spacer()
-                    
+
                     Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
                         .foregroundColor(.secondary)
+                        .padding(.top, 2)
                 }
             }
             .buttonStyle(PlainButtonStyle())
@@ -3372,5 +3514,157 @@ struct BottleCardView: View {
         .background(Color(.systemBackground))
         .cornerRadius(10)
         .shadow(color: Color(.systemGray4), radius: 2, x: 0, y: 1)
+    }
+}
+
+// MARK: - Bottle View Tutorial Overlay
+
+private struct BottleViewTutorialOverlay: View {
+    @Binding var step: Int
+    var onScrollTo: (String) -> Void
+    var onDismiss: () -> Void
+
+    private struct TutorialStep {
+        let icon: String
+        let title: String
+        let rows: [(String, String)]
+    }
+
+    private let steps: [TutorialStep] = [
+        TutorialStep(
+            icon: "square.stack.3d.up.fill",
+            title: "Your Individual Bottles",
+            rows: [
+                ("1.circle.fill",  "Each physical bottle you own has its own card in the **Individual Bottles** section below."),
+                ("lock.open.fill", "Tap a card to mark it **Open** when you crack the seal."),
+                ("xmark.circle",   "When it's finished, mark it **Dead** — BarrelBook records the date you killed it.")
+            ]
+        ),
+        TutorialStep(
+            icon: "chart.bar.fill",
+            title: "Bottle History",
+            rows: [
+                ("clock.fill",          "BarrelBook automatically tracks the full lifecycle of every bottle you own."),
+                ("calendar.badge.plus", "It records when you added it, when you opened it, and when you finished it."),
+                ("chart.line.uptrend.xyaxis", "Over time you'll build a complete history — how fast you go through bottles, your opening patterns, and more.")
+            ]
+        ),
+        TutorialStep(
+            icon: "star.fill",
+            title: "Log a Tasting",
+            rows: [
+                ("plus.circle.fill", "Tap **Add Tasting** to record your rating, tasting notes, and flavor wheel profile."),
+                ("calendar",         "You can log multiple tastings per bottle — each is dated and saved independently."),
+                ("book.fill",        "Every tasting feeds into your **Journal** and builds your personal taste profile.")
+            ]
+        ),
+        TutorialStep(
+            icon: "note.text",
+            title: "Quick Notes",
+            rows: [
+                ("pencil",     "**Bottle Notes** are your personal scratchpad — storage location, gift ideas, cocktail uses."),
+                ("star.slash", "Unlike Tastings, notes aren't rated or dated. Think of them as sticky notes for the bottle.")
+            ]
+        ),
+        TutorialStep(
+            icon: "safari.fill",
+            title: "External Reviews",
+            rows: [
+                ("magnifyingglass",   "Tap **Search Web for Reviews** to find articles, reviews, and write-ups for this bottle."),
+                ("bookmark.fill",     "Save any page directly to the bottle — it stays attached here for easy reference."),
+                ("note.text.badge.plus", "Read what the experts say alongside your own tasting notes, all in one place.")
+            ]
+        )
+    ]
+
+    private var current: TutorialStep { steps[min(step - 1, steps.count - 1)] }
+    private var isLastStep: Bool { step >= steps.count }
+
+    var body: some View {
+        ZStack {
+            ColorManager.tutorialScrim
+                .ignoresSafeArea()
+                .onTapGesture { }
+            GeometryReader { geometry in
+                ScrollView {
+                    VStack(spacing: 0) {
+                        Spacer(minLength: 0)
+                        VStack(spacing: 20) {
+                            VStack(alignment: .leading, spacing: 16) {
+                                HStack {
+                                    Image(systemName: current.icon)
+                                        .font(.title2)
+                                        .foregroundColor(ColorManager.primaryBrandColor)
+                                    Text(current.title)
+                                        .font(.headline)
+                                    Spacer()
+                                    Text("Step \(step) of \(steps.count)")
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                }
+                                VStack(alignment: .leading, spacing: 10) {
+                                    ForEach(Array(current.rows.enumerated()), id: \.offset) { _, row in
+                                        tutorialRow(icon: row.0, text: row.1)
+                                    }
+                                }
+                                .font(.subheadline)
+                            }
+                            .padding(24)
+                            .background(Color(UIColor.secondarySystemBackground))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 16)
+                                    .stroke(ColorManager.tutorialCardBorder, lineWidth: 1)
+                            )
+                            .cornerRadius(16)
+                            .shadow(radius: 12)
+                            .padding(.horizontal, 24)
+
+                            Button(action: {
+                                if isLastStep {
+                                    onDismiss()
+                                } else {
+                                    advance()
+                                }
+                            }) {
+                                Text(isLastStep ? "Got it" : "Next")
+                                    .fontWeight(.semibold)
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 12)
+                            }
+                            .buttonStyle(.borderedProminent)
+                            .tint(ColorManager.primaryBrandColor)
+                            .padding(.horizontal, 24)
+                        }
+                        .padding()
+                        Spacer(minLength: 0)
+                    }
+                    .frame(minHeight: geometry.size.height)
+                }
+            }
+        }
+    }
+
+    private func advance() {
+        let next = step + 1
+        switch next {
+        case 2: onScrollTo("bottleHistorySection")
+        case 3: onScrollTo("tastingsSection")
+        case 4: onScrollTo("notesSection")
+        case 5: onScrollTo("externalContentSection")
+        default: break
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.45) {
+            step = next
+        }
+    }
+
+    private func tutorialRow(icon: String, text: String) -> some View {
+        HStack(alignment: .top, spacing: 10) {
+            Image(systemName: icon)
+                .foregroundColor(ColorManager.primaryBrandColor)
+                .font(.subheadline)
+            Text(LocalizedStringKey(text))
+                .fixedSize(horizontal: false, vertical: true)
+        }
     }
 }
