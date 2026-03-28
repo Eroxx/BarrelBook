@@ -289,6 +289,23 @@ struct DemoDataService {
                 OwnedSeed("Widow Jane 10 Year", "Bourbon", "Widow Jane", 91, 79.99,
                           [BottleState(false, false, daysAgoAdded: 16)],
                           age: "10"),
+
+                // REPLACEMENT DEMO — idx 47
+                // Killed 7 days ago, marked as wanting a replacement
+                OwnedSeed("Old Weller Antique 107", "Bourbon", "Buffalo Trace", 107, 29.99,
+                          [BottleState(true, true, daysAgoAdded: 120, daysAgoOpened: 80,
+                                       daysAgoFinished: 7)]),
+
+                // REPLACEMENT CHAIN — idx 48 (original) → idx 49 (replacement)
+                // Original Bulleit killed 45 days ago; replacement bottle bought shortly after
+                OwnedSeed("Bulleit 10 Year", "Bourbon", "Four Roses", 91.2, 44.99,
+                          [BottleState(true, true, daysAgoAdded: 150, daysAgoOpened: 100,
+                                       daysAgoFinished: 45)],
+                          age: "10"),
+
+                OwnedSeed("Bulleit 10 Year", "Bourbon", "Four Roses", 91.2, 47.99,
+                          [BottleState(false, false, daysAgoAdded: 40)],
+                          age: "10"),
             ]
 
             var ownedWhiskeys: [Whiskey] = []
@@ -331,6 +348,20 @@ struct DemoDataService {
                 }
                 w.updateFinishedStatus()
                 ownedWhiskeys.append(w)
+            }
+
+            // MARK: - Replacement Setup
+            // idx 47: Old Weller Antique — killed, wants a replacement
+            if ownedWhiskeys.count > 47 {
+                ownedWhiskeys[47].replacementStatus = "wantToReplace"
+            }
+            // idx 48 → 49: Bulleit 10 Year replacement chain
+            if ownedWhiskeys.count > 49 {
+                let original    = ownedWhiskeys[48]
+                let replacement = ownedWhiskeys[49]
+                original.replacedBy        = replacement
+                replacement.replaces       = original
+                replacement.replacementStatus = "isReplacement"
             }
 
             // MARK: - Wishlist
