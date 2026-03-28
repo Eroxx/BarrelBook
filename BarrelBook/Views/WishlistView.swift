@@ -1032,6 +1032,7 @@ private struct ReplacementsTutorialOverlay: View {
             Image(systemName: icon)
                 .foregroundColor(ColorManager.primaryBrandColor)
                 .font(.subheadline)
+                .frame(width: 20, alignment: .center)
             Text(LocalizedStringKey(text))
                 .fixedSize(horizontal: false, vertical: true)
         }
