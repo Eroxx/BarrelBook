@@ -672,16 +672,25 @@ struct WishlistView: View {
             }
         }
         .onChange(of: selectedTab) { newTab in
-            if newTab == 1 && !hasSeenReplacementsTutorial {
+            if newTab == 0 && !hasSeenWishlistTutorial {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                    showingWishlistTutorialOverlay = true
+                    wishlistTutorialStep = 1
+                }
+            } else if newTab == 1 && !hasSeenReplacementsTutorial {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                     showingReplacementsTutorial = true
                 }
             }
         }
         .onAppear {
-            if !hasSeenWishlistTutorial {
+            if selectedTab == 0 && !hasSeenWishlistTutorial {
                 showingWishlistTutorialOverlay = true
                 wishlistTutorialStep = 1
+            } else if selectedTab == 1 && !hasSeenReplacementsTutorial {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                    showingReplacementsTutorial = true
+                }
             }
 
             // Restore persisted sort config
