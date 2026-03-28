@@ -761,6 +761,7 @@ struct SettingsView: View {
             "hasSeenSortTutorial",
             "hasSeenStoresTutorialInAddWishlist",
             "hasSeenWishlistTutorial",
+            "hasSeenReplacementsTutorial",
             "hasSeenInfinityBottleTutorial",
             "hasSeenAddInfinityBottleTutorial",
             "hasSeenAddPourToInfinityBottleTutorial",

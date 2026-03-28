@@ -262,6 +262,8 @@ struct WishlistView: View {
     @AppStorage("hasSeenWishlistTutorial") private var hasSeenWishlistTutorial = false
     @State private var showingWishlistTutorialOverlay = false
     @State private var wishlistTutorialStep = 1
+    @AppStorage("hasSeenReplacementsTutorial") private var hasSeenReplacementsTutorial = false
+    @State private var showingReplacementsTutorial = false
     @State private var showingShareSheet = false
     @State private var shareActivityVC: UIActivityViewController?
     
@@ -493,6 +495,13 @@ struct WishlistView: View {
                     HapticManager.shared.lightImpact()
                 })
             }
+            if showingReplacementsTutorial {
+                ReplacementsTutorialOverlay(onDismiss: {
+                    hasSeenReplacementsTutorial = true
+                    showingReplacementsTutorial = false
+                    HapticManager.shared.lightImpact()
+                })
+            }
         }
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -660,6 +669,13 @@ struct WishlistView: View {
                 Button("OK", role: .cancel) { }
             } message: {
                 Text("Stores appear here when you add them to wishlist items. When adding or editing a bottle, use \"Where to Find\" to add one or more stores.")
+            }
+        }
+        .onChange(of: selectedTab) { newTab in
+            if newTab == 1 && !hasSeenReplacementsTutorial {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                    showingReplacementsTutorial = true
+                }
             }
         }
         .onAppear {
@@ -944,6 +960,81 @@ struct ReplacementRowView: View {
             }
         }
         .padding(.vertical, 4)
+    }
+}
+
+// MARK: - Replacements Tutorial Overlay
+private struct ReplacementsTutorialOverlay: View {
+    let onDismiss: () -> Void
+
+    var body: some View {
+        ZStack {
+            ColorManager.tutorialScrim
+                .ignoresSafeArea()
+                .onTapGesture { }
+            GeometryReader { geometry in
+                ScrollView {
+                    VStack(spacing: 0) {
+                        Spacer(minLength: 0)
+                        VStack(spacing: 20) {
+                            VStack(alignment: .leading, spacing: 16) {
+                                HStack {
+                                    Image(systemName: "arrow.triangle.2.circlepath")
+                                        .font(.title2)
+                                        .foregroundColor(ColorManager.primaryBrandColor)
+                                    Text("Replacement Hunting")
+                                        .font(.headline)
+                                    Spacer()
+                                }
+                                VStack(alignment: .leading, spacing: 10) {
+                                    tutorialRow(icon: "xmark.circle.fill",
+                                                text: "When you finish a bottle and want to find another, tap **Mark as Replacement** in that bottle's detail view — it lands here automatically.")
+                                    tutorialRow(icon: "arrow.left.arrow.right",
+                                                text: "This tab keeps your re-buys separate from new bottles you're hunting. These are bottles you already know and love.")
+                                    tutorialRow(icon: "cart.badge.plus",
+                                                text: "Once you find one, open the bottle detail and tap **Add Replacement Bottle** to log the new purchase and link it to the original.")
+                                    tutorialRow(icon: "clock.arrow.circlepath",
+                                                text: "BarrelBook connects the two bottles so you can see your full history — when you opened the original, when you killed it, and when the replacement arrived.")
+                                }
+                                .font(.subheadline)
+                            }
+                            .padding(24)
+                            .background(Color(UIColor.secondarySystemBackground))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 16)
+                                    .stroke(ColorManager.tutorialCardBorder, lineWidth: 1)
+                            )
+                            .cornerRadius(16)
+                            .shadow(radius: 12)
+                            .padding(.horizontal, 24)
+
+                            Button(action: onDismiss) {
+                                Text("Got it")
+                                    .fontWeight(.semibold)
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 12)
+                            }
+                            .buttonStyle(.borderedProminent)
+                            .tint(ColorManager.primaryBrandColor)
+                            .padding(.horizontal, 24)
+                        }
+                        .padding()
+                        Spacer(minLength: 0)
+                    }
+                    .frame(minHeight: geometry.size.height)
+                }
+            }
+        }
+    }
+
+    private func tutorialRow(icon: String, text: String) -> some View {
+        HStack(alignment: .top, spacing: 10) {
+            Image(systemName: icon)
+                .foregroundColor(ColorManager.primaryBrandColor)
+                .font(.subheadline)
+            Text(LocalizedStringKey(text))
+                .fixedSize(horizontal: false, vertical: true)
+        }
     }
 }
 
