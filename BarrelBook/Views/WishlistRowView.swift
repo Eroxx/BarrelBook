@@ -81,22 +81,19 @@ struct WishlistRowView: View {
                     .padding(.top, 2)
             }
 
-            // Store pills — anchored to leading edge
+            // Store pills — plain HStack so they align flush with rows above
             if let stores = whiskey.stores as? Set<Store>, !stores.isEmpty {
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 4) {
-                        ForEach(Array(stores).sorted { ($0.name ?? "") < ($1.name ?? "") }, id: \.self) { store in
-                            Text(store.name ?? "Unknown Store")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                                .padding(.horizontal, 6)
-                                .padding(.vertical, 2)
-                                .background(Color.secondary.opacity(0.1))
-                                .cornerRadius(4)
-                        }
+                HStack(spacing: 4) {
+                    ForEach(Array(stores).sorted { ($0.name ?? "") < ($1.name ?? "") }, id: \.self) { store in
+                        Text(store.name ?? "Unknown Store")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                            .padding(.horizontal, 6)
+                            .padding(.vertical, 2)
+                            .background(Color.secondary.opacity(0.1))
+                            .cornerRadius(4)
                     }
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
         .padding(.vertical, 4)
