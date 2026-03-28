@@ -58,6 +58,11 @@ REGULAR_FONTS = [
 # ── Screenshot manifest — ordered as they should appear in the App Store ───
 SCREENSHOTS = [
     {
+        "file":     "Paywall.png",
+        "headline": "Everything You\nNeed",
+        "subhead":  "Unlimited bottles, tasting notes,\nstatistics and more",
+    },
+    {
         "file":     "1 Collection.png",
         "headline": "Catalog Your\nEntire Shelf",
         "subhead":  "Track proof, price, distillery &\nspecial designations for every bottle",
@@ -68,7 +73,7 @@ SCREENSHOTS = [
         "subhead":  "Log ratings and tasting notes so\nevery pour is remembered",
     },
     {
-        "file":     "3 Flavor Wheel.png",
+        "file":     "3 flavor wheel.png",
         "headline": "Detail Every\nFlavor",
         "subhead":  "8 flavor categories, each with subflavors,\nto map nose, palate and finish precisely",
     },
