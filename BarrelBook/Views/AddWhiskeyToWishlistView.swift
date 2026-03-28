@@ -22,17 +22,20 @@ struct AddWhiskeyToWishlistView: View {
     @State private var showingStoreSelection = false
     @State private var bottleCount = 1
     @State private var showingAddAnother = false
+    @AppStorage("hasSeenStoresTutorialInAddWishlist") private var hasSeenStoresTutorialInAddWishlist = false
+    @State private var showingStoresTutorialOverlay = false
     
     // Removed location manager delegate - no longer auto-detecting stores
     
     var body: some View {
+        ZStack {
         NavigationView {
             Form {
                 // Removed auto-detected store section - users now manually select stores
                 
                 Section(header: Text("Basic Info")) {
                     TextField("Name", text: $name)
-                    TextField("Target Price", text: $targetPrice)
+                    TextField(selectedStores.isEmpty ? "Target Price" : "Price at Store", text: $targetPrice)
                         .keyboardType(.decimalPad)
                     Picker("Rarity", selection: $rarity) {
                         ForEach(WhiskeyRarity.allCases) { rarity in
@@ -190,6 +193,19 @@ struct AddWhiskeyToWishlistView: View {
                 } else {
                     Text("Would you like to add another bottle?")
                 }
+            }
+        }
+            if showingStoresTutorialOverlay {
+                StoresTutorialOverlay(onDismiss: {
+                    hasSeenStoresTutorialInAddWishlist = true
+                    showingStoresTutorialOverlay = false
+                    HapticManager.shared.lightImpact()
+                })
+            }
+        }
+        .onAppear {
+            if !hasSeenStoresTutorialInAddWishlist {
+                showingStoresTutorialOverlay = true
             }
         }
     }

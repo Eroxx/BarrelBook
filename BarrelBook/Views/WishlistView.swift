@@ -6,8 +6,8 @@ enum WishlistSortOption: String, CaseIterable, Codable {
     case nameAsc = "Name (A-Z)"
     case nameDesc = "Name (Z-A)"
     case priorityHigh = "Priority (High-Low)"
-    case targetPriceLow = "Target Price (Low-High)"
-    case targetPriceHigh = "Target Price (High-Low)"
+    case targetPriceLow = "Price (Low-High)"
+    case targetPriceHigh = "Price (High-Low)"
     case rarityLow = "Rarity (Low-High)"
     case rarityHigh = "Rarity (High-Low)"
 }
@@ -101,7 +101,7 @@ struct WishlistFilterView: View {
                     }
                 }
                 
-                Section("Target Price Range") {
+                Section("Price Range") {
                     HStack {
                         Text("$\(Int(targetPriceRange.lowerBound))")
                         Spacer()

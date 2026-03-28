@@ -374,7 +374,8 @@ struct WhiskeyDetailView: View {
                         }
                         
                         if whiskey.isWishlist && whiskey.targetPrice > 0 {
-                            DetailRow(label: "Target Price", value: String(format: "$%.2f", whiskey.targetPrice))
+                            let hasStores = (whiskey.stores as? Set<Store>)?.isEmpty == false
+                            DetailRow(label: hasStores ? "Price" : "Target Price", value: String(format: "$%.2f", whiskey.targetPrice))
                         }
                         
                         // Add price information only if price is greater than 0

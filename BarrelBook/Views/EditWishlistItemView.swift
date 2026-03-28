@@ -48,7 +48,7 @@ struct EditWishlistItemView: View {
             Form {
                 Section(header: Text("Basic Info")) {
                     TextField("Name", text: $name)
-                    TextField("Target Price", text: $targetPrice)
+                    TextField(selectedStores.isEmpty ? "Target Price" : "Price at Store", text: $targetPrice)
                         .keyboardType(.decimalPad)
                     Picker("Rarity", selection: $rarity) {
                         ForEach(WhiskeyRarity.allCases) { rarity in

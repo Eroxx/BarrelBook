@@ -18,10 +18,16 @@ struct WishlistRowView: View {
 
                 VStack(alignment: .trailing, spacing: 3) {
                     if whiskey.targetPrice > 0.0 {
+                        let hasStores = (whiskey.stores as? Set<Store>)?.isEmpty == false
                         Text("$\(String(format: "%.2f", whiskey.targetPrice))")
                             .font(.subheadline)
                             .fontWeight(.semibold)
                             .foregroundColor(ColorManager.primaryBrandColor)
+                        if !hasStores {
+                            Text("target")
+                                .font(.caption2)
+                                .foregroundColor(.secondary)
+                        }
                     }
                     if whiskey.priority > 0 {
                         PriorityStarsView(priority: Int(whiskey.priority))
