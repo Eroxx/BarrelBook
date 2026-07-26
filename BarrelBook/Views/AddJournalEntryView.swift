@@ -3,11 +3,19 @@ import SwiftUI
 struct AddJournalEntryView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.dismiss) private var dismiss
+    @StateObject private var subscriptionManager = SubscriptionManager.shared
+    @State private var showingPaywall = false
     
     @FetchRequest(
         sortDescriptors: [NSSortDescriptor(keyPath: \Whiskey.name, ascending: true)],
         animation: .default)
     private var whiskeys: FetchedResults<Whiskey>
+    
+    // Fetch all journal entries to check free-tier limit
+    @FetchRequest(
+        sortDescriptors: [NSSortDescriptor(keyPath: \JournalEntry.date, ascending: false)],
+        animation: .default)
+    private var allJournalEntries: FetchedResults<JournalEntry>
     
     @State private var selectedWhiskey: Whiskey?
     @State private var date: Date = Date()
@@ -78,7 +86,7 @@ struct AddJournalEntryView: View {
                 }
                 
                 Section(header: Text("Basic Info")) {
-                    DatePicker("Date", selection: $date, displayedComponents: [.date])
+                    DatePicker("Date & Time", selection: $date, displayedComponents: [.date, .hourAndMinute])
                     
                     VStack(alignment: .leading) {
                         Text("Overall Rating")
@@ -180,7 +188,11 @@ struct AddJournalEntryView: View {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Save") {
                         HapticManager.shared.mediumImpact()
-                        saveEntry()
+                        if subscriptionManager.canAddTasting(currentCount: allJournalEntries.count) {
+                            saveEntry()
+                        } else {
+                            showingPaywall = true
+                        }
                     }
                     .disabled(selectedWhiskey == nil)
                 }
@@ -188,6 +200,9 @@ struct AddJournalEntryView: View {
             .sheet(isPresented: $showingWhiskeySelection) {
                 WhiskeySelectionView(selectedWhiskey: $selectedWhiskey)
             }
+        }
+        .fullScreenCover(isPresented: $showingPaywall) {
+            PaywallView(isPresented: $showingPaywall)
         }
     }
     
@@ -224,23 +239,8 @@ struct AddJournalEntryView: View {
             let newEntry = JournalEntry(context: viewContext)
             newEntry.id = UUID()
             
-            // Ensure date is saved in the correct time zone
-            // Create a date with just the date components from the selected date
-            // but using the current time in the user's time zone
-            let calendar = Calendar.current
-            let dateComponents = calendar.dateComponents([.year, .month, .day], from: date)
-            let timeComponents = calendar.dateComponents([.hour, .minute, .second], from: Date())
-            
-            var fullComponents = DateComponents()
-            fullComponents.year = dateComponents.year
-            fullComponents.month = dateComponents.month
-            fullComponents.day = dateComponents.day
-            fullComponents.hour = timeComponents.hour
-            fullComponents.minute = timeComponents.minute
-            fullComponents.second = timeComponents.second
-            fullComponents.timeZone = TimeZone.current
-            
-            newEntry.date = calendar.date(from: fullComponents) ?? date
+            // Use the date/time from the standard DatePicker as-is
+            newEntry.date = date
             newEntry.modificationDate = Date() // Add modification date
             
             // Only set non-empty values to avoid nil reference issues

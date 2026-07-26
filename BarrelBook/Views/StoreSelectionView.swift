@@ -418,10 +418,28 @@ struct StoreSelectionView: View {
     }
     
     private func createStore(from mapItem: MKMapItem) {
+        let name = (mapItem.name ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+        let address = (mapItem.placemark.title ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        // Reuse existing store if same name and address so favorites never duplicate
+        let request = Store.fetchRequest()
+        request.predicate = NSPredicate(format: "name == %@ AND address == %@", name, address)
+        request.fetchLimit = 1
+        do {
+            let existing = try viewContext.fetch(request)
+            if let existingStore = existing.first {
+                onStoreSelected(existingStore)
+                dismiss()
+                return
+            }
+        } catch {
+            print("Error checking for existing store: \(error)")
+        }
+        
         let store = Store(context: viewContext)
         store.id = UUID()
-        store.name = mapItem.name
-        store.address = mapItem.placemark.title
+        store.name = name.isEmpty ? nil : name
+        store.address = address.isEmpty ? nil : address
         store.latitude = mapItem.placemark.coordinate.latitude
         store.longitude = mapItem.placemark.coordinate.longitude
         store.modificationDate = Date()
@@ -432,6 +450,79 @@ struct StoreSelectionView: View {
             dismiss()
         } catch {
             print("Error saving store: \(error)")
+        }
+    }
+}
+
+// MARK: - Stores tutorial (first-time overlay; used from Add to Wishlist and Wishlist store picker)
+
+struct StoresTutorialOverlay: View {
+    var onDismiss: () -> Void
+    /// When true (e.g. embedded as Wishlist tutorial step 2), do not draw our own scrim so the parent’s scrim is used and both steps match.
+    var useParentScrim: Bool = false
+    
+    var body: some View {
+        if !useParentScrim {
+            ColorManager.tutorialScrim
+                .ignoresSafeArea()
+                .onTapGesture { }
+        }
+        GeometryReader { geometry in
+            ScrollView {
+                VStack(spacing: 0) {
+                    Spacer(minLength: 0)
+                    VStack(spacing: 20) {
+                        VStack(alignment: .leading, spacing: 16) {
+                            HStack {
+                                Image(systemName: "storefront.circle.fill")
+                        .font(.title2)
+                        .foregroundColor(ColorManager.primaryBrandColor)
+                    Text("How Stores work")
+                        .font(.headline)
+                }
+                VStack(alignment: .leading, spacing: 10) {
+                    storesTutorialRow(icon: "1.circle.fill", text: "Stores are where you might find this bottle — optional but helpful for tracking.")
+                    storesTutorialRow(icon: "2.circle.fill", text: "Choose **No Store Selected** if you don’t have a store in mind, or search / use nearby to pick one or more.")
+                    storesTutorialRow(icon: "3.circle.fill", text: "You can add multiple stores per wishlist item; tap **Add Another Store** back on the form after picking one.")
+                    storesTutorialRow(icon: "star.fill", text: "Stores you mark as favorites (in Settings) show under **Nearby Favorite Stores** when you’re close.")
+                }
+                .font(.subheadline)
+            }
+            .padding(24)
+            .background(Color(UIColor.secondarySystemBackground))
+            .overlay(
+                RoundedRectangle(cornerRadius: 16)
+                    .stroke(ColorManager.tutorialCardBorder, lineWidth: 1)
+            )
+            .cornerRadius(16)
+            .shadow(radius: 12)
+            .padding(.horizontal, 24)
+            Button(action: onDismiss) {
+                Text("Got it")
+                    .fontWeight(.semibold)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 12)
+            }
+            .buttonStyle(.borderedProminent)
+            .tint(ColorManager.primaryBrandColor)
+            .padding(.horizontal, 24)
+                    }
+                    .padding()
+                    Spacer(minLength: 0)
+                }
+                .frame(minHeight: geometry.size.height)
+            }
+            .padding()
+        }
+    }
+    
+    private func storesTutorialRow(icon: String, text: String) -> some View {
+        HStack(alignment: .top, spacing: 10) {
+            Image(systemName: icon)
+                .foregroundColor(ColorManager.primaryBrandColor)
+                .font(.subheadline)
+            Text(LocalizedStringKey(text))
+                .fixedSize(horizontal: false, vertical: true)
         }
     }
 }

@@ -111,30 +111,33 @@ struct WhiskeyRowView: View {
             if whiskey.isBiB || whiskey.isSiB || whiskey.isStorePick || whiskey.isFinished > 0 || whiskey.activeBottleCount > 1 || (whiskey.activeBottleCount > 0 && whiskey.deadBottleCount > 0) {
                 HStack(spacing: 4) {
                     if whiskey.isBiB {
+                        // BiB — lowest prestige tier: muted warm tan
                         Text("BiB")
                             .font(.caption)
                             .padding(.horizontal, 6)
                             .padding(.vertical, 2)
-                            .background(Color.blue.opacity(0.1))
-                            .foregroundColor(.blue)
+                            .background(Color(red: 0.50, green: 0.35, blue: 0.10).opacity(0.15))
+                            .foregroundColor(Color(red: 0.50, green: 0.35, blue: 0.10))
                             .clipShape(Capsule())
                     }
                     if whiskey.isSiB {
+                        // SiB — mid prestige: bronze/dark amber
                         Text("SiB")
                             .font(.caption)
                             .padding(.horizontal, 6)
                             .padding(.vertical, 2)
-                            .background(Color.purple.opacity(0.1))
-                            .foregroundColor(.purple)
+                            .background(Color(red: 0.65, green: 0.42, blue: 0.05).opacity(0.15))
+                            .foregroundColor(Color(red: 0.65, green: 0.42, blue: 0.05))
                             .clipShape(Capsule())
                     }
                     if whiskey.isStorePick {
+                        // SP — highest prestige: rich amber (app accent family)
                         Text("SP")
                             .font(.caption)
                             .padding(.horizontal, 6)
                             .padding(.vertical, 2)
-                            .background(Color.green.opacity(0.1))
-                            .foregroundColor(.green)
+                            .background(Color(red: 0.85, green: 0.55, blue: 0.05).opacity(0.15))
+                            .foregroundColor(Color(red: 0.85, green: 0.55, blue: 0.05))
                             .clipShape(Capsule())
                     }
                     

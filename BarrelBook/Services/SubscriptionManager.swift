@@ -78,8 +78,8 @@ class SubscriptionManager: ObservableObject {
     }
     
     // Free tier limits
-    private let freeWhiskeyLimit = 10
-    private let freeTastingLimitPerMonth = 5
+    private let freeWhiskeyLimit = 5
+    private let freeTastingLimit = 2
     
     // Purchase states
     enum PurchaseState: Equatable {
@@ -88,6 +88,13 @@ class SubscriptionManager: ObservableObject {
         case purchased
         case failed(String)
         case deferred
+    }
+    
+    /// Explicit result for Restore Purchases so UI can distinguish success / nothing / failure.
+    enum RestoreResult: Equatable {
+        case restored
+        case nothingFound
+        case failed(String)
     }
     
     private var updateListenerTask: Task<Void, Error>? = nil
@@ -134,38 +141,38 @@ class SubscriptionManager: ObservableObject {
         return currentCount < freeWhiskeyLimit
     }
     
-    /// Check if user can add more tastings this month (premium users have unlimited, free users have monthly limit)
-    func canAddTastingThisMonth(currentMonthCount: Int) -> Bool {
+    /// Check if user can add more tasting notes (premium users have unlimited, free users have a total limit)
+    func canAddTasting(currentCount: Int) -> Bool {
         if hasAccess {
-            return true // Premium users have unlimited
+            return true
         }
-        return currentMonthCount < freeTastingLimitPerMonth
+        return currentCount < freeTastingLimit
     }
-    
+
     /// Get remaining whiskey slots for free users
     func remainingWhiskeySlots(currentCount: Int) -> Int {
         if hasAccess {
-            return Int.max // Unlimited for premium
+            return Int.max
         }
         return max(0, freeWhiskeyLimit - currentCount)
     }
-    
-    /// Get remaining tasting slots for this month for free users
-    func remainingTastingSlots(currentMonthCount: Int) -> Int {
+
+    /// Get remaining tasting slots for free users
+    func remainingTastingSlots(currentCount: Int) -> Int {
         if hasAccess {
-            return Int.max // Unlimited for premium
+            return Int.max
         }
-        return max(0, freeTastingLimitPerMonth - currentMonthCount)
+        return max(0, freeTastingLimit - currentCount)
     }
-    
+
     /// Get whiskey limit for free tier
     var whiskeyLimit: Int {
         return freeWhiskeyLimit
     }
-    
-    /// Get monthly tasting limit for free tier
-    var monthlyTastingLimit: Int {
-        return freeTastingLimitPerMonth
+
+    /// Get tasting limit for free tier
+    var tastingLimit: Int {
+        return freeTastingLimit
     }
     
     /// One-time purchase: no trial; kept for compatibility (always 0).
@@ -326,18 +333,53 @@ class SubscriptionManager: ObservableObject {
         }
     }
     
-    /// Restore purchases
-    func restorePurchases() async {
+    /// Restore purchases. Returns an explicit result for UI alerts (does not swallow AppStore.sync errors).
+    @discardableResult
+    func restorePurchases() async -> RestoreResult {
         await MainActor.run {
             self.purchaseState = .purchasing
         }
         
-        try? await AppStore.sync()
+        do {
+            try await AppStore.sync()
+        } catch {
+            let message = userFacingRestoreError(error)
+            await MainActor.run {
+                // Stay idle so purchase-error UI isn't triggered alongside restore-specific alerts
+                self.purchaseState = .idle
+            }
+            return .failed(message)
+        }
+        
         await updateSubscriptionStatus()
         
-        await MainActor.run {
-            self.purchaseState = .idle
+        if hasAccess {
+            await MainActor.run {
+                self.purchaseState = .purchased
+            }
+            return .restored
+        } else {
+            await MainActor.run {
+                self.purchaseState = .idle
+            }
+            return .nothingFound
         }
+    }
+    
+    private func userFacingRestoreError(_ error: Error) -> String {
+        let nsError = error as NSError
+        // StoreKit / App Store sync cancelled by user
+        if nsError.domain == "ASDErrorDomain", nsError.code == 509 {
+            return "Restore was cancelled."
+        }
+        if nsError.localizedDescription.lowercased().contains("cancel") {
+            return "Restore was cancelled."
+        }
+        if nsError.localizedDescription.lowercased().contains("network")
+            || nsError.localizedDescription.lowercased().contains("internet") {
+            return "Network error while restoring. Check your connection and try again."
+        }
+        return "Could not restore purchases: \(error.localizedDescription)"
     }
     
     /// Update entitlement status from StoreKit (one-time purchase: check for completed transaction).

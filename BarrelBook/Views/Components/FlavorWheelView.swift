@@ -50,6 +50,7 @@ struct FlavorWheelView: View {
     var phase: TastingPhase
     @State private var selectedCategory: FlavorCategory?
     @State private var showingSubflavorPicker = false
+    @Environment(\.colorScheme) private var colorScheme
 
     private func wheelSize(for geometry: GeometryProxy) -> CGFloat {
         let available = min(geometry.size.width - 32, geometry.size.height - 140)
@@ -108,7 +109,12 @@ struct FlavorWheelView: View {
         }
     }
 
-    private static let cardBG  = Color(red: 0.96, green: 0.92, blue: 0.86) // warm parchment
+    /// Warm parchment in light mode; a deep warm charcoal in dark mode.
+    private var cardBG: Color {
+        colorScheme == .dark
+            ? Color(red: 0.13, green: 0.10, blue: 0.07)
+            : Color(red: 0.96, green: 0.92, blue: 0.86)
+    }
     private static let wheelBG = Color(red: 0.09, green: 0.06, blue: 0.02) // dark bourbon centre
 
     var body: some View {
@@ -126,9 +132,9 @@ struct FlavorWheelView: View {
                 }
             }
             .frame(width: geometry.size.width, height: geometry.size.height)
-            .background(Self.cardBG)
+            .background(cardBG)
         }
-        .listRowBackground(Self.cardBG)
+        .listRowBackground(cardBG)
         .listRowInsets(EdgeInsets())
         .sheet(isPresented: Binding(
             get: { showingSubflavorPicker && selectedCategory != nil },
@@ -195,12 +201,12 @@ struct FlavorWheelView: View {
             if flavors.isEmpty {
                 Text("Tap on wheel segments to add flavors")
                     .font(.subheadline)
-                    .foregroundColor(Color(red: 0.40, green: 0.25, blue: 0.08).opacity(0.70))
+                    .foregroundColor(.secondary)
                     .padding(.horizontal)
             } else {
                 Text("Selected Flavors")
                     .font(.headline)
-                    .foregroundColor(Color(red: 0.30, green: 0.18, blue: 0.04))
+                    .foregroundColor(.primary)
                     .padding(.horizontal)
                 ScrollView(.horizontal, showsIndicators: false) {
                     LazyHStack(spacing: 8) {

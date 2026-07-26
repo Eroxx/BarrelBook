@@ -2574,7 +2574,20 @@ Know thy shelf - Eric
     
     private func restorePurchasesFromSettings() {
         Task {
-            await subscriptionManager.restorePurchases()
+            let result = await subscriptionManager.restorePurchases()
+            await MainActor.run {
+                switch result {
+                case .restored:
+                    successMessage = "Premium purchase restored."
+                    showingSuccess = true
+                case .nothingFound:
+                    errorMessage = "No previous BarrelBook Premium purchase was found for this Apple ID."
+                    showingError = true
+                case .failed(let message):
+                    errorMessage = message
+                    showingError = true
+                }
+            }
         }
     }
 }

@@ -6,27 +6,54 @@ import BackgroundTasks
 struct BarrelBookApp: App {
     // Add AppDelegate to handle system events
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
-    
+
+    // Read the stored preference here so .preferredColorScheme is applied
+    // at the very top of the view hierarchy — before any tab's NavigationView
+    // is initialised — which fixes dark-mode not applying on first Statistics load.
+    @AppStorage("colorScheme") private var storedColorScheme: AppColorScheme = .system
+
+    private var preferredScheme: ColorScheme? {
+        switch storedColorScheme {
+        case .light:  return .light
+        case .dark:   return .dark
+        case .system: return nil
+        }
+    }
+
     let persistenceController = PersistenceController.shared
-    
+
     init() {
         // Reset sync state first
         CSVSyncService.shared.resetSyncState()
-        
+
         // Restore CSV sync settings when app launches
         DispatchQueue.main.async {
             CSVSyncService.shared.restoreSyncSettingsOnAppLaunch()
         }
     }
-    
+
     var body: some Scene {
         WindowGroup {
             DeviceAdaptiveContentView()
                 .environment(\.managedObjectContext, persistenceController.container.viewContext)
+                .accentColor(ColorManager.primaryBrandColor)
+                .preferredColorScheme(preferredScheme)
                 .onAppear {
-                    // Set up addedDate for existing whiskeys first
+                    applyUIKitColorScheme()
                     setupAddedDateForExistingWhiskeys()
                 }
+        }
+    }
+
+    /// Belt-and-suspenders: also set UIKit's window style so that
+    /// UINavigationController bars (NavigationView) respect the preference.
+    private func applyUIKitColorScheme() {
+        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+              let window = windowScene.windows.first else { return }
+        switch storedColorScheme {
+        case .light:  window.overrideUserInterfaceStyle = .light
+        case .dark:   window.overrideUserInterfaceStyle = .dark
+        case .system: window.overrideUserInterfaceStyle = .unspecified
         }
     }
     
@@ -87,13 +114,17 @@ class PersistenceController {
     }()
     
     let container: NSPersistentCloudKitContainer
-    private var lastProcessedToken: String?
+    /// Persisted as binary Data via NSKeyedArchiver — never as a UTF-8 String.
+    private var lastHistoryToken: NSPersistentHistoryToken?
+    private let historyTokenDefaultsKey = "BarrelBook.persistentHistoryToken"
+    private let legacyHistoryTokenDefaultsKey = "lastProcessedToken"
+    private let historyTokenQueue = DispatchQueue(label: "com.ericlinder.barrelbook.historyToken")
     
     init(inMemory: Bool = false) {
         container = NSPersistentCloudKitContainer(name: "BarrelBook")
         
         if inMemory {
-            container.persistentStoreDescriptions.first!.url = URL(fileURLWithPath: "/dev/null")
+            container.persistentStoreDescriptions.first?.url = URL(fileURLWithPath: "/dev/null")
         }
         
         // Configure persistent store options
@@ -104,7 +135,7 @@ class PersistenceController {
         // Enable CloudKit sync
         description.setOption(true as NSNumber, forKey: NSPersistentStoreRemoteChangeNotificationPostOptionKey)
         description.setOption(true as NSNumber, forKey: NSPersistentHistoryTrackingKey)
-        description.cloudKitContainerOptions = NSPersistentCloudKitContainerOptions(containerIdentifier: "iCloud.com.ericlinder.barrelbook")
+        description.cloudKitContainerOptions = NSPersistentCloudKitContainerOptions(containerIdentifier: "iCloud.com.ericlinder.barrelbookapp")
         
         // Load the persistent stores
         container.loadPersistentStores { description, error in
@@ -119,45 +150,107 @@ class PersistenceController {
         
         // Set up CloudKit sync callbacks
         container.viewContext.transactionAuthor = "app"
+        loadHistoryToken()
         setupCloudKitSync()
     }
     
+    /// Load history token from UserDefaults (Data). Clears invalid legacy string values.
+    private func loadHistoryToken() {
+        // Migration: discard old string-based tokens that could never round-trip binary archives
+        if UserDefaults.standard.object(forKey: legacyHistoryTokenDefaultsKey) != nil {
+            UserDefaults.standard.removeObject(forKey: legacyHistoryTokenDefaultsKey)
+        }
+        if UserDefaults.standard.object(forKey: historyTokenDefaultsKey) is String {
+            UserDefaults.standard.removeObject(forKey: historyTokenDefaultsKey)
+        }
+        
+        guard let data = UserDefaults.standard.data(forKey: historyTokenDefaultsKey) else { return }
+        do {
+            lastHistoryToken = try NSKeyedUnarchiver.unarchivedObject(
+                ofClass: NSPersistentHistoryToken.self,
+                from: data
+            )
+        } catch {
+            print("⚠️ Failed to decode history token, clearing: \(error)")
+            UserDefaults.standard.removeObject(forKey: historyTokenDefaultsKey)
+            lastHistoryToken = nil
+        }
+    }
+    
+    private func saveHistoryToken(_ token: NSPersistentHistoryToken) {
+        historyTokenQueue.sync {
+            lastHistoryToken = token
+            do {
+                let data = try NSKeyedArchiver.archivedData(withRootObject: token, requiringSecureCoding: true)
+                UserDefaults.standard.set(data, forKey: historyTokenDefaultsKey)
+            } catch {
+                print("⚠️ Failed to archive history token: \(error)")
+            }
+        }
+    }
+    
+    private func currentHistoryToken() -> NSPersistentHistoryToken? {
+        historyTokenQueue.sync { lastHistoryToken }
+    }
+    
     private func setupCloudKitSync() {
-        // Enable remote notifications for CloudKit changes
+        // Remote store changes: process persistent history (token stored as Data, not UTF-8 String)
         NotificationCenter.default.addObserver(
             forName: .NSPersistentStoreRemoteChange,
             object: container.persistentStoreCoordinator,
-            queue: .main
-        ) { [weak self] notification in
-            guard let self = self,
-                  let userInfo = notification.userInfo,
-                  let historyToken = userInfo["historyToken"] as? NSPersistentHistoryToken,
-                  let tokenData = try? NSKeyedArchiver.archivedData(withRootObject: historyToken, requiringSecureCoding: true),
-                  let tokenString = String(data: tokenData, encoding: .utf8)
-            else {
-                return
-            }
-            
-            // Skip if we've already processed this token
-            if tokenString == self.lastProcessedToken {
-                return
-            }
-            
-            self.lastProcessedToken = tokenString
-            print("📱 Processing CloudKit changes")
-            
-            // Refresh the view context
-            self.container.viewContext.refreshAllObjects()
-            
-            // Mark sync as successful
-            self.isSyncing = false
-            self.lastSyncAttempt = Date()
+            queue: nil
+        ) { [weak self] _ in
+            self?.processPersistentHistory()
         }
         
-        // Add periodic sync check
+        // Periodic fallback sync check
         Timer.scheduledTimer(withTimeInterval: 60, repeats: true) { [weak self] _ in
             self?.checkAndRetrySync()
         }
+    }
+    
+    /// Fetch and apply persistent history since the last stored token, then refresh the UI context.
+    private func processPersistentHistory() {
+        let backgroundContext = container.newBackgroundContext()
+        backgroundContext.perform { [weak self] in
+            guard let self = self else { return }
+            
+            let token = self.currentHistoryToken()
+            let request = NSPersistentHistoryChangeRequest.fetchHistory(after: token)
+            
+            do {
+                guard let result = try backgroundContext.execute(request) as? NSPersistentHistoryResult,
+                      let transactions = result.result as? [NSPersistentHistoryTransaction] else {
+                    DispatchQueue.main.async {
+                        self.finishSyncRefresh()
+                    }
+                    return
+                }
+                
+                if let newToken = transactions.last?.token {
+                    self.saveHistoryToken(newToken)
+                }
+                
+                DispatchQueue.main.async {
+                    if !transactions.isEmpty {
+                        print("📱 Processed \(transactions.count) CloudKit history transaction(s)")
+                    }
+                    self.finishSyncRefresh()
+                }
+            } catch {
+                print("❌ Error processing persistent history: \(error)")
+                DispatchQueue.main.async {
+                    // Still refresh so auto-merged changes appear in the UI
+                    self.finishSyncRefresh()
+                }
+            }
+        }
+    }
+    
+    private func finishSyncRefresh() {
+        container.viewContext.refreshAllObjects()
+        isSyncing = false
+        lastSyncAttempt = Date()
     }
     
     private func checkAndRetrySync() {
@@ -170,17 +263,12 @@ class PersistenceController {
             guard timeSinceLastAttempt > maxSyncRetryInterval else { return }
         }
         
-        // Attempt to sync
         isSyncing = true
         print("🔄 Attempting to sync with CloudKit...")
         
-        // Force a refresh of all objects
-        container.viewContext.refreshAllObjects()
-        
-        // Ensure sync is enabled
         container.viewContext.automaticallyMergesChangesFromParent = true
         
-        // Save any pending changes
+        // Save any pending local changes so they can upload
         if container.viewContext.hasChanges {
             do {
                 try container.viewContext.save()
@@ -189,12 +277,26 @@ class PersistenceController {
                 print("❌ Error saving changes during sync attempt: \(error)")
             }
         }
+        
+        processPersistentHistory()
     }
     
     func forceSync() {
         isSyncing = true
         lastSyncAttempt = Date()
-        checkAndRetrySync()
+        container.viewContext.automaticallyMergesChangesFromParent = true
+        
+        // Push local changes first, then pull/process remote history
+        if container.viewContext.hasChanges {
+            do {
+                try container.viewContext.save()
+                print("✅ Saved pending changes before force sync")
+            } catch {
+                print("❌ Error saving before force sync: \(error)")
+            }
+        }
+        
+        processPersistentHistory()
     }
     
     func save() {

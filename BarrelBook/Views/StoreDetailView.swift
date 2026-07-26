@@ -33,6 +33,23 @@ struct StoreDetailView: View {
     
     private func toggleFavorite() {
         withAnimation {
+            if !store.isFavorite {
+                // Adding to favorites: ensure no other favorite has same name/address
+                let name = (store.name ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+                let address = (store.address ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+                let request = Store.fetchRequest()
+                request.predicate = NSPredicate(format: "isFavorite == YES AND name == %@ AND address == %@", name, address)
+                request.fetchLimit = 2
+                do {
+                    let existing = try viewContext.fetch(request)
+                    let otherExists = existing.contains { $0.objectID != store.objectID }
+                    if otherExists {
+                        return // Already a favorite with this name/address
+                    }
+                } catch {
+                    return
+                }
+            }
             store.isFavorite.toggle()
             do {
                 try viewContext.save()

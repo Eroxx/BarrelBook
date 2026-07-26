@@ -213,6 +213,9 @@ struct AddWhiskeyView: View {
         if let v = data.proof,       proof.isEmpty  { proof  = v }
         if let v = data.age,         age.isEmpty    { age    = v }
         if let v = data.finish,      finish.isEmpty { finish = v }
+        // Only turn attributes on when detected — never clear a toggle the user already set
+        if data.isBiB { isBiB = true }
+        if data.isSiB { isSiB = true }
     }
 
     // Helper function to normalize whiskey type and prevent duplicates

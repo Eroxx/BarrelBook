@@ -9,6 +9,9 @@ struct iPadDashboardView: View {
     @State private var showingAddWishlist = false
     @State private var showingAddJournal = false
     @State private var selectedJournalEntry: JournalEntry?
+    @State private var selectedWhiskey: Whiskey?
+    @State private var whiskeyToEdit: Whiskey?
+    @State private var selectedInfinityBottle: InfinityBottle?
     
     // Fetch recently added whiskeys
     @FetchRequest(
@@ -95,7 +98,7 @@ struct iPadDashboardView: View {
                                         // Collection Value Card
                                         QuickStatView(
                                             title: "Collection Value",
-                                            value: formatCurrency(getTotalValue()),
+                                            value: AppFormatters.formatCurrency(getTotalValue()),
                                             icon: "dollarsign.circle.fill",
                                             color: .green
                                         )
@@ -133,8 +136,7 @@ struct iPadDashboardView: View {
                                             ForEach(Array(recentWhiskeys.prefix(15)), id: \.id) { whiskey in
                                                 RecentActivityRow(whiskey: whiskey)
                                                     .onTapGesture {
-                                                        selectedTab = .collection
-                                                        // In a full implementation, we'd navigate to the detail view
+                                                        selectedWhiskey = whiskey
                                                     }
                                             }
                                         }
@@ -182,20 +184,18 @@ struct iPadDashboardView: View {
                                             ForEach(Array(wishlistWhiskeys.prefix(15)), id: \.id) { whiskey in
                                                 DashboardWishlistItemRow(whiskey: whiskey)
                                                     .onTapGesture {
-                                                        // Navigate to whiskey detail
-                                                        selectedTab = .wishlist
-                                                        // In a full implementation, you would pass the whiskey.id to open details
+                                                        selectedWhiskey = whiskey
                                                     }
                                                     .contextMenu {
-                                                        Button(action: {
-                                                            // Add code to mark as acquired
-                                                        }) {
+                                                        Button {
+                                                            markAsAcquired(whiskey)
+                                                        } label: {
                                                             Label("Mark as Acquired", systemImage: "checkmark.circle")
                                                         }
                                                         
-                                                        Button(action: {
-                                                            // Add code to edit wishlist item
-                                                        }) {
+                                                        Button {
+                                                            whiskeyToEdit = whiskey
+                                                        } label: {
                                                             Label("Edit", systemImage: "pencil")
                                                         }
                                                     }
@@ -217,6 +217,9 @@ struct iPadDashboardView: View {
                                 HStack(spacing: 20) {
                                     ForEach(infinityBottles, id: \.id) { bottle in
                                         InfinityBottleCard(infinityBottle: bottle)
+                                            .onTapGesture {
+                                                selectedInfinityBottle = bottle
+                                            }
                                     }
                                 }
                                 .padding(.horizontal)
@@ -239,6 +242,63 @@ struct iPadDashboardView: View {
                             }
                         }
                     }
+            }
+        }
+        .sheet(item: $selectedWhiskey) { whiskey in
+            NavigationView {
+                WhiskeyDetailView(whiskey: whiskey)
+                    .navigationBarTitleDisplayMode(.inline)
+                    .toolbar {
+                        ToolbarItem(placement: .navigationBarTrailing) {
+                            Button("Done") {
+                                selectedWhiskey = nil
+                            }
+                        }
+                    }
+            }
+        }
+        .sheet(item: $whiskeyToEdit) { whiskey in
+            EditWishlistItemView(whiskey: whiskey)
+        }
+        .sheet(item: $selectedInfinityBottle) { bottle in
+            NavigationView {
+                InfinityBottleDetailView(bottle: bottle)
+                    .environment(\.managedObjectContext, viewContext)
+                    .navigationBarTitleDisplayMode(.inline)
+                    .toolbar {
+                        ToolbarItem(placement: .navigationBarLeading) {
+                            Button("Done") {
+                                selectedInfinityBottle = nil
+                            }
+                        }
+                    }
+            }
+        }
+        .sheet(isPresented: $showingAddWhiskey) {
+            AddWhiskeyView()
+                .environment(\.managedObjectContext, viewContext)
+        }
+        .sheet(isPresented: $showingAddWishlist) {
+            AddWhiskeyToWishlistView()
+                .environment(\.managedObjectContext, viewContext)
+        }
+        .sheet(isPresented: $showingAddJournal) {
+            AddJournalEntryView()
+                .environment(\.managedObjectContext, viewContext)
+        }
+    }
+    
+    private func markAsAcquired(_ whiskey: Whiskey) {
+        withAnimation {
+            whiskey.statusEnum = .owned
+            whiskey.modificationDate = Date()
+            
+            do {
+                try viewContext.save()
+                HapticManager.shared.successFeedback()
+            } catch {
+                HapticManager.shared.errorFeedback()
+                print("Error marking wishlist item as acquired: \(error)")
             }
         }
     }
@@ -353,14 +413,6 @@ struct iPadDashboardView: View {
     }
     
     // Format currency with comma separators
-    private func formatCurrency(_ value: Double) -> String {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .currency
-        formatter.maximumFractionDigits = 0
-        formatter.currencySymbol = "$"
-        
-        return formatter.string(from: NSNumber(value: value)) ?? "$\(Int(value))"
-    }
 }
 
 // MARK: - Supporting Views

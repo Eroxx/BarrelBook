@@ -250,7 +250,7 @@ struct EditJournalEntryView: View {
                 }
                 
                 Section(header: Text("Basic Info")) {
-                    DatePicker("Date", selection: $date, displayedComponents: [.date])
+                    DatePicker("Date & Time", selection: $date, displayedComponents: [.date, .hourAndMinute])
                     
                     VStack(alignment: .leading) {
                         Text("Overall Rating")

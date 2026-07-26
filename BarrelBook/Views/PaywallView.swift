@@ -5,32 +5,39 @@ struct PaywallView: View {
     @StateObject private var subscriptionManager = SubscriptionManager.shared
     @Environment(\.dismiss) private var dismiss
     @Binding var isPresented: Bool
-    
+
     @State private var showingError = false
     @State private var errorMessage = ""
     @State private var showingTerms = false
     @State private var showingPrivacy = false
+    @State private var showingRestoreAlert = false
+    @State private var restoreAlertTitle = ""
+    @State private var restoreAlertMessage = ""
+
+    // Amber palette (matches OnboardingView)
+    private let deepAmber = Color(red: 0.48, green: 0.22, blue: 0.04)
+    private let gold      = Color(red: 0.84, green: 0.63, blue: 0.24)
     
+    private var displayPrice: String {
+        subscriptionManager.currentSubscription?.priceFormatted ?? "…"
+    }
+
     var body: some View {
         NavigationView {
             ScrollView {
-                VStack(spacing: 28) {
+                VStack(spacing: 16) {
                     headerSection
                     featuresSection
-                    subscriptionSection
                     purchaseSection
                     legalSection
                 }
-                .padding(.horizontal, 20)
-                .padding(.vertical, 24)
+                .padding(.horizontal, 24)
+                .padding(.vertical, 16)
             }
-            .navigationTitle("Premium")
-            .navigationBarTitleDisplayMode(.large)
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Cancel") {
-                        dismiss()
-                    }
+                    Button("Cancel") { dismiss() }
                 }
             }
         }
@@ -39,10 +46,14 @@ struct PaywallView: View {
         } message: {
             Text(errorMessage)
         }
+        .alert(restoreAlertTitle, isPresented: $showingRestoreAlert) {
+            Button("OK") { }
+        } message: {
+            Text(restoreAlertMessage)
+        }
         .onChange(of: subscriptionManager.purchaseState) { state in
             switch state {
             case .purchased:
-                // Dismiss paywall on successful purchase
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                     isPresented = false
                 }
@@ -63,174 +74,128 @@ struct PaywallView: View {
             PrivacyPolicyView()
         }
     }
-    
+
+    // MARK: - Sections
+
     private var headerSection: some View {
-        VStack(spacing: 20) {
-            Image(systemName: "crown.fill")
-                .font(.system(size: 56))
-                .foregroundStyle(
-                    LinearGradient(
-                        colors: [Color.yellow, Color.orange.opacity(0.9)],
+        VStack(spacing: 10) {
+            ZStack {
+                Circle()
+                    .fill(LinearGradient(
+                        colors: [gold.opacity(0.25), gold.opacity(0.08)],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
+                    ))
+                    .frame(width: 80, height: 80)
+
+                Image(systemName: "crown.fill")
+                    .font(.system(size: 34, weight: .medium))
+                    .foregroundStyle(
+                        LinearGradient(
+                            colors: [gold, deepAmber],
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
                     )
-                )
-                .shadow(color: .orange.opacity(0.3), radius: 8, x: 0, y: 4)
-            
-            VStack(spacing: 8) {
-                Text("Unlock Your Complete")
-                    .font(.title2)
-                    .fontWeight(.semibold)
-                    .foregroundColor(.primary)
-                
-                Text("Whiskey Experience")
-                    .font(.title)
-                    .fontWeight(.bold)
-                    .foregroundColor(ColorManager.primaryBrandColor)
+                    .symbolRenderingMode(.hierarchical)
             }
-            .multilineTextAlignment(.center)
-            
-            Text("One-time purchase · \(subscriptionManager.currentSubscription?.priceFormatted ?? "$7.99") · Unlock forever")
-                .font(.subheadline)
-                .foregroundColor(.secondary)
+
+            VStack(spacing: 4) {
+                Text("Unlock the Full Shelf")
+                    .font(.title2).bold()
+                    .multilineTextAlignment(.center)
+
+                Text("One purchase. Unlimited everything.")
+                    .font(.subheadline)
+                    .foregroundColor(gold)
+                    .multilineTextAlignment(.center)
+            }
         }
-        .padding(.vertical, 8)
+        .padding(.top, 4)
     }
-    
+
     private var featuresSection: some View {
-        VStack(alignment: .leading, spacing: 20) {
-            Text("Everything you need to track and enjoy your collection")
-                .font(.subheadline)
-                .foregroundColor(.secondary)
-                .frame(maxWidth: .infinity, alignment: .center)
-            
-            VStack(spacing: 0) {
-                FeatureRow(
-                    icon: "square.grid.2x2.fill",
-                    title: "Unlimited Collection",
-                    description: "Add as many bottles as you own"
-                )
-                .padding(.vertical, 6)
-                
-                Divider()
-                    .padding(.leading, 44)
-                
-                FeatureRow(
-                    icon: "book.fill",
-                    title: "Unlimited Tastings",
-                    description: "Journal every pour with notes and ratings"
-                )
-                .padding(.vertical, 6)
-                
-                Divider()
-                    .padding(.leading, 44)
-                
-                FeatureRow(
-                    icon: "heart.fill",
-                    title: "Unlimited Wishlist",
-                    description: "Build and manage your dream list"
-                )
-                .padding(.vertical, 6)
-                
-                Divider()
-                    .padding(.leading, 44)
-                
-                FeatureRow(
-                    icon: "chart.bar.fill",
-                    title: "Advanced Analytics",
-                    description: "Proof, price, and composition insights"
-                )
-                .padding(.vertical, 6)
-                
-                Divider()
-                    .padding(.leading, 44)
-                
-                FeatureRow(
-                    icon: "square.and.arrow.up.fill",
-                    title: "Export & Backup",
-                    description: "Full collection export, CSV import, and backup"
-                )
-                .padding(.vertical, 6)
-            }
-            .padding(20)
-            .background(Color(.secondarySystemBackground))
-            .cornerRadius(16)
+        VStack(alignment: .leading, spacing: 9) {
+            paywallFeatureRow("Unlimited bottles in your collection",                                                           icon: "infinity")
+            paywallFeatureRow("Unlimited tasting notes, searchable & filterable",                                              icon: "star.bubble.fill")
+            paywallFeatureRow("Deep statistics with value, spending trends, flavor profiles and more",                         icon: "chart.bar.fill")
+            paywallFeatureRow("Sort & filter by distillery, proof, price, rating, finish, special designations (such as single barrel, BiB, etc.) and more", icon: "line.3.horizontal.decrease.circle.fill")
+            paywallFeatureRow("Wishlist with target prices & store notes",                                                     icon: "heart.fill")
+            paywallFeatureRow("Infinity bottle tracker with pour percentages",                                                 icon: "drop.fill")
+            paywallFeatureRow("Bottle label scanner that auto-fills name, proof, type and age (beta)",                        icon: "camera.viewfinder")
+            paywallFeatureRow("CSV import/export, light & dark mode",                                                         icon: "moon.stars.fill")
         }
     }
-    
-    private var subscriptionSection: some View {
-        VStack(spacing: 8) {
-            if let product = subscriptionManager.currentSubscription {
-                Text(product.priceFormatted)
-                    .font(.system(size: 44, weight: .bold, design: .rounded))
-                    .foregroundColor(ColorManager.primaryBrandColor)
-            } else {
-                Text("$7.99")
-                    .font(.system(size: 44, weight: .bold, design: .rounded))
-                    .foregroundColor(ColorManager.primaryBrandColor)
-            }
-            Text("one-time · unlock forever")
+
+    private func paywallFeatureRow(_ text: String, icon: String) -> some View {
+        HStack(spacing: 12) {
+            Image(systemName: icon)
+                .font(.system(size: 16, weight: .medium))
+                .foregroundColor(gold)
+                .frame(width: 24)
+            Text(text)
                 .font(.subheadline)
-                .foregroundColor(.secondary)
+                .foregroundColor(.primary)
+            Spacer()
         }
-        .padding(.vertical, 4)
     }
-    
+
     private var purchaseSection: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: 12) {
+            Text("One-time purchase · \(displayPrice) · No subscription ever")
+                .font(.footnote)
+                .foregroundColor(gold.opacity(0.8))
+                .multilineTextAlignment(.center)
+
             Button(action: startTrial) {
                 HStack(spacing: 8) {
                     if subscriptionManager.purchaseState == .purchasing {
-                        ProgressView()
-                            .scaleEffect(0.9)
-                            .tint(.white)
+                        ProgressView().tint(.white).padding(.trailing, 4)
+                    } else {
+                        Image(systemName: "crown.fill")
                     }
-                    Text(subscriptionManager.purchaseState == .purchasing ? "Purchasing…" : "Unlock for \(subscriptionManager.currentSubscription?.priceFormatted ?? "$7.99")")
+                    Text(subscriptionManager.purchaseState == .purchasing
+                         ? "Purchasing..."
+                         : "Unlock Premium — \(displayPrice)")
                         .font(.headline)
-                        .fontWeight(.semibold)
                 }
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 16)
-                .background(ColorManager.primaryBrandColor)
                 .foregroundColor(.white)
-                .cornerRadius(14)
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(gold.gradient)
+                .cornerRadius(15)
             }
             .disabled(subscriptionManager.purchaseState == .purchasing)
             .buttonStyle(.plain)
-            
+
             Button(action: restorePurchases) {
                 Text("Restore Purchases")
                     .font(.subheadline)
-                    .fontWeight(.medium)
-                    .foregroundColor(ColorManager.primaryBrandColor)
+                    .foregroundColor(.secondary)
             }
             .disabled(subscriptionManager.purchaseState == .purchasing)
         }
     }
-    
+
     private var legalSection: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: 12) {
             Text("Payment is charged once to your Apple ID. No subscription — you own premium forever. Restore on a new device via Restore Purchases.")
                 .font(.caption2)
                 .foregroundColor(.secondary)
                 .multilineTextAlignment(.center)
-            
+
             HStack(spacing: 24) {
                 Button("Terms of Service") { showingTerms = true }
-                    .font(.caption2)
-                    .fontWeight(.medium)
-                    .foregroundColor(.blue)
+                    .font(.caption2).fontWeight(.medium).foregroundColor(.blue)
                 Button("Privacy Policy") { showingPrivacy = true }
-                    .font(.caption2)
-                    .fontWeight(.medium)
-                    .foregroundColor(.blue)
+                    .font(.caption2).fontWeight(.medium).foregroundColor(.blue)
             }
         }
-        .padding(.top, 8)
+        .padding(.top, 4)
     }
-    
+
     // MARK: - Actions
-    
+
     private func startTrial() {
         Task {
             if subscriptionManager.currentSubscription == nil {
@@ -250,12 +215,23 @@ struct PaywallView: View {
             await subscriptionManager.purchaseSubscription()
         }
     }
-    
+
     private func restorePurchases() {
         Task {
-            await subscriptionManager.restorePurchases()
-            if subscriptionManager.hasAccess {
-                isPresented = false
+            let result = await subscriptionManager.restorePurchases()
+            await MainActor.run {
+                switch result {
+                case .restored:
+                    isPresented = false
+                case .nothingFound:
+                    restoreAlertTitle = "No Purchases Found"
+                    restoreAlertMessage = "We couldn’t find a previous BarrelBook Premium purchase for this Apple ID."
+                    showingRestoreAlert = true
+                case .failed(let message):
+                    restoreAlertTitle = "Restore Failed"
+                    restoreAlertMessage = message
+                    showingRestoreAlert = true
+                }
             }
         }
     }
@@ -311,7 +287,7 @@ struct TermsOfServiceView: View {
                         Text("2. Premium Purchase")
                             .font(.headline)
                             .fontWeight(.semibold)
-                        Text("BarrelBook Premium is a one-time in-app purchase that provides unlimited access to all features of the BarrelBook application, including unlimited whiskey collection management, tasting notes, wishlist management, and advanced analytics. The purchase price is $7.99. This is not a subscription; you own premium access with no recurring charges.")
+                        Text("BarrelBook Premium is a one-time in-app purchase that provides unlimited access to all features of the BarrelBook application, including unlimited whiskey collection management, tasting notes, wishlist management, and advanced analytics. The purchase price is shown in the App Store for your region at the time of purchase. This is not a subscription; you own premium access with no recurring charges.")
                         
                         Text("3. Payment")
                             .font(.headline)

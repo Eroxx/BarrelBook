@@ -44,19 +44,20 @@ class CSVService {
         var csvString = "\u{FEFF}" + header + "\n"
         
         // Add diagnostic logging
+        #if DEBUG
         let allNames = whiskeys.compactMap { $0.name?.trimmingCharacters(in: .whitespacesAndNewlines) }
         print("EXPORT DIAGNOSTIC: Total whiskeys to export: \(whiskeys.count)")
         print("EXPORT DIAGNOSTIC: Unique names (case-sensitive): \(Set(allNames).count)")
-        
+
         let normalizedNames = whiskeys.compactMap { $0.name?.lowercased().trimmingCharacters(in: .whitespacesAndNewlines) }
         print("EXPORT DIAGNOSTIC: Unique names (case-insensitive): \(Set(normalizedNames).count)")
-        
+
         // Get names with case or space variations
         let nameCounts = Dictionary(grouping: normalizedNames) { $0 }.mapValues { $0.count }
         print("EXPORT DIAGNOSTIC: Names with duplicates after normalization:")
         for (name, count) in nameCounts where count > 1 {
-            let variations = whiskeys.compactMap { 
-                if let whiskeyName = $0.name?.lowercased().trimmingCharacters(in: .whitespacesAndNewlines), 
+            let variations = whiskeys.compactMap {
+                if let whiskeyName = $0.name?.lowercased().trimmingCharacters(in: .whitespacesAndNewlines),
                    whiskeyName == name {
                    return $0.name
                 }
@@ -64,6 +65,7 @@ class CSVService {
             }
             print("- '\(name)' appears \(count) times with variations: \(variations)")
         }
+        #endif
         
         // Create a composite key using normalized name AND other identifying properties
         // This will ensure whiskeys with identical names but different properties are exported separately
@@ -78,27 +80,30 @@ class CSVService {
             // Create a composite key that uniquely identifies the whiskey beyond just its name
             return "\(name)|\(proof)|\(type)|\(distillery)|\(isStorePick)|\(spName)"
         }
+        #if DEBUG
         print("EXPORT DIAGNOSTIC: Grouped whiskey count: \(groupedWhiskeys.count)")
-        
+        #endif
+
         for (_, whiskeysGroup) in groupedWhiskeys {
             // Skip empty names
             guard let firstWhiskey = whiskeysGroup.first, let name = firstWhiskey.name, !name.isEmpty else { continue }
-            
+
             // Get bottle instances for the whiskey
             let bottles = firstWhiskey.bottleInstances as? Set<BottleInstance> ?? Set<BottleInstance>()
-            
-            // Add debug logging for bottle counts
-            print("DEBUG: Processing whiskey '\(name)'")
-            print("DEBUG: Total bottle instances: \(bottles.count)")
-            
+
             // Calculate counts from actual bottle instances and whiskey properties
             let currentBottles = bottles.filter { !$0.isDead }.count
             let openBottles = bottles.filter { !$0.isDead && $0.isOpen }.count
             let deadBottles = Int(firstWhiskey.isFinished) // Use isFinished for dead bottle count
-            
+
+            #if DEBUG
+            // Add debug logging for bottle counts
+            print("DEBUG: Processing whiskey '\(name)'")
+            print("DEBUG: Total bottle instances: \(bottles.count)")
             // Debug log the counts
             print("DEBUG: '\(name)' counts - Current: \(currentBottles), Open: \(openBottles), Dead: \(deadBottles)")
             print("DEBUG: isFinished value: \(firstWhiskey.isFinished)")
+            #endif
             
             // Calculate average price from active bottles
             let averagePrice = firstWhiskey.averagePrice
@@ -151,8 +156,10 @@ class CSVService {
      * @param progressHandler Optional callback for progress updates
      */
     func importWhiskeys(from csvString: String, context: NSManagedObjectContext, isFreshImport: Bool = false, progressHandler: ImportProgress? = nil) async throws {
+        #if DEBUG
         print("Starting CSV import process...")
         print("CSV string length: \(csvString.count) characters")
+        #endif
         
         // Add import timeout tracking with increased duration for large imports
         let importStartTime = Date()
@@ -927,8 +934,9 @@ class CSVService {
                     newWhiskey.isCaskStrength = fields.count > caskStrengthIndex ? parseBooleanField(fields[caskStrengthIndex], initials: "CS") : false
                     newWhiskey.externalReviews = fields.count > reviewsIndex ? fields[reviewsIndex] : ""
                     newWhiskey.status = "owned"
-                    newWhiskey.addedDate = Date()
-                    newWhiskey.modificationDate = Date()
+                    let addedDate = Date()
+                    newWhiskey.addedDate = addedDate
+                    newWhiskey.modificationDate = addedDate
                     
                     // Get bottle counts
                     let currentBottles = fields.count > currentBottlesIndex ? Int16(fields[currentBottlesIndex]) ?? 1 : 1

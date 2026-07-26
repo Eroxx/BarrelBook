@@ -6,6 +6,8 @@ struct InfinityBottleDetailView: View {
     @Environment(\.dismiss) private var dismiss
     
     @ObservedObject var bottle: InfinityBottle
+    @AppStorage("hasSeenAddPourToInfinityBottleTutorial") private var hasSeenAddPourToInfinityBottleTutorial = false
+    @State private var showingAddPourTutorialOverlay = false
     
     @State private var showingAddWhiskeySheet = false
     @State private var showingEditBottleSheet = false
@@ -50,6 +52,7 @@ struct InfinityBottleDetailView: View {
     }
     
     var body: some View {
+        ZStack {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
                 // Bottle image and basic info
@@ -129,7 +132,7 @@ struct InfinityBottleDetailView: View {
                                 showingAddWhiskeySheet = true
                                 HapticManager.shared.mediumImpact()
                             } label: {
-                                Label("Add", systemImage: "plus")
+                                Label("Add whiskey", systemImage: "plus")
                                     .font(.subheadline)
                             }
                             .buttonStyle(.bordered)
@@ -140,7 +143,7 @@ struct InfinityBottleDetailView: View {
                                 Text("No whiskeys added yet")
                                     .foregroundColor(.secondary)
                                     .font(.subheadline)
-                                Text("Tap the + button to add your first whiskey")
+                                Text("Tap Add whiskey to add your first whiskey")
                                     .foregroundColor(.secondary)
                                     .font(.caption)
                             }
@@ -275,12 +278,23 @@ struct InfinityBottleDetailView: View {
             }
         }
         .onAppear {
+            if !hasSeenAddPourToInfinityBottleTutorial {
+                showingAddPourTutorialOverlay = true
+            }
             // Refresh the bottle object whenever the view appears to ensure latest data
             viewContext.refresh(bottle, mergeChanges: true)
         }
         .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
             // Refresh when app comes to foreground in case data was updated elsewhere
             viewContext.refresh(bottle, mergeChanges: true)
+        }
+            if showingAddPourTutorialOverlay {
+                AddPourToInfinityBottleTutorialOverlay(onDismiss: {
+                    hasSeenAddPourToInfinityBottleTutorial = true
+                    showingAddPourTutorialOverlay = false
+                    HapticManager.shared.lightImpact()
+                })
+            }
         }
     }
     
@@ -323,6 +337,64 @@ struct InfinityBottleDetailView: View {
                 print("Error deleting tasting: \(error)")
                 HapticManager.shared.errorFeedback()
             }
+        }
+    }
+}
+
+// MARK: - Add whiskey to infinity bottle tutorial (first time on bottle detail)
+
+private struct AddPourToInfinityBottleTutorialOverlay: View {
+    var onDismiss: () -> Void
+    
+    var body: some View {
+        ColorManager.tutorialScrim
+            .ignoresSafeArea()
+            .onTapGesture { }
+        GeometryReader { geometry in
+            ScrollView {
+                VStack(spacing: 0) {
+                    Spacer(minLength: 0)
+                    VStack(spacing: 20) {
+                        VStack(alignment: .leading, spacing: 16) {
+                            HStack {
+                                Image(systemName: "plus.circle.fill")
+                                    .font(.title2)
+                                    .foregroundColor(ColorManager.primaryBrandColor)
+                                Text("Add whiskey to your bottle")
+                                    .font(.headline)
+                            }
+                            VStack(alignment: .leading, spacing: 10) {
+                                Text(LocalizedStringKey("Tap **Add whiskey** next to \"Whiskey Additions\" above. Choose a whiskey from your collection and enter the amount — proof and volume are calculated automatically."))
+                                Text("You can also add tasting notes on the Tastings tab as the blend changes over time.")
+                                    .font(.subheadline)
+                            }
+                            .font(.subheadline)
+                        }
+                        .padding(24)
+                        .background(Color(UIColor.secondarySystemBackground))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 16)
+                                .stroke(ColorManager.tutorialCardBorder, lineWidth: 1)
+                        )
+                        .cornerRadius(16)
+                        .shadow(radius: 12)
+                        .padding(.horizontal, 24)
+                        Button(action: onDismiss) {
+                            Text("Got it")
+                                .fontWeight(.semibold)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 12)
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .tint(ColorManager.primaryBrandColor)
+                        .padding(.horizontal, 24)
+                    }
+                    .padding()
+                    Spacer(minLength: 0)
+                }
+                .frame(minHeight: geometry.size.height)
+            }
+            .padding()
         }
     }
 }
@@ -510,7 +582,7 @@ struct AddWhiskeyToBottleView: View {
                 }
                 
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Add") {
+                    Button("Add whiskey") {
                         addWhiskeyToBottle()
                         HapticManager.shared.successFeedback()
                         dismiss()
@@ -605,7 +677,7 @@ struct AddTastingView: View {
         NavigationView {
             Form {
                 Section(header: Text("Basic Info")) {
-                    DatePicker("Date", selection: $date, displayedComponents: [.date])
+                    DatePicker("Date & Time", selection: $date, displayedComponents: [.date, .hourAndMinute])
                     
                     VStack(alignment: .leading) {
                         Text("Overall Rating")

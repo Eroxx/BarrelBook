@@ -24,6 +24,9 @@ struct SubscriptionGuardView<Content: View>: View {
         }
         .task {
             await subscriptionManager.updateSubscriptionStatus()
+            if subscriptionManager.currentSubscription == nil {
+                await subscriptionManager.loadProducts()
+            }
         }
         .fullScreenCover(isPresented: $showingPaywall) {
             PaywallView(isPresented: $showingPaywall)
@@ -52,7 +55,7 @@ struct SubscriptionGuardView<Content: View>: View {
             
             if showTrialInfo {
                 VStack(spacing: 8) {
-                    Text("One-time purchase · $7.99")
+                    Text("One-time purchase · \(subscriptionManager.currentSubscription?.priceFormatted ?? "…")")
                         .font(.headline)
                         .fontWeight(.semibold)
                         .foregroundColor(ColorManager.primaryBrandColor)

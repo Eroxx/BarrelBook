@@ -66,6 +66,8 @@ struct SortCriterion: Equatable {
 
 struct iPadCollectionGridView: View {
     @Environment(\.managedObjectContext) private var viewContext
+    @StateObject private var subscriptionManager = SubscriptionManager.shared
+    @State private var showingPaywall = false
     @State private var searchText = ""
     @State private var selectedCategory: String? = nil
     @State private var selectedTypes: Set<String> = []  // New state for multiple type selection
@@ -283,7 +285,11 @@ struct iPadCollectionGridView: View {
                 
                 // Add new whiskey button
                 Button(action: {
-                    showingAddSheet = true
+                    if subscriptionManager.canAddWhiskey(currentCount: whiskeys.count) {
+                        showingAddSheet = true
+                    } else {
+                        showingPaywall = true
+                    }
                 }) {
                     Label("Add", systemImage: "plus")
                         .font(.system(size: 16, weight: .medium))
@@ -625,6 +631,9 @@ struct iPadCollectionGridView: View {
         }
         .sheet(isPresented: $showingAddSheet) {
             AddWhiskeyView()
+        }
+        .fullScreenCover(isPresented: $showingPaywall) {
+            PaywallView(isPresented: $showingPaywall)
         }
         .onAppear {
             // Initialize the slider ranges based on actual data

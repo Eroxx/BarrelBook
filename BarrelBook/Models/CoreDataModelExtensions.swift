@@ -168,4 +168,24 @@ extension BottleTasting {
         
         return stars
     }
+}
+
+// MARK: - App Formatting Helpers
+/// Shared formatters used across the app for consistent currency and date display.
+enum AppFormatters {
+    /// Format a value as currency. Use maxFractionDigits 0 for whole dollars, 2 for cents.
+    static func formatCurrency(_ value: Double, maxFractionDigits: Int = 0) -> String {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .currency
+        formatter.maximumFractionDigits = maxFractionDigits
+        let fallback = maxFractionDigits == 0 ? "$0" : "$0.00"
+        return formatter.string(from: NSNumber(value: value)) ?? fallback
+    }
+    
+    /// Format a date as MM/dd/yyyy (short date used in activity and lists).
+    static func formatDateShort(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MM/dd/yyyy"
+        return formatter.string(from: date)
+    }
 } 

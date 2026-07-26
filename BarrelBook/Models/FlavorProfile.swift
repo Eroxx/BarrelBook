@@ -18,8 +18,8 @@ enum FlavorCategory: String, CaseIterable, Codable {
         case .floral: return Color(red: 0.7, green: 0.1, blue: 0.6) // Deep magenta (AA compliant)
         case .spicy: return Color(red: 0.8, green: 0.3, blue: 0.0) // Dark orange (AA compliant)
         case .woody: return Color(red: 0.4, green: 0.2, blue: 0.0) // Dark brown (AA compliant)
-        case .sweet: return Color(red: 0.7, green: 0.6, blue: 0.0) // Dark gold (AA compliant)
-        case .smoky: return Color(red: 0.2, green: 0.2, blue: 0.2) // Dark gray (AA compliant)
+        case .sweet: return Color(red: 0.82, green: 0.55, blue: 0.04) // warm bourbon gold
+        case .smoky: return Color(red: 0.31, green: 0.35, blue: 0.41) // slate blue-gray (ashy/peated)
         case .nutty: return Color(red: 0.6, green: 0.3, blue: 0.0) // Dark amber (AA compliant)
         case .earthy: return Color(red: 0.1, green: 0.5, blue: 0.1) // Dark forest green (AA compliant)
         }

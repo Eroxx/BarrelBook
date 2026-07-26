@@ -31,7 +31,7 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
     
     // Setup CloudKit container and check account status
     private func setupCloudKitContainer() {
-        let container = CKContainer(identifier: "iCloud.com.ericlinder.barrelbook")
+        let container = CKContainer(identifier: "iCloud.com.ericlinder.barrelbookapp")
         container.accountStatus { [weak self] status, error in
             DispatchQueue.main.async {
                 if let error = error {
@@ -42,7 +42,8 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
                 switch status {
                 case .available:
                     print("iCloud account is available")
-                    self?.requestApplicationPermission()
+                    // Note: requestApplicationPermission(.userDiscoverability) is deprecated in iOS 17+
+                    // CloudKit sync will work automatically without it
                     // Force a sync when iCloud becomes available
                     PersistenceController.shared.forceSync()
                 case .noAccount:
@@ -64,21 +65,9 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         }
     }
     
-    private func requestApplicationPermission() {
-        let container = CKContainer(identifier: "iCloud.com.ericlinder.barrelbook")
-        container.requestApplicationPermission(.userDiscoverability) { status, error in
-            if let error = error {
-                print("Error requesting application permission: \(error)")
-                return
-            }
-            
-            if status == .granted {
-                print("Application permission granted")
-            } else {
-                print("Application permission not granted: \(status)")
-            }
-        }
-    }
+    // DEPRECATED: requestApplicationPermission(.userDiscoverability) is no longer needed in iOS 17+
+    // CloudKit sync works automatically without requesting this permission
+    // The API now returns an "Internal Error" and should not be called
     
     // Setup file access permissions and cleanup temporary items
     private func setupFileAccessPermissions() {
@@ -101,8 +90,9 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
             }
             
             // Set app container directory permissions
-            let containerURL = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first!
-            try? fileManager.setAttributes([.posixPermissions: 0o755], ofItemAtPath: containerURL.path)
+            if let containerURL = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first {
+                try? fileManager.setAttributes([.posixPermissions: 0o755], ofItemAtPath: containerURL.path)
+            }
             
             print("File access permissions setup completed")
         } catch {
@@ -124,8 +114,8 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         if let notification = CKNotification(fromRemoteNotificationDictionary: userInfo) {
             print("Received CloudKit notification: \(notification)")
             
-            // Refresh Core Data context
-            PersistenceController.shared.container.viewContext.refreshAllObjects()
+            // Process persistent history + refresh UI (same path as store remote-change)
+            PersistenceController.shared.forceSync()
             
             completionHandler(.newData)
         } else {
