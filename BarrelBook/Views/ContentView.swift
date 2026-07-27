@@ -81,7 +81,6 @@ struct ContentView: View {
     @StateObject private var subscriptionManager = SubscriptionManager.shared
     @State private var showingSettings = false
     @State private var statisticsShowingFilteredView = false
-    @AppStorage("hasSeenOnboarding") private var hasSeenOnboarding = false
     @AppStorage("isDemoDataActive") private var isDemoDataActive = false
     @AppStorage("colorScheme") private var storedColorScheme: AppColorScheme = .system
 
@@ -192,13 +191,8 @@ struct ContentView: View {
         .fullScreenCover(isPresented: $showingSettings) {
             SettingsView()
         }
-        .fullScreenCover(isPresented: Binding(
-            get: { !hasSeenOnboarding },
-            set: { _ in } // prevent dismiss — only completeOnboarding() can close this
-        )) {
-            OnboardingView(onLoadDemoData: { loadDemoData() })
-                .interactiveDismissDisabled(true)
-        }
+        // Onboarding is presented from DeviceAdaptiveContentView so iPad (iPadContentView)
+        // and iPhone share one full-screen walkthrough.
         }
         .preferredColorScheme(preferredScheme)   // applied before first render
         .onAppear {
@@ -217,13 +211,6 @@ struct ContentView: View {
         case .light:  window.overrideUserInterfaceStyle = .light
         case .dark:   window.overrideUserInterfaceStyle = .dark
         case .system: window.overrideUserInterfaceStyle = .unspecified
-        }
-    }
-
-    private func loadDemoData() {
-        DemoDataService.load(context: viewContext) { _ in
-            isDemoDataActive = true
-            HapticManager.shared.successFeedback()
         }
     }
 

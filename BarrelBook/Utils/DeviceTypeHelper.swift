@@ -35,4 +35,29 @@ struct DeviceTypeHelper {
     static var isMac: Bool {
         return current == .mac
     }
-} 
+}
+
+/// Empty detail placeholder for iPad split columns (iOS 16–compatible).
+struct iPadEmptyDetailView: View {
+    let title: String
+    let systemImage: String
+    let description: String
+    
+    var body: some View {
+        VStack(spacing: 16) {
+            Image(systemName: systemImage)
+                .font(.system(size: 48, weight: .light))
+                .foregroundStyle(.secondary)
+            Text(title)
+                .font(.title2.weight(.semibold))
+            Text(description)
+                .font(.body)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+                .frame(maxWidth: 360)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .padding()
+        .background(Color(UIColor.systemGroupedBackground))
+    }
+}

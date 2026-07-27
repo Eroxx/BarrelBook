@@ -352,7 +352,191 @@ struct JournalView: View {
     }
     
     var body: some View {
+        Group {
+            if DeviceTypeHelper.isIPad {
+                iPadJournalLayout
+            } else {
+                iPhoneJournalLayout
+            }
+        }
+        .sheet(isPresented: $showingAddEntry) {
+            AddJournalEntryView()
+        }
+        .sheet(isPresented: $showingEditSheet, onDismiss: {
+            editingEntry = nil
+        }) {
+            if let entry = editingEntry {
+                EditJournalEntryView(entry: entry)
+            }
+        }
+        .sheet(isPresented: $showingSortSheet) {
+            JournalHierarchicalSortPickerView(sortConfig: $sortConfig)
+        }
+        .sheet(isPresented: $showingFilterSheet) {
+            journalFilterSheet
+        }
+        .sheet(isPresented: $showingSettings) {
+            SettingsView()
+        }
+        .onAppear {
+            sortConfig = FilterSettingsManager.loadJournalHierarchicalSortConfig()
+            if !hasSeenJournalTutorial {
+                showingJournalTutorialOverlay = true
+            }
+        }
+        .onChange(of: sortConfig.activeSorts) { _ in
+            FilterSettingsManager.saveJournalHierarchicalSortConfig(sortConfig)
+        }
+    }
+    
+    private var iPadJournalLayout: some View {
+        NavigationSplitView {
+            journalMainColumn
+                .navigationTitle("Tastings")
+                .navigationBarTitleDisplayMode(.large)
+                .toolbar {
+                    ToolbarItem(placement: .primaryAction) {
+                        Button {
+                            showingAddEntry = true
+                            HapticManager.shared.mediumImpact()
+                        } label: {
+                            Image(systemName: "plus")
+                        }
+                        .accessibilityLabel("Add Tasting")
+                    }
+                    ToolbarItemGroup(placement: .topBarTrailing) {
+                        Button {
+                            showingFilterSheet = true
+                            HapticManager.shared.mediumImpact()
+                        } label: {
+                            Image(systemName: searchOptions.selectedServingMethods.isEmpty &&
+                                  searchOptions.ratingRange == (1...10) &&
+                                  searchOptions.selectedFlavorCategories.isEmpty &&
+                                  searchOptions.selectedSubflavors.isEmpty
+                                  ? "line.3.horizontal.decrease.circle"
+                                  : "line.3.horizontal.decrease.circle.fill")
+                        }
+                        
+                        Button {
+                            showingSortSheet = true
+                            HapticManager.shared.mediumImpact()
+                        } label: {
+                            HStack(spacing: 4) {
+                                Image(systemName: "arrow.up.arrow.down")
+                                if sortConfig.activeSorts.count > 1 {
+                                    Text("\(sortConfig.activeSorts.count)")
+                                        .font(.caption2)
+                                }
+                            }
+                        }
+                    }
+                    ToolbarItemGroup(placement: .keyboard) {
+                        Spacer()
+                        Button("Done") {
+                            isSearchFocused = false
+                        }
+                    }
+                }
+        } detail: {
+            NavigationStack {
+                if let entry = selectedEntry {
+                    JournalEntryDetailView(entry: entry)
+                        .id(entry.id)
+                } else {
+                    iPadEmptyDetailView(
+                        title: "Select a Tasting",
+                        systemImage: "book",
+                        description: "Choose an entry from the list to read tasting notes."
+                    )
+                }
+            }
+        }
+        .navigationSplitViewStyle(.balanced)
+        .overlay {
+            if showingJournalTutorialOverlay {
+                JournalTutorialOverlay(onDismiss: {
+                    hasSeenJournalTutorial = true
+                    showingJournalTutorialOverlay = false
+                    HapticManager.shared.lightImpact()
+                })
+            }
+        }
+    }
+    
+    private var iPhoneJournalLayout: some View {
         ZStack {
+            journalMainColumn
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .principal) {
+                        Text("Tastings")
+                            .font(.headline)
+                            .fontWeight(.bold)
+                    }
+                    ToolbarItem(placement: .navigationBarLeading) {
+                        HStack(spacing: 12) {
+                            Button {
+                                showingFilterSheet = true
+                                HapticManager.shared.mediumImpact()
+                            } label: {
+                                Image(systemName: "line.3.horizontal.decrease.circle")
+                            }
+                            
+                            Button {
+                                showingSortSheet = true
+                                HapticManager.shared.mediumImpact()
+                            } label: {
+                                HStack(spacing: 4) {
+                                    Image(systemName: "arrow.up.arrow.down")
+                                    if sortConfig.activeSorts.count > 1 {
+                                        Text("\(sortConfig.activeSorts.count)")
+                                            .font(.caption2)
+                                            .foregroundColor(.accentColor)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        Button(action: {
+                            showingSettings = true
+                            HapticManager.shared.lightImpact()
+                        }) {
+                            Image(systemName: "gear")
+                        }
+                    }
+                    ToolbarItemGroup(placement: .keyboard) {
+                        Spacer()
+                        Button("Done") {
+                            isSearchFocused = false
+                        }
+                    }
+                }
+                .sheet(item: $selectedEntry) { entry in
+                    NavigationView {
+                        JournalEntryDetailView(entry: entry)
+                            .navigationBarTitleDisplayMode(.inline)
+                            .toolbar {
+                                ToolbarItem(placement: .navigationBarTrailing) {
+                                    Button("Done") {
+                                        selectedEntry = nil
+                                    }
+                                }
+                            }
+                    }
+                }
+            
+            if showingJournalTutorialOverlay {
+                JournalTutorialOverlay(onDismiss: {
+                    hasSeenJournalTutorial = true
+                    showingJournalTutorialOverlay = false
+                    HapticManager.shared.lightImpact()
+                })
+            }
+        }
+    }
+    
+    private var journalMainColumn: some View {
         VStack(spacing: 0) {
             // Custom search bar
             HStack(spacing: 12) {
@@ -378,17 +562,20 @@ struct JournalView: View {
                 .background(Color(.systemGray6))
                 .cornerRadius(10)
                 
-                Button {
-                    showingFilterSheet = true
-                } label: {
-                    Image(systemName: searchOptions.selectedServingMethods.isEmpty && 
-                          searchOptions.ratingRange == (1...10) && 
-                          searchOptions.selectedFlavorCategories.isEmpty && 
-                          searchOptions.selectedSubflavors.isEmpty
-                        ? "line.3.horizontal.decrease.circle" 
-                        : "line.3.horizontal.decrease.circle.fill")
-                        .foregroundColor(Color(red: 0.8, green: 0.6, blue: 0.3))
-                        .font(.system(size: 22))
+                // Filter control stays in the search row on iPhone; iPad uses the real toolbar.
+                if !DeviceTypeHelper.isIPad {
+                    Button {
+                        showingFilterSheet = true
+                    } label: {
+                        Image(systemName: searchOptions.selectedServingMethods.isEmpty &&
+                              searchOptions.ratingRange == (1...10) &&
+                              searchOptions.selectedFlavorCategories.isEmpty &&
+                              searchOptions.selectedSubflavors.isEmpty
+                              ? "line.3.horizontal.decrease.circle"
+                              : "line.3.horizontal.decrease.circle.fill")
+                            .foregroundColor(Color(red: 0.8, green: 0.6, blue: 0.3))
+                            .font(.system(size: 22))
+                    }
                 }
                 
                 Picker("View Mode", selection: $viewMode) {
@@ -410,78 +597,18 @@ struct JournalView: View {
         }
         .background(Color(UIColor.systemGroupedBackground))
         .overlay(
-            FloatingAddButton(action: {
-                showingAddEntry = true
-                HapticManager.shared.mediumImpact()
-            })
+            Group {
+                if !DeviceTypeHelper.isIPad {
+                    FloatingAddButton(action: {
+                        showingAddEntry = true
+                        HapticManager.shared.mediumImpact()
+                    })
+                }
+            }
         )
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .principal) {
-                Text("Tastings")
-                    .font(.headline)
-                    .fontWeight(.bold)
-                    .opacity(UIDevice.current.userInterfaceIdiom == .pad ? 0 : 1)
-            }
-            ToolbarItem(placement: .navigationBarLeading) {
-                HStack(spacing: 12) {
-                    // Filter button
-                    Button {
-                        showingFilterSheet = true
-                        HapticManager.shared.mediumImpact()
-                    } label: {
-                        Image(systemName: "line.3.horizontal.decrease.circle")
-                    }
-                    
-                    // Sort button
-                    Button {
-                        showingSortSheet = true
-                        HapticManager.shared.mediumImpact()
-                    } label: {
-                        HStack(spacing: 4) {
-                            Image(systemName: "arrow.up.arrow.down")
-                            if sortConfig.activeSorts.count > 1 {
-                                Text("\(sortConfig.activeSorts.count)")
-                                    .font(.caption2)
-                                    .foregroundColor(.accentColor)
-                            }
-                        }
-                    }
-                }
-                .opacity(UIDevice.current.userInterfaceIdiom == .pad ? 0 : 1)
-            }
-            ToolbarItem(placement: .navigationBarTrailing) {
-                Button(action: {
-                    showingSettings = true
-                    HapticManager.shared.lightImpact()
-                }) {
-                    Image(systemName: "gear")
-                }
-                .opacity(UIDevice.current.userInterfaceIdiom == .pad ? 0 : 1)
-            }
-        }
-        .toolbar {
-            ToolbarItemGroup(placement: .keyboard) {
-                Spacer()
-                Button("Done") {
-                    isSearchFocused = false
-                }
-            }
-        }
-        .sheet(isPresented: $showingAddEntry) {
-            AddJournalEntryView()
-        }
-        .sheet(isPresented: $showingEditSheet, onDismiss: {
-            editingEntry = nil
-        }) {
-            if let entry = editingEntry {
-                EditJournalEntryView(entry: entry)
-            }
-        }
-        .sheet(isPresented: $showingSortSheet) {
-            JournalHierarchicalSortPickerView(sortConfig: $sortConfig)
-        }
-        .sheet(isPresented: $showingFilterSheet) {
+    }
+    
+    private var journalFilterSheet: some View {
             NavigationView {
                 Form {
                     Section(header: Text("Rating Range")) {
@@ -604,40 +731,6 @@ struct JournalView: View {
                     }
                 }
             }
-        }
-        .sheet(isPresented: $showingSettings) {
-            SettingsView()
-        }
-        .sheet(item: $selectedEntry) { entry in
-            NavigationView {
-                JournalEntryDetailView(entry: entry)
-                    .navigationBarTitleDisplayMode(.inline)
-                    .toolbar {
-                        ToolbarItem(placement: .navigationBarTrailing) {
-                            Button("Done") {
-                                selectedEntry = nil
-                            }
-                        }
-                    }
-            }
-        }
-            if showingJournalTutorialOverlay {
-                JournalTutorialOverlay(onDismiss: {
-                    hasSeenJournalTutorial = true
-                    showingJournalTutorialOverlay = false
-                    HapticManager.shared.lightImpact()
-                })
-            }
-        }
-        .onAppear {
-            sortConfig = FilterSettingsManager.loadJournalHierarchicalSortConfig()
-            if !hasSeenJournalTutorial {
-                showingJournalTutorialOverlay = true
-            }
-        }
-        .onChange(of: sortConfig.activeSorts) { _ in
-            FilterSettingsManager.saveJournalHierarchicalSortConfig(sortConfig)
-        }
     }
     
     private var listView: some View {
@@ -650,6 +743,11 @@ struct JournalView: View {
                         .foregroundColor(.primary)
                 }
                 .buttonStyle(.plain)
+                .listRowBackground(
+                    DeviceTypeHelper.isIPad && selectedEntry?.id == entry.id
+                        ? ColorManager.primaryBrandColor.opacity(0.12)
+                        : Color.clear
+                )
                 .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                     Button(role: .destructive) {
                         withAnimation {

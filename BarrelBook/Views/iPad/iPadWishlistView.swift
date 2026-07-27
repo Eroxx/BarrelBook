@@ -7,6 +7,7 @@ struct iPadWishlistView: View {
     @State private var showingAddSheet = false
     @State private var searchText = ""
     @State private var selectedWhiskey: Whiskey? = nil
+    @State private var whiskeyToEdit: Whiskey? = nil
     @State private var isFiltersExpanded = true
     @State private var isTypesExpanded = true
     
@@ -16,71 +17,44 @@ struct iPadWishlistView: View {
     @State private var selectedRarities: Set<WhiskeyRarity> = Set(WhiskeyRarity.allCases)
     @State private var showingShareSheet = false
     @State private var shareActivityVC: UIActivityViewController?
+    @State private var columnVisibility: NavigationSplitViewVisibility = .all
     
     var body: some View {
-        VStack(spacing: 0) {
-            // Tab selector
-            HStack(spacing: 0) {
-                Button(action: { selectedTab = 0 }) {
-                    Text("Wishlist")
-                        .font(.system(size: 17, weight: selectedTab == 0 ? .semibold : .regular))
-                        .foregroundColor(selectedTab == 0 ? .blue : .secondary)
-                        .padding(.vertical, 12)
-                        .frame(maxWidth: .infinity)
-                        .background(
-                            Rectangle()
-                                .fill(selectedTab == 0 ? Color.blue.opacity(0.1) : Color.clear)
-                        )
+        NavigationSplitView(columnVisibility: $columnVisibility) {
+            wishlistPrimaryColumn
+                .navigationTitle("Wishlist")
+                .navigationBarTitleDisplayMode(.large)
+                .toolbar {
+                    ToolbarItem(placement: .primaryAction) {
+                        Button {
+                            showingAddSheet = true
+                        } label: {
+                            Image(systemName: "plus")
+                        }
+                        .accessibilityLabel("Add to Wishlist")
+                    }
                 }
-                
-                Button(action: { selectedTab = 1 }) {
-                    Text("Replacements")
-                        .font(.system(size: 17, weight: selectedTab == 1 ? .semibold : .regular))
-                        .foregroundColor(selectedTab == 1 ? .blue : .secondary)
-                        .padding(.vertical, 12)
-                        .frame(maxWidth: .infinity)
-                        .background(
-                            Rectangle()
-                                .fill(selectedTab == 1 ? Color.blue.opacity(0.1) : Color.clear)
-                        )
+        } detail: {
+            NavigationStack {
+                if let whiskey = selectedWhiskey {
+                    WhiskeyDetailView(whiskey: whiskey)
+                        .environment(\.managedObjectContext, viewContext)
+                        .id(whiskey.id)
+                } else {
+                    iPadEmptyDetailView(
+                        title: selectedTab == 0 ? "Select a Wishlist Item" : "Select a Replacement",
+                        systemImage: selectedTab == 0 ? "heart" : "arrow.triangle.2.circlepath",
+                        description: "Choose an item from the list to see details."
+                    )
                 }
-            }
-            .background(Color(UIColor.secondarySystemBackground))
-            
-            // Content based on selected tab
-            if selectedTab == 0 {
-                WishlistContentView(
-                    searchText: $searchText,
-                    selectedWhiskey: $selectedWhiskey,
-                    isFiltersExpanded: $isFiltersExpanded,
-                    isTypesExpanded: $isTypesExpanded,
-                    selectedPriorities: $selectedPriorities,
-                    selectedTypes: $selectedTypes,
-                    selectedRarities: $selectedRarities,
-                    showingAddSheet: $showingAddSheet,
-                    shareAction: { shareCurrentList() },
-                    getCurrentItems: { getCurrentListItems() }
-                )
-            } else {
-                ReplacementsContentView(
-                    searchText: $searchText,
-                    selectedWhiskey: $selectedWhiskey,
-                    isFiltersExpanded: $isFiltersExpanded,
-                    isTypesExpanded: $isTypesExpanded,
-                    selectedPriorities: $selectedPriorities,
-                    selectedTypes: $selectedTypes,
-                    selectedRarities: $selectedRarities,
-                    showingAddSheet: $showingAddSheet,
-                    shareAction: { shareCurrentList() },
-                    getCurrentItems: { getCurrentListItems() }
-                )
             }
         }
+        .navigationSplitViewStyle(.balanced)
         .sheet(isPresented: $showingAddSheet) {
             AddWhiskeyToWishlistView()
                 .environment(\.managedObjectContext, viewContext)
         }
-        .sheet(item: $selectedWhiskey) { whiskey in
+        .sheet(item: $whiskeyToEdit) { whiskey in
             EditWishlistItemView(whiskey: whiskey)
         }
         .sheet(isPresented: Binding(
@@ -108,6 +82,87 @@ struct iPadWishlistView: View {
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .background(Color(.systemBackground))
+            }
+        }
+        .onChange(of: selectedTab) { _ in
+            selectedWhiskey = nil
+        }
+    }
+    
+    private var wishlistPrimaryColumn: some View {
+        VStack(spacing: 0) {
+            // Tab selector
+            HStack(spacing: 0) {
+                Button(action: { selectedTab = 0 }) {
+                    Text("Wishlist")
+                        .font(.system(size: 17, weight: selectedTab == 0 ? .semibold : .regular))
+                        .foregroundColor(selectedTab == 0 ? ColorManager.primaryBrandColor : .secondary)
+                        .padding(.vertical, 12)
+                        .frame(maxWidth: .infinity)
+                        .background(
+                            Rectangle()
+                                .fill(selectedTab == 0 ? ColorManager.primaryBrandColor.opacity(0.1) : Color.clear)
+                        )
+                }
+                
+                Button(action: { selectedTab = 1 }) {
+                    Text("Replacements")
+                        .font(.system(size: 17, weight: selectedTab == 1 ? .semibold : .regular))
+                        .foregroundColor(selectedTab == 1 ? ColorManager.primaryBrandColor : .secondary)
+                        .padding(.vertical, 12)
+                        .frame(maxWidth: .infinity)
+                        .background(
+                            Rectangle()
+                                .fill(selectedTab == 1 ? ColorManager.primaryBrandColor.opacity(0.1) : Color.clear)
+                        )
+                }
+            }
+            .background(Color(UIColor.secondarySystemBackground))
+            
+            // Content based on selected tab
+            if selectedTab == 0 {
+                WishlistContentView(
+                    searchText: $searchText,
+                    selectedWhiskey: $selectedWhiskey,
+                    whiskeyToEdit: $whiskeyToEdit,
+                    isFiltersExpanded: $isFiltersExpanded,
+                    isTypesExpanded: $isTypesExpanded,
+                    selectedPriorities: $selectedPriorities,
+                    selectedTypes: $selectedTypes,
+                    selectedRarities: $selectedRarities,
+                    showingAddSheet: $showingAddSheet,
+                    shareAction: { shareCurrentList() },
+                    markAsAcquired: markAsAcquired,
+                    getCurrentItems: { getCurrentListItems() }
+                )
+            } else {
+                ReplacementsContentView(
+                    searchText: $searchText,
+                    selectedWhiskey: $selectedWhiskey,
+                    isFiltersExpanded: $isFiltersExpanded,
+                    isTypesExpanded: $isTypesExpanded,
+                    selectedPriorities: $selectedPriorities,
+                    selectedTypes: $selectedTypes,
+                    selectedRarities: $selectedRarities,
+                    showingAddSheet: $showingAddSheet,
+                    shareAction: { shareCurrentList() },
+                    getCurrentItems: { getCurrentListItems() }
+                )
+            }
+        }
+    }
+    
+    private func markAsAcquired(_ whiskey: Whiskey) {
+        withAnimation {
+            whiskey.statusEnum = .owned
+            whiskey.modificationDate = Date()
+            
+            do {
+                try viewContext.save()
+                HapticManager.shared.successFeedback()
+            } catch {
+                HapticManager.shared.errorFeedback()
+                print("Error marking wishlist item as acquired: \(error)")
             }
         }
     }
@@ -211,6 +266,7 @@ struct WishlistContentView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @Binding var searchText: String
     @Binding var selectedWhiskey: Whiskey?
+    @Binding var whiskeyToEdit: Whiskey?
     @Binding var isFiltersExpanded: Bool
     @Binding var isTypesExpanded: Bool
     @Binding var selectedPriorities: Set<Int>
@@ -218,6 +274,7 @@ struct WishlistContentView: View {
     @Binding var selectedRarities: Set<WhiskeyRarity>
     @Binding var showingAddSheet: Bool
     let shareAction: () -> Void
+    let markAsAcquired: (Whiskey) -> Void
     let getCurrentItems: () -> [Whiskey]
     
     // Fetch whiskeys in wishlist
@@ -568,8 +625,30 @@ struct WishlistContentView: View {
                     ], spacing: 16) {
                         ForEach(filteredWhiskeys, id: \.id) { whiskey in
                             WishlistCard(whiskey: whiskey)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .strokeBorder(
+                                            selectedWhiskey?.id == whiskey.id
+                                                ? ColorManager.primaryBrandColor
+                                                : Color.clear,
+                                            lineWidth: 2
+                                        )
+                                )
                                 .onTapGesture {
                                     selectedWhiskey = whiskey
+                                }
+                                .contextMenu {
+                                    Button {
+                                        markAsAcquired(whiskey)
+                                    } label: {
+                                        Label("Mark as Acquired", systemImage: "checkmark.circle")
+                                    }
+                                    
+                                    Button {
+                                        whiskeyToEdit = whiskey
+                                    } label: {
+                                        Label("Edit", systemImage: "pencil")
+                                    }
                                 }
                         }
                     }
@@ -672,6 +751,15 @@ struct ReplacementsContentView: View {
                     ], spacing: 16) {
                         ForEach(replacementItems, id: \.id) { whiskey in
                             WishlistCard(whiskey: whiskey)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .strokeBorder(
+                                            selectedWhiskey?.id == whiskey.id
+                                                ? ColorManager.primaryBrandColor
+                                                : Color.clear,
+                                            lineWidth: 2
+                                        )
+                                )
                                 .onTapGesture {
                                     selectedWhiskey = whiskey
                                 }

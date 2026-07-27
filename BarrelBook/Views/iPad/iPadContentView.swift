@@ -1,98 +1,92 @@
 import SwiftUI
 
 struct iPadContentView: View {
-    @State private var selectedTab: TabSelection = .home
+    @State private var selectedTab: TabSelection? = .home
+    @State private var columnVisibility: NavigationSplitViewVisibility = .all
     @StateObject private var navigationState = NavigationStateManager.shared
     @State private var showingSettings = false
+    @State private var statisticsShowingFilteredView = false
+    
+    private var selectedTabBinding: Binding<TabSelection> {
+        Binding(
+            get: { selectedTab ?? .home },
+            set: { selectedTab = $0 }
+        )
+    }
     
     var body: some View {
-        NavigationView {
-            VStack(spacing: 0) {
-                // Navigation Bar
-                HStack {
-                    Spacer()
-                    Button(action: {
-                        showingSettings = true
-                    }) {
-                        Image(systemName: "gearshape")
-                            .font(.system(size: 22))
-                    }
-                    .padding(.trailing, 16)
-                }
-                .frame(height: 44)
-                .background(Color(.systemBackground))
-                
-                // Custom Tab Bar
-                HStack(spacing: 0) {
-                    TabButton(selection: $selectedTab, tab: .home, icon: "house", label: "Home")
-                    TabButton(selection: $selectedTab, tab: .collection, icon: "square.grid.2x2", label: "Collection")
-                    TabButton(selection: $selectedTab, tab: .wishlist, icon: "heart.fill", label: "Wishlist")
-                    TabButton(selection: $selectedTab, tab: .journal, icon: "book", label: "Tastings")
-                    TabButton(selection: $selectedTab, tab: .statistics, icon: "chart.bar.fill", label: "Statistics")
-                }
-                .frame(height: 60)
-                .background(Color(.systemBackground))
-                .overlay(
-                    Rectangle()
-                        .frame(height: 0.5)
-                        .foregroundColor(Color(.separator)),
-                    alignment: .bottom
-                )
-                
-                // Content
-                TabView(selection: $selectedTab) {
-                    iPadDashboardView(selectedTab: $selectedTab)
-                        .tag(TabSelection.home)
-                        .navigationBarHidden(true)
-                    
-                    iPadCollectionGridView()
-                        .tag(TabSelection.collection)
-                        .navigationBarHidden(true)
-                    
-                    iPadWishlistView()
-                        .tag(TabSelection.wishlist)
-                        .navigationBarHidden(true)
-                    
-                    JournalView()
-                        .tag(TabSelection.journal)
-                        .navigationBarHidden(true)
-                    
-                    StatisticsView(showingFilteredView: .constant(false))
-                        .tag(TabSelection.statistics)
-                        .navigationBarHidden(true)
-                }
-                .tabViewStyle(.page(indexDisplayMode: .never))
-            }
-            .navigationBarHidden(true)
+        NavigationSplitView(columnVisibility: $columnVisibility) {
+            sidebar
+        } detail: {
+            detailColumn
         }
-        .navigationViewStyle(StackNavigationViewStyle())
-        .fullScreenCover(isPresented: $showingSettings) {
+        .navigationSplitViewStyle(.balanced)
+        .tint(ColorManager.primaryBrandColor)
+        .onChange(of: navigationState.activeTab) { newTab in
+            if let tab = newTab {
+                selectedTab = tab
+                DispatchQueue.main.async {
+                    navigationState.activeTab = nil
+                }
+            }
+        }
+        .sheet(isPresented: $showingSettings) {
             SettingsView()
         }
     }
-}
-
-struct TabButton: View {
-    @Binding var selection: TabSelection
-    let tab: TabSelection
-    let icon: String
-    let label: String
     
-    var body: some View {
-        Button(action: {
-            withAnimation {
-                selection = tab
+    // MARK: - Sidebar
+    
+    private var sidebar: some View {
+        List(selection: $selectedTab) {
+            Section {
+                ForEach(TabSelection.allCases) { tab in
+                    Label(tab.title, systemImage: tab.systemImage)
+                        .tag(tab)
+                }
+            }
+        }
+        .listStyle(.sidebar)
+        .navigationTitle("BarrelBook")
+        .safeAreaInset(edge: .bottom, spacing: 0) {
+            Button {
+                showingSettings = true
                 HapticManager.shared.lightImpact()
+            } label: {
+                Label("Settings", systemImage: "gearshape")
+                    .font(.body.weight(.medium))
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 14)
+                    .contentShape(Rectangle())
             }
-        }) {
-            VStack(spacing: 4) {
-                Image(systemName: icon)
-                    .font(.system(size: 22))
-                Text(label)
-                    .font(.caption)
+            .buttonStyle(.plain)
+            .foregroundStyle(ColorManager.primaryBrandColor)
+            .background(.bar)
+        }
+    }
+    
+    // MARK: - Detail
+    
+    @ViewBuilder
+    private var detailColumn: some View {
+        switch selectedTab ?? .home {
+        case .home:
+            NavigationStack {
+                iPadDashboardView(selectedTab: selectedTabBinding)
+                    .navigationTitle("Home")
+                    .navigationBarTitleDisplayMode(.large)
             }
-            .frame(maxWidth: .infinity)
-            .foregroundColor(selection == tab ? .blue : .secondary)
+        case .collection:
+            iPadCollectionGridView()
+        case .wishlist:
+            iPadWishlistView()
+        case .journal:
+            JournalView()
+        case .statistics:
+            NavigationStack {
+                StatisticsView(showingFilteredView: $statisticsShowingFilteredView)
+            }
         }
     }
 }
@@ -100,4 +94,4 @@ struct TabButton: View {
 #Preview {
     iPadContentView()
         .environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
-} 
+}

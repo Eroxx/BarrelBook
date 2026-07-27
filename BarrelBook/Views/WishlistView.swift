@@ -506,61 +506,61 @@ struct WishlistView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .principal) {
-                Text("Wishlist")
-                    .font(.headline)
-                    .fontWeight(.bold)
-                    // Hide title on iPad
-                    .opacity(UIDevice.current.userInterfaceIdiom == .pad ? 0 : 1)
+                if !DeviceTypeHelper.isIPad {
+                    Text("Wishlist")
+                        .font(.headline)
+                        .fontWeight(.bold)
+                }
             }
             ToolbarItem(placement: .navigationBarLeading) {
-                HStack(spacing: 12) {
-                    // Filter button
-                    Button {
-                        showingFilterSheet = true
-                        HapticManager.shared.mediumImpact()
-                    } label: {
-                        Image(systemName: "line.3.horizontal.decrease.circle")
-                    }
-                    
-                    // Sort button
-                    Button {
-                        showingSortSheet = true
-                        HapticManager.shared.mediumImpact()
-                    } label: {
-                        HStack(spacing: 4) {
-                            Image(systemName: "arrow.up.arrow.down")
-                            if sortConfig.activeSorts.count > 1 {
-                                Text("\(sortConfig.activeSorts.count)")
-                                    .font(.caption2)
-                                    .foregroundColor(.accentColor)
+                if !DeviceTypeHelper.isIPad {
+                    HStack(spacing: 12) {
+                        // Filter button
+                        Button {
+                            showingFilterSheet = true
+                            HapticManager.shared.mediumImpact()
+                        } label: {
+                            Image(systemName: "line.3.horizontal.decrease.circle")
+                        }
+                        
+                        // Sort button
+                        Button {
+                            showingSortSheet = true
+                            HapticManager.shared.mediumImpact()
+                        } label: {
+                            HStack(spacing: 4) {
+                                Image(systemName: "arrow.up.arrow.down")
+                                if sortConfig.activeSorts.count > 1 {
+                                    Text("\(sortConfig.activeSorts.count)")
+                                        .font(.caption2)
+                                        .foregroundColor(.accentColor)
+                                }
                             }
                         }
                     }
                 }
-                // Hide sort/filter buttons on iPad
-                .opacity(UIDevice.current.userInterfaceIdiom == .pad ? 0 : 1)
             }
             ToolbarItem(placement: .navigationBarTrailing) {
-                HStack(spacing: 12) {
-                    // Share button
-                    Button(action: {
-                        shareCurrentList()
-                        HapticManager.shared.lightImpact()
-                    }) {
-                        Image(systemName: "square.and.arrow.up")
-                    }
-                    .disabled(selectedTab == 0 ? wishlistItems.isEmpty : replacementItems.isEmpty)
-                    
-                    // Settings button
-                    Button(action: {
-                        showingSettings = true
-                        HapticManager.shared.lightImpact()
-                    }) {
-                        Image(systemName: "gear")
+                if !DeviceTypeHelper.isIPad {
+                    HStack(spacing: 12) {
+                        // Share button
+                        Button(action: {
+                            shareCurrentList()
+                            HapticManager.shared.lightImpact()
+                        }) {
+                            Image(systemName: "square.and.arrow.up")
+                        }
+                        .disabled(selectedTab == 0 ? wishlistItems.isEmpty : replacementItems.isEmpty)
+                        
+                        // Settings button
+                        Button(action: {
+                            showingSettings = true
+                            HapticManager.shared.lightImpact()
+                        }) {
+                            Image(systemName: "gear")
+                        }
                     }
                 }
-                // Only show these buttons on iPhone, not on iPad
-                .opacity(UIDevice.current.userInterfaceIdiom == .pad ? 0 : 1)
             }
         }
         .overlay(

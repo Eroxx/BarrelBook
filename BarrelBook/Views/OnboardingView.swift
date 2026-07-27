@@ -35,6 +35,16 @@ struct OnboardingView: View {
     @State private var showingCSVImport = false
     @State private var isPurchasing = false
 
+    /// Real iPad idiom — NOT horizontalSizeClass. Sheets / split detail often report
+    /// `.compact` on iPad, which previously kept the phone column layout forever.
+    private var useIPadLayout: Bool { DeviceTypeHelper.isIPad }
+
+    private var outerHorizontalInset: CGFloat { useIPadLayout ? 48 : 0 }
+    private var buttonMaxWidth: CGFloat { useIPadLayout ? 560 : .infinity }
+    private var horizontalPadding: CGFloat { useIPadLayout ? 48 : 32 }
+    private var copyMaxWidth: CGFloat { useIPadLayout ? 560 : .infinity }
+    private var contentMaxWidth: CGFloat { useIPadLayout ? 1100 : .infinity }
+
     // ── Amber palette ─────────────────────────────────────────────────────
     private let deepAmber = Color(red: 0.48, green: 0.22, blue: 0.04)
     private let richAmber = Color(red: 0.60, green: 0.30, blue: 0.06)
@@ -92,75 +102,199 @@ struct OnboardingView: View {
         ),
     ]}
 
-    private var isLastPage: Bool { currentPage == pages.count - 1 }
     private var isPremiumPage: Bool { pages[currentPage].isPremiumPage }
     private var isGetStartedPage: Bool { pages[currentPage].isGetStartedPage }
     private var currentAccent: Color { pages[currentPage].accentColor }
 
     var body: some View {
-        ZStack {
-            LinearGradient(
-                colors: [currentAccent.opacity(0.15), Color(.systemBackground)],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-            .ignoresSafeArea()
-            .animation(.easeInOut(duration: 0.4), value: currentPage)
+        GeometryReader { geo in
+            let wide = useIPadLayout && geo.size.width >= 700
 
-            VStack(spacing: 0) {
-                HStack { Spacer() }.frame(height: 44) // reserved space, no skip button
+            ZStack {
+                LinearGradient(
+                    colors: [currentAccent.opacity(0.15), Color(.systemBackground)],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+                .ignoresSafeArea()
+                .animation(.easeInOut(duration: 0.4), value: currentPage)
 
-                TabView(selection: $currentPage) {
-                    ForEach(pages.indices, id: \.self) { index in
-                        pageView(for: pages[index]).tag(index)
+                VStack(spacing: 0) {
+                    HStack { Spacer() }.frame(height: wide ? 20 : 44)
+
+                    TabView(selection: $currentPage) {
+                        ForEach(pages.indices, id: \.self) { index in
+                            pageView(for: pages[index], wide: wide)
+                                .tag(index)
+                                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        }
                     }
-                }
-                .tabViewStyle(.page(indexDisplayMode: .always))
-                .indexViewStyle(.page(backgroundDisplayMode: .always))
+                    .tabViewStyle(.page(indexDisplayMode: .always))
+                    .indexViewStyle(.page(backgroundDisplayMode: .always))
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
 
-                if isPremiumPage {
-                    premiumPageButtons
-                } else if isGetStartedPage {
-                    lastPageButtons
-                } else {
-                    nextButton
+                    Group {
+                        if isPremiumPage {
+                            premiumPageButtons
+                        } else if isGetStartedPage {
+                            lastPageButtons
+                        } else {
+                            nextButton
+                        }
+                    }
+                    .frame(maxWidth: buttonMaxWidth)
+                    .frame(maxWidth: .infinity)
                 }
+                .frame(maxWidth: contentMaxWidth)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .padding(.horizontal, wide ? outerHorizontalInset : 0)
             }
         }
     }
 
     // ── Page layout ───────────────────────────────────────────────────────
-    private func pageView(for page: OnboardingPage) -> some View {
+    private func pageView(for page: OnboardingPage, wide: Bool) -> some View {
         Group {
             if page.isPremiumPage {
-                premiumPageContent
+                premiumPageContent(wide: wide)
             } else if page.isGetStartedPage {
-                getStartedPageContent
+                getStartedPageContent(wide: wide)
+            } else if wide {
+                regularWidthFeaturePage(for: page)
+            } else {
+                compactFeaturePage(for: page)
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+
+    /// Phone: stacked icon + copy
+    private func compactFeaturePage(for page: OnboardingPage) -> some View {
+        VStack(spacing: 28) {
+            Spacer()
+
+            if page.isWelcome {
+                appIconView(wide: false)
+            } else {
+                symbolIconView(name: page.image, color: page.accentColor, wide: false)
+            }
+
+            pageCopy(for: page, centered: true, wide: false)
+
+            Spacer()
+        }
+        .padding(.top, 20)
+    }
+
+    /// iPad: side-by-side hero across the full canvas (not a ~400pt phone column)
+    private func regularWidthFeaturePage(for page: OnboardingPage) -> some View {
+        HStack(alignment: .center, spacing: 56) {
+            Group {
+                if page.isWelcome {
+                    appIconView(wide: true)
+                } else {
+                    symbolIconView(name: page.image, color: page.accentColor, wide: true)
+                }
+            }
+            .frame(maxWidth: .infinity)
+
+            pageCopy(for: page, centered: false, wide: true)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .padding(.horizontal, horizontalPadding)
+        .padding(.vertical, 40)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+
+    private func pageCopy(for page: OnboardingPage, centered: Bool, wide: Bool) -> some View {
+        VStack(alignment: centered ? .center : .leading, spacing: wide ? 22 : 14) {
+            Text(page.title)
+                .font(wide ? .system(size: 40, weight: .bold) : .title2.bold())
+                .multilineTextAlignment(centered ? .center : .leading)
+
+            Text(page.subtitle)
+                .font(wide ? .title : .title3)
+                .foregroundColor(page.accentColor)
+                .multilineTextAlignment(centered ? .center : .leading)
+
+            Text(page.description)
+                .font(wide ? .title3 : .body)
+                .foregroundColor(.secondary)
+                .multilineTextAlignment(centered ? .center : .leading)
+                .fixedSize(horizontal: false, vertical: true)
+                .frame(maxWidth: wide ? copyMaxWidth : .infinity,
+                       alignment: centered ? .center : .leading)
+        }
+        .padding(.horizontal, centered ? horizontalPadding : 0)
+    }
+
+    // ── Get Started page content ──────────────────────────────────────────
+    private func getStartedPageContent(wide: Bool) -> some View {
+        Group {
+            if wide {
+                HStack(alignment: .center, spacing: 56) {
+                    VStack(spacing: 24) {
+                        symbolIconView(name: "flag.checkered", color: warmAmber, wide: true)
+                        VStack(alignment: .leading, spacing: 14) {
+                            Text("You're All Set")
+                                .font(.system(size: 40, weight: .bold))
+                            Text("Time to build your shelf")
+                                .font(.title)
+                                .foregroundColor(warmAmber)
+                        }
+                    }
+                    .frame(maxWidth: .infinity)
+
+                    VStack(spacing: 20) {
+                        tutorialInfoRow(
+                            icon: "arrow.counterclockwise.circle.fill",
+                            text: "Replay this walkthrough anytime",
+                            detail: "Settings → Help & Tutorials",
+                            wide: true
+                        )
+                        tutorialInfoRow(
+                            icon: "lightbulb.fill",
+                            text: "Each screen has a built-in guide",
+                            detail: "Tips appear automatically on first visit. Reset them anytime in Settings → Help & Tutorials.",
+                            wide: true
+                        )
+                    }
+                    .frame(maxWidth: .infinity)
+                }
+                .padding(.horizontal, horizontalPadding)
+                .padding(.vertical, 40)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
                 VStack(spacing: 28) {
                     Spacer()
 
-                    if page.isWelcome {
-                        appIconView
-                    } else {
-                        symbolIconView(name: page.image, color: page.accentColor)
-                    }
+                    symbolIconView(name: "flag.checkered", color: warmAmber, wide: false)
 
                     VStack(spacing: 14) {
-                        Text(page.title)
+                        Text("You're All Set")
                             .font(.title2).bold()
                             .multilineTextAlignment(.center)
 
-                        Text(page.subtitle)
+                        Text("Time to build your shelf")
                             .font(.title3)
-                            .foregroundColor(page.accentColor)
+                            .foregroundColor(warmAmber)
                             .multilineTextAlignment(.center)
+                    }
+                    .padding(.horizontal, 32)
 
-                        Text(page.description)
-                            .font(.body)
-                            .foregroundColor(.secondary)
-                            .multilineTextAlignment(.center)
-                            .fixedSize(horizontal: false, vertical: true)
+                    VStack(spacing: 12) {
+                        tutorialInfoRow(
+                            icon: "arrow.counterclockwise.circle.fill",
+                            text: "Replay this walkthrough anytime",
+                            detail: "Settings → Help & Tutorials",
+                            wide: false
+                        )
+                        tutorialInfoRow(
+                            icon: "lightbulb.fill",
+                            text: "Each screen has a built-in guide",
+                            detail: "Tips appear automatically on first visit. Reset them anytime in Settings → Help & Tutorials.",
+                            wide: false
+                        )
                     }
                     .padding(.horizontal, 32)
 
@@ -171,142 +305,131 @@ struct OnboardingView: View {
         }
     }
 
-    // ── Get Started page content ──────────────────────────────────────────
-    private var getStartedPageContent: some View {
-        VStack(spacing: 28) {
-            Spacer()
-
-            symbolIconView(name: "flag.checkered", color: warmAmber)
-
-            VStack(spacing: 14) {
-                Text("You're All Set")
-                    .font(.title2).bold()
-                    .multilineTextAlignment(.center)
-
-                Text("Time to build your shelf")
-                    .font(.title3)
-                    .foregroundColor(warmAmber)
-                    .multilineTextAlignment(.center)
-            }
-            .padding(.horizontal, 32)
-
-            // Tutorial info cards
-            VStack(spacing: 12) {
-                tutorialInfoRow(
-                    icon: "arrow.counterclockwise.circle.fill",
-                    text: "Replay this walkthrough anytime",
-                    detail: "Settings → Help & Tutorials"
-                )
-                tutorialInfoRow(
-                    icon: "lightbulb.fill",
-                    text: "Each screen has a built-in guide",
-                    detail: "Tips appear automatically on first visit. Reset them anytime in Settings → Help & Tutorials."
-                )
-            }
-            .padding(.horizontal, 32)
-
-            Spacer()
-        }
-        .padding(.top, 20)
-    }
-
-    private func tutorialInfoRow(icon: String, text: String, detail: String) -> some View {
-        HStack(spacing: 14) {
+    private func tutorialInfoRow(icon: String, text: String, detail: String, wide: Bool) -> some View {
+        HStack(spacing: 16) {
             Image(systemName: icon)
-                .font(.system(size: 28))
+                .font(.system(size: wide ? 36 : 28))
                 .foregroundColor(warmAmber)
-                .frame(width: 36)
+                .frame(width: wide ? 44 : 36)
 
-            VStack(alignment: .leading, spacing: 2) {
+            VStack(alignment: .leading, spacing: 4) {
                 Text(text)
-                    .font(.subheadline).fontWeight(.medium)
+                    .font(wide ? .title3.weight(.semibold) : .subheadline.weight(.medium))
                 Text(detail)
-                    .font(.caption)
+                    .font(wide ? .body : .caption)
                     .foregroundColor(.secondary)
             }
             Spacer()
         }
-        .padding(14)
+        .padding(wide ? 22 : 14)
         .background(warmAmber.opacity(0.08))
-        .cornerRadius(12)
+        .cornerRadius(14)
     }
 
     // ── Premium page content ──────────────────────────────────────────────
-    private var premiumPageContent: some View {
-        VStack(spacing: 10) {
-            // Compact crown icon
+    private func premiumPageContent(wide: Bool) -> some View {
+        VStack(spacing: wide ? 20 : 10) {
             ZStack {
                 Circle()
                     .fill(LinearGradient(
                         colors: [gold.opacity(0.25), gold.opacity(0.08)],
                         startPoint: .topLeading, endPoint: .bottomTrailing
                     ))
-                    .frame(width: 64, height: 64)
+                    .frame(width: wide ? 100 : 64, height: wide ? 100 : 64)
                 Image(systemName: "crown.fill")
-                    .font(.system(size: 26, weight: .medium))
+                    .font(.system(size: wide ? 42 : 26, weight: .medium))
                     .foregroundStyle(LinearGradient(
                         colors: [gold, deepAmber], startPoint: .top, endPoint: .bottom
                     ))
                     .symbolRenderingMode(.hierarchical)
             }
 
-            VStack(spacing: 3) {
+            VStack(spacing: wide ? 8 : 3) {
                 Text("Unlock the Full Shelf")
-                    .font(.title3).bold()
+                    .font(wide ? .system(size: 34, weight: .bold) : .title3.bold())
                     .multilineTextAlignment(.center)
                 Text("One purchase. Unlimited everything.")
-                    .font(.subheadline)
+                    .font(wide ? .title2 : .subheadline)
                     .foregroundColor(gold)
                     .multilineTextAlignment(.center)
             }
-            .padding(.horizontal, 32)
+            .padding(.horizontal, horizontalPadding)
 
-            // Feature list
-            VStack(alignment: .leading, spacing: 7) {
-                premiumFeatureRow("Unlimited bottles in your collection", icon: "infinity")
-                premiumFeatureRow("Unlimited tasting notes, searchable & filterable", icon: "star.bubble.fill")
-                premiumFeatureRow("Deep statistics with value, spending trends, flavor profiles and more", icon: "chart.bar.fill")
-                premiumFeatureRow("Sort & filter by distillery, proof, price, rating, finish, special designations (such as single barrel, BiB, etc.) and more", icon: "line.3.horizontal.decrease.circle.fill")
-                premiumFeatureRow("Wishlist with target prices & store notes", icon: "heart.fill")
-                premiumFeatureRow("Infinity bottle tracker with pour percentages", icon: "drop.fill")
-                premiumFeatureRow("Bottle label scanner that auto-fills name, proof, type and age (beta)", icon: "camera.viewfinder")
-                premiumFeatureRow("CSV import/export, light & dark mode", icon: "moon.stars.fill")
+            Group {
+                if wide {
+                    LazyVGrid(columns: [
+                        GridItem(.flexible(), spacing: 20),
+                        GridItem(.flexible(), spacing: 20)
+                    ], alignment: .leading, spacing: 16) {
+                        premiumFeatureRow("Unlimited bottles in your collection", icon: "infinity", wide: true)
+                        premiumFeatureRow("Unlimited tasting notes, searchable & filterable", icon: "star.bubble.fill", wide: true)
+                        premiumFeatureRow("Deep statistics with value, spending trends, flavor profiles and more", icon: "chart.bar.fill", wide: true)
+                        premiumFeatureRow("Sort & filter by distillery, proof, price, rating, finish, special designations (such as single barrel, BiB, etc.) and more", icon: "line.3.horizontal.decrease.circle.fill", wide: true)
+                        premiumFeatureRow("Wishlist with target prices & store notes", icon: "heart.fill", wide: true)
+                        premiumFeatureRow("Infinity bottle tracker with pour percentages", icon: "drop.fill", wide: true)
+                        premiumFeatureRow("Bottle label scanner that auto-fills name, proof, type and age (beta)", icon: "camera.viewfinder", wide: true)
+                        premiumFeatureRow("CSV import/export, light & dark mode", icon: "moon.stars.fill", wide: true)
+                    }
+                } else {
+                    VStack(alignment: .leading, spacing: 7) {
+                        premiumFeatureRow("Unlimited bottles in your collection", icon: "infinity", wide: false)
+                        premiumFeatureRow("Unlimited tasting notes, searchable & filterable", icon: "star.bubble.fill", wide: false)
+                        premiumFeatureRow("Deep statistics with value, spending trends, flavor profiles and more", icon: "chart.bar.fill", wide: false)
+                        premiumFeatureRow("Sort & filter by distillery, proof, price, rating, finish, special designations (such as single barrel, BiB, etc.) and more", icon: "line.3.horizontal.decrease.circle.fill", wide: false)
+                        premiumFeatureRow("Wishlist with target prices & store notes", icon: "heart.fill", wide: false)
+                        premiumFeatureRow("Infinity bottle tracker with pour percentages", icon: "drop.fill", wide: false)
+                        premiumFeatureRow("Bottle label scanner that auto-fills name, proof, type and age (beta)", icon: "camera.viewfinder", wide: false)
+                        premiumFeatureRow("CSV import/export, light & dark mode", icon: "moon.stars.fill", wide: false)
+                    }
+                }
             }
-            .padding(.horizontal, 28)
+            .padding(.horizontal, wide ? horizontalPadding : 28)
+            .frame(maxWidth: wide ? contentMaxWidth : .infinity)
 
             Spacer(minLength: 8)
         }
-        .padding(.top, 10)
+        .padding(.top, wide ? 28 : 10)
         .padding(.bottom, 8)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
-    private func premiumFeatureRow(_ text: String, icon: String) -> some View {
-        HStack(spacing: 10) {
+    private func premiumFeatureRow(_ text: String, icon: String, wide: Bool) -> some View {
+        HStack(alignment: .top, spacing: 12) {
             Image(systemName: icon)
-                .font(.system(size: 14, weight: .medium))
+                .font(.system(size: wide ? 18 : 14, weight: .medium))
                 .foregroundColor(gold)
-                .frame(width: 20)
+                .frame(width: wide ? 28 : 20)
             Text(text)
-                .font(.footnote)
+                .font(wide ? .body : .footnote)
                 .minimumScaleFactor(0.85)
-                .lineLimit(2)
+                .lineLimit(wide ? 3 : 2)
                 .foregroundColor(.primary)
-            Spacer()
+            Spacer(minLength: 0)
         }
+        .padding(wide ? 14 : 0)
+        .background(
+            Group {
+                if wide {
+                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                        .fill(gold.opacity(0.06))
+                }
+            }
+        )
     }
 
     // ── App icon (welcome page) ───────────────────────────────────────────
-    private var appIconView: some View {
-        Group {
+    private func appIconView(wide: Bool) -> some View {
+        let size: CGFloat = wide ? 220 : 120
+        let radius: CGFloat = wide ? 46 : 26
+        return Group {
             if let uiImage = UIImage(named: "AppIcon") {
                 Image(uiImage: uiImage)
                     .resizable()
                     .aspectRatio(contentMode: .fit)
-                    .frame(width: 120, height: 120)
-                    .clipShape(RoundedRectangle(cornerRadius: 26, style: .continuous))
+                    .frame(width: size, height: size)
+                    .clipShape(RoundedRectangle(cornerRadius: radius, style: .continuous))
                     .shadow(color: gold.opacity(0.4), radius: 16, x: 0, y: 8)
             } else {
-                // Fallback: styled amber circle with a whiskey glass emoji
                 ZStack {
                     Circle()
                         .fill(LinearGradient(
@@ -314,29 +437,31 @@ struct OnboardingView: View {
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
                         ))
-                        .frame(width: 120, height: 120)
+                        .frame(width: size, height: size)
                     Text("🥃")
-                        .font(.system(size: 60))
+                        .font(.system(size: size * 0.5))
                 }
                 .shadow(color: gold.opacity(0.4), radius: 16, x: 0, y: 8)
             }
         }
-        .frame(height: 160)
+        .frame(height: wide ? 240 : 160)
     }
 
     // ── SF Symbol icon (feature pages) ───────────────────────────────────
-    private func symbolIconView(name: String, color: Color) -> some View {
-        ZStack {
+    private func symbolIconView(name: String, color: Color, wide: Bool) -> some View {
+        let circle: CGFloat = wide ? 220 : 140
+        let symbol: CGFloat = wide ? 88 : 58
+        return ZStack {
             Circle()
                 .fill(LinearGradient(
                     colors: [color.opacity(0.25), color.opacity(0.08)],
                     startPoint: .topLeading,
                     endPoint: .bottomTrailing
                 ))
-                .frame(width: 140, height: 140)
+                .frame(width: circle, height: circle)
 
             Image(systemName: name)
-                .font(.system(size: 58, weight: .medium))
+                .font(.system(size: symbol, weight: .medium))
                 .foregroundStyle(
                     LinearGradient(
                         colors: [color, deepAmber],
@@ -346,7 +471,7 @@ struct OnboardingView: View {
                 )
                 .symbolRenderingMode(.hierarchical)
         }
-        .frame(height: 160)
+        .frame(height: wide ? 240 : 160)
     }
 
     // ── Next button ───────────────────────────────────────────────────────

@@ -72,10 +72,13 @@ struct iPadCollectionGridView: View {
     @State private var selectedCategory: String? = nil
     @State private var selectedTypes: Set<String> = []  // New state for multiple type selection
     @State private var selectedWhiskey: Whiskey? = nil
-    @State private var showingDetailView = false
     @State private var sortCriteria: [SortCriterion] = []  // Replace sortOrder with sortCriteria
     @State private var showingColumnOptions = false
     @State private var showingAddSheet = false
+    @State private var viewMode: CollectionViewMode = .whiskeys
+    @State private var showingAddInfinityBottle = false
+    @State private var selectedInfinityBottle: InfinityBottle? = nil
+    @State private var columnVisibility: NavigationSplitViewVisibility = .all
     
     // Column visibility states
     @State private var showTypeColumn = true
@@ -122,6 +125,11 @@ struct iPadCollectionGridView: View {
         predicate: NSPredicate(format: "status == %@", "owned"),
         animation: .default)
     private var whiskeys: FetchedResults<Whiskey>
+    
+    @FetchRequest(
+        sortDescriptors: [NSSortDescriptor(keyPath: \InfinityBottle.name, ascending: true)],
+        animation: .default)
+    private var infinityBottles: FetchedResults<InfinityBottle>
     
     // Categories to filter by
     let categories = ["Bourbon", "Rye", "Scotch", "Irish", "Japanese", "Canadian", "Others"]
@@ -181,9 +189,96 @@ struct iPadCollectionGridView: View {
     }
     
     var body: some View {
+        NavigationSplitView(columnVisibility: $columnVisibility) {
+            collectionPrimaryColumn
+                .navigationTitle("Collection")
+                .navigationBarTitleDisplayMode(.large)
+                .toolbar {
+                    ToolbarItem(placement: .primaryAction) {
+                        Button {
+                            if viewMode == .whiskeys {
+                                if subscriptionManager.canAddWhiskey(currentCount: whiskeys.count) {
+                                    showingAddSheet = true
+                                } else {
+                                    showingPaywall = true
+                                }
+                            } else if subscriptionManager.hasAccess {
+                                showingAddInfinityBottle = true
+                            } else {
+                                showingPaywall = true
+                            }
+                        } label: {
+                            Image(systemName: "plus")
+                        }
+                        .accessibilityLabel(viewMode == .whiskeys ? "Add Whiskey" : "Add Infinity Bottle")
+                    }
+                }
+        } detail: {
+            collectionDetailColumn
+        }
+        .navigationSplitViewStyle(.balanced)
+        .sheet(isPresented: $showingAddSheet) {
+            AddWhiskeyView()
+        }
+        .sheet(isPresented: $showingAddInfinityBottle) {
+            AddInfinityBottleView()
+        }
+        .fullScreenCover(isPresented: $showingPaywall) {
+            PaywallView(isPresented: $showingPaywall)
+        }
+        .onAppear {
+            initializeFilterRanges()
+            selectAllWhiskeyTypes()
+        }
+        .onChange(of: viewMode) { _ in
+            selectedWhiskey = nil
+            selectedInfinityBottle = nil
+        }
+        .onChange(of: selectedInfinityBottle) { bottle in
+            if bottle != nil {
+                selectedWhiskey = nil
+            }
+        }
+        .onChange(of: selectedWhiskey) { whiskey in
+            if whiskey != nil {
+                selectedInfinityBottle = nil
+            }
+        }
+    }
+    
+    @ViewBuilder
+    private var collectionDetailColumn: some View {
+        NavigationStack {
+            if viewMode == .infinityBottles {
+                if let bottle = selectedInfinityBottle {
+                    InfinityBottleDetailView(bottle: bottle)
+                        .environment(\.managedObjectContext, viewContext)
+                        .id(bottle.id)
+                } else {
+                    iPadEmptyDetailView(
+                        title: "Select an Infinity Bottle",
+                        systemImage: "infinity",
+                        description: "Choose a bottle from the list to view its blend details."
+                    )
+                }
+            } else if let whiskey = selectedWhiskey {
+                WhiskeyDetailView(whiskey: whiskey)
+                    .id(whiskey.id)
+            } else {
+                iPadEmptyDetailView(
+                    title: "Select a Bottle",
+                    systemImage: "wineglass",
+                    description: "Choose a whiskey from your collection to see details."
+                )
+            }
+        }
+    }
+    
+    private var collectionPrimaryColumn: some View {
         VStack(spacing: 0) {
             // Search and filter bar
             HStack {
+                if viewMode == .whiskeys {
                 // Reset filters button
                 Button(action: {
                     // Reset filters to show full range of actual data
@@ -282,22 +377,48 @@ struct iPadCollectionGridView: View {
                     .padding()
                     .frame(width: 200)
                 }
+                } else {
+                    Spacer()
+                }
                 
-                // Add new whiskey button
+                // Add new whiskey / infinity bottle button
                 Button(action: {
-                    if subscriptionManager.canAddWhiskey(currentCount: whiskeys.count) {
-                        showingAddSheet = true
+                    if viewMode == .whiskeys {
+                        if subscriptionManager.canAddWhiskey(currentCount: whiskeys.count) {
+                            showingAddSheet = true
+                        } else {
+                            showingPaywall = true
+                        }
+                    } else if subscriptionManager.hasAccess {
+                        showingAddInfinityBottle = true
                     } else {
                         showingPaywall = true
                     }
                 }) {
-                    Label("Add", systemImage: "plus")
+                    Label(viewMode == .whiskeys ? "Add" : "Add Infinity Bottle", systemImage: "plus")
                         .font(.system(size: 16, weight: .medium))
                 }
                 .padding(.horizontal)
             }
             .padding()
             
+            Picker("View Mode", selection: $viewMode) {
+                Text("Whiskeys").tag(CollectionViewMode.whiskeys)
+                Text("Infinity Bottles").tag(CollectionViewMode.infinityBottles)
+            }
+            .pickerStyle(SegmentedPickerStyle())
+            .padding(.horizontal)
+            .padding(.bottom, 12)
+            
+            if viewMode == .infinityBottles {
+                iPadInfinityBottlesContent(
+                    infinityBottles: infinityBottles,
+                    selectedInfinityBottle: $selectedInfinityBottle,
+                    showingAddInfinityBottle: $showingAddInfinityBottle,
+                    hasAccess: subscriptionManager.hasAccess,
+                    onRequestPaywall: { showingPaywall = true }
+                )
+            } else {
             // Filter section with collapsible panels
             VStack(spacing: 16) {
                 // Combined Status and Range Filters Card
@@ -610,9 +731,14 @@ struct iPadCollectionGridView: View {
                             )
                             .onTapGesture {
                                 selectedWhiskey = whiskey
-                                showingDetailView = true
+                                selectedInfinityBottle = nil
                             }
                             .padding(.vertical, 10)
+                            .background(
+                                selectedWhiskey?.id == whiskey.id
+                                    ? ColorManager.primaryBrandColor.opacity(0.12)
+                                    : Color.clear
+                            )
                             
                             Divider()
                         }
@@ -620,27 +746,7 @@ struct iPadCollectionGridView: View {
                     .frame(minWidth: UIScreen.main.bounds.width)
                 }
             }
-        }
-        .navigationTitle("Whiskey Collection")
-        .sheet(isPresented: $showingDetailView) {
-            if let whiskey = selectedWhiskey {
-                NavigationView {
-                    WhiskeyDetailView(whiskey: whiskey)
-                }
-            }
-        }
-        .sheet(isPresented: $showingAddSheet) {
-            AddWhiskeyView()
-        }
-        .fullScreenCover(isPresented: $showingPaywall) {
-            PaywallView(isPresented: $showingPaywall)
-        }
-        .onAppear {
-            // Initialize the slider ranges based on actual data
-            initializeFilterRanges()
-            
-            // Select all whiskey types by default
-            selectAllWhiskeyTypes()
+            } // end whiskeys mode
         }
     }
     
@@ -1677,4 +1783,88 @@ struct StatusFilterButton: View {
         }
         .buttonStyle(PlainButtonStyle())
     }
-} 
+}
+
+// Infinity bottles list/manage for iPad Collection (reuses phone row + detail patterns)
+private struct iPadInfinityBottlesContent: View {
+    @Environment(\.managedObjectContext) private var viewContext
+    let infinityBottles: FetchedResults<InfinityBottle>
+    @Binding var selectedInfinityBottle: InfinityBottle?
+    @Binding var showingAddInfinityBottle: Bool
+    let hasAccess: Bool
+    let onRequestPaywall: () -> Void
+    
+    var body: some View {
+        Group {
+            if infinityBottles.isEmpty {
+                VStack(spacing: 16) {
+                    Image(systemName: "wineglass")
+                        .font(.system(size: 50))
+                        .foregroundColor(.secondary)
+                    
+                    Text("No Infinity Bottles")
+                        .font(.headline)
+                    
+                    Text("Tap Add Infinity Bottle to create your first one")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal)
+                    
+                    Button {
+                        if hasAccess {
+                            showingAddInfinityBottle = true
+                        } else {
+                            onRequestPaywall()
+                        }
+                    } label: {
+                        Label("Create Infinity Bottle", systemImage: "plus.circle.fill")
+                            .font(.headline)
+                    }
+                    .buttonStyle(.borderedProminent)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .padding()
+            } else {
+                List {
+                    ForEach(infinityBottles) { bottle in
+                        Button {
+                            selectedInfinityBottle = bottle
+                        } label: {
+                            HStack {
+                                InfinityBottleRowView(bottle: bottle)
+                                Spacer(minLength: 0)
+                                if selectedInfinityBottle?.id == bottle.id {
+                                    Image(systemName: "checkmark")
+                                        .foregroundStyle(ColorManager.primaryBrandColor)
+                                        .font(.body.weight(.semibold))
+                                }
+                            }
+                            .padding(.vertical, 4)
+                            .contentShape(Rectangle())
+                        }
+                        .buttonStyle(.plain)
+                        .listRowBackground(
+                            selectedInfinityBottle?.id == bottle.id
+                                ? ColorManager.primaryBrandColor.opacity(0.12)
+                                : Color.clear
+                        )
+                    }
+                    .onDelete(perform: deleteInfinityBottles)
+                }
+                .listStyle(.plain)
+            }
+        }
+    }
+    
+    private func deleteInfinityBottles(at offsets: IndexSet) {
+        withAnimation {
+            offsets.map { infinityBottles[$0] }.forEach(viewContext.delete)
+            do {
+                try viewContext.save()
+            } catch {
+                print("Error deleting infinity bottles: \(error)")
+            }
+        }
+    }
+}

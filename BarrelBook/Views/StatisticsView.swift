@@ -799,21 +799,25 @@ struct StatisticsView: View {
                 }
             }
         }
-        .navigationBarTitleDisplayMode(.inline)
+        .navigationTitle(DeviceTypeHelper.isIPad ? "Statistics" : "")
+        .navigationBarTitleDisplayMode(DeviceTypeHelper.isIPad ? .large : .inline)
         .toolbar {
             ToolbarItem(placement: .principal) {
-                Text("Statistics")
-                    .font(.headline)
-                    .fontWeight(.bold)
+                if !DeviceTypeHelper.isIPad {
+                    Text("Statistics")
+                        .font(.headline)
+                        .fontWeight(.bold)
+                }
             }
             ToolbarItem(placement: .navigationBarTrailing) {
-                Button(action: {
-                    showingSettings = true
-                    HapticManager.shared.lightImpact()
-                }) {
-                    Image(systemName: "gear")
+                if !DeviceTypeHelper.isIPad {
+                    Button(action: {
+                        showingSettings = true
+                        HapticManager.shared.lightImpact()
+                    }) {
+                        Image(systemName: "gear")
+                    }
                 }
-                .opacity(UIDevice.current.userInterfaceIdiom == .pad ? 0 : 1)
             }
         }
         .sheet(isPresented: $showingSettings) {

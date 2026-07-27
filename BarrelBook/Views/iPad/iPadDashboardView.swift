@@ -51,7 +51,7 @@ struct iPadDashboardView: View {
     var body: some View {
         GeometryReader { mainGeometry in
             ScrollView {
-                VStack(spacing: 25) {
+                VStack(spacing: 32) {
                     // Quick Actions Row
                     HStack(spacing: 20) {
                         // Add Whiskey
@@ -227,7 +227,8 @@ struct iPadDashboardView: View {
                         }
                     }
                 }
-                .padding(.horizontal)
+                .padding(.horizontal, 28)
+                .padding(.vertical, 8)
             }
             .background(Color(UIColor.systemGroupedBackground).ignoresSafeArea())
         }
