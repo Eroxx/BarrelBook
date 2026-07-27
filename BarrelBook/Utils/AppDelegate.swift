@@ -5,19 +5,25 @@ import CloudKit
 
 class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
-        // Request notification permissions
+        // Request notification permissions (skipped while capturing marketing screenshots)
         UNUserNotificationCenter.current().delegate = self
-        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
-            if granted {
-                print("Notification permission granted")
-                
-                // Register for remote notifications once permission is granted
-                DispatchQueue.main.async {
-                    UIApplication.shared.registerForRemoteNotifications()
+        let skipNotifications = ProcessInfo.processInfo.arguments.contains("-marketingScreenshot")
+            || ProcessInfo.processInfo.arguments.contains("-SKIP_NOTIFICATIONS")
+        if !skipNotifications {
+            UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
+                if granted {
+                    print("Notification permission granted")
+                    
+                    // Register for remote notifications once permission is granted
+                    DispatchQueue.main.async {
+                        UIApplication.shared.registerForRemoteNotifications()
+                    }
+                } else if let error = error {
+                    print("Notification permission error: \(error.localizedDescription)")
                 }
-            } else if let error = error {
-                print("Notification permission error: \(error.localizedDescription)")
             }
+        } else {
+            print("Skipping notification permission request (marketing/screenshot launch)")
         }
         
         // Setup for file access permissions

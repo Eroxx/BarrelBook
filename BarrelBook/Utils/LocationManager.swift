@@ -19,6 +19,10 @@ class LocationManager: NSObject, ObservableObject {
     }
     
     func requestLocation() {
+        // Avoid the system location prompt during website screenshot captures.
+        if ProcessInfo.processInfo.arguments.contains("-marketingScreenshot") {
+            return
+        }
         locationManager.requestWhenInUseAuthorization()
     }
     

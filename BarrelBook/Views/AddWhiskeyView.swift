@@ -197,9 +197,7 @@ struct AddWhiskeyView: View {
                 showingAddWhiskeyTutorialOverlay = true
             }
         }
-        .fullScreenCover(isPresented: $showingPaywall) {
-            PaywallView(isPresented: $showingPaywall)
-        }
+        .barrelPaywallPresentation(isPresented: $showingPaywall)
     }
     
     // MARK: Bottle Scanner — apply scanned data to form fields

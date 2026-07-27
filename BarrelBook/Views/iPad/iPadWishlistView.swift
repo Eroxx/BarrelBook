@@ -17,7 +17,8 @@ struct iPadWishlistView: View {
     @State private var selectedRarities: Set<WhiskeyRarity> = Set(WhiskeyRarity.allCases)
     @State private var showingShareSheet = false
     @State private var shareActivityVC: UIActivityViewController?
-    @State private var columnVisibility: NavigationSplitViewVisibility = .all
+    @State private var columnVisibility: NavigationSplitViewVisibility = .automatic
+    @StateObject private var navigationState = NavigationStateManager.shared
     
     var body: some View {
         NavigationSplitView(columnVisibility: $columnVisibility) {
@@ -53,9 +54,20 @@ struct iPadWishlistView: View {
         .sheet(isPresented: $showingAddSheet) {
             AddWhiskeyToWishlistView()
                 .environment(\.managedObjectContext, viewContext)
+                .iPadFormSheetChrome()
         }
         .sheet(item: $whiskeyToEdit) { whiskey in
             EditWishlistItemView(whiskey: whiskey)
+                .iPadFormSheetChrome()
+        }
+        .onAppear {
+            consumePendingWishlistNavigation()
+        }
+        .onChange(of: navigationState.pendingWishlistWhiskeyID) { _ in
+            consumePendingWishlistNavigation()
+        }
+        .onChange(of: selectedWhiskey) { whiskey in
+            columnVisibility = whiskey == nil ? .automatic : .all
         }
         .sheet(isPresented: Binding(
             get: { showingShareSheet && shareActivityVC != nil },
@@ -87,6 +99,19 @@ struct iPadWishlistView: View {
         .onChange(of: selectedTab) { _ in
             selectedWhiskey = nil
         }
+    }
+    
+    private func consumePendingWishlistNavigation() {
+        guard let id = navigationState.pendingWishlistWhiskeyID else { return }
+        let request: NSFetchRequest<Whiskey> = Whiskey.fetchRequest()
+        request.predicate = NSPredicate(format: "id == %@", id as CVarArg)
+        request.fetchLimit = 1
+        if let whiskey = try? viewContext.fetch(request).first {
+            selectedTab = whiskey.replacementStatus == "wantToReplace" ? 1 : 0
+            selectedWhiskey = whiskey
+            columnVisibility = .all
+        }
+        navigationState.pendingWishlistWhiskeyID = nil
     }
     
     private var wishlistPrimaryColumn: some View {

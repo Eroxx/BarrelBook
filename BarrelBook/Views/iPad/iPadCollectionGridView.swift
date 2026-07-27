@@ -78,7 +78,8 @@ struct iPadCollectionGridView: View {
     @State private var viewMode: CollectionViewMode = .whiskeys
     @State private var showingAddInfinityBottle = false
     @State private var selectedInfinityBottle: InfinityBottle? = nil
-    @State private var columnVisibility: NavigationSplitViewVisibility = .all
+    @State private var columnVisibility: NavigationSplitViewVisibility = .automatic
+    @StateObject private var navigationState = NavigationStateManager.shared
     
     // Column visibility states
     @State private var showTypeColumn = true
@@ -219,30 +220,72 @@ struct iPadCollectionGridView: View {
         .navigationSplitViewStyle(.balanced)
         .sheet(isPresented: $showingAddSheet) {
             AddWhiskeyView()
+                .iPadFormSheetChrome()
         }
         .sheet(isPresented: $showingAddInfinityBottle) {
             AddInfinityBottleView()
+                .iPadFormSheetChrome()
         }
-        .fullScreenCover(isPresented: $showingPaywall) {
-            PaywallView(isPresented: $showingPaywall)
-        }
+        .barrelPaywallPresentation(isPresented: $showingPaywall)
         .onAppear {
             initializeFilterRanges()
             selectAllWhiskeyTypes()
+            consumePendingNavigation()
+        }
+        .onChange(of: navigationState.pendingCollectionWhiskeyID) { _ in
+            consumePendingNavigation()
+        }
+        .onChange(of: navigationState.pendingInfinityBottleID) { _ in
+            consumePendingNavigation()
         }
         .onChange(of: viewMode) { _ in
             selectedWhiskey = nil
             selectedInfinityBottle = nil
+            if selectedWhiskey == nil && selectedInfinityBottle == nil {
+                columnVisibility = .automatic
+            }
         }
         .onChange(of: selectedInfinityBottle) { bottle in
             if bottle != nil {
                 selectedWhiskey = nil
+                columnVisibility = .all
+            } else if selectedWhiskey == nil {
+                columnVisibility = .automatic
             }
         }
         .onChange(of: selectedWhiskey) { whiskey in
             if whiskey != nil {
                 selectedInfinityBottle = nil
+                columnVisibility = .all
+            } else if selectedInfinityBottle == nil {
+                columnVisibility = .automatic
             }
+        }
+    }
+    
+    private func consumePendingNavigation() {
+        if navigationState.preferInfinityCollectionMode || navigationState.pendingInfinityBottleID != nil {
+            viewMode = .infinityBottles
+            navigationState.preferInfinityCollectionMode = false
+        }
+        
+        if let id = navigationState.pendingInfinityBottleID {
+            if let bottle = infinityBottles.first(where: { $0.id == id }) {
+                selectedInfinityBottle = bottle
+                selectedWhiskey = nil
+                columnVisibility = .all
+            }
+            navigationState.pendingInfinityBottleID = nil
+        }
+        
+        if let id = navigationState.pendingCollectionWhiskeyID {
+            viewMode = .whiskeys
+            if let whiskey = whiskeys.first(where: { $0.id == id }) {
+                selectedWhiskey = whiskey
+                selectedInfinityBottle = nil
+                columnVisibility = .all
+            }
+            navigationState.pendingCollectionWhiskeyID = nil
         }
     }
     

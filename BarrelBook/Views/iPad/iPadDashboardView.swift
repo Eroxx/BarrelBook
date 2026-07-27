@@ -5,13 +5,11 @@ struct iPadDashboardView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.colorScheme) private var colorScheme
     @Binding var selectedTab: TabSelection
+    @StateObject private var navigationState = NavigationStateManager.shared
     @State private var showingAddWhiskey = false
     @State private var showingAddWishlist = false
     @State private var showingAddJournal = false
-    @State private var selectedJournalEntry: JournalEntry?
-    @State private var selectedWhiskey: Whiskey?
     @State private var whiskeyToEdit: Whiskey?
-    @State private var selectedInfinityBottle: InfinityBottle?
     
     // Fetch recently added whiskeys
     @FetchRequest(
@@ -136,7 +134,7 @@ struct iPadDashboardView: View {
                                             ForEach(Array(recentWhiskeys.prefix(15)), id: \.id) { whiskey in
                                                 RecentActivityRow(whiskey: whiskey)
                                                     .onTapGesture {
-                                                        selectedWhiskey = whiskey
+                                                        navigationState.openOwnedWhiskey(whiskey)
                                                     }
                                             }
                                         }
@@ -159,8 +157,8 @@ struct iPadDashboardView: View {
                                         VStack(spacing: 14) {
                                             ForEach(Array(allJournalEntries.prefix(10)), id: \.id) { entry in
                                                 if let whiskey = entry.whiskey, let date = entry.date {
-                                                                                                         Button(action: {
-                                                        selectedJournalEntry = entry
+                                                    Button(action: {
+                                                        navigationState.openJournalEntry(entry)
                                                     }) {
                                                         DashboardJournalEntryRow(whiskey: whiskey, entry: entry, date: date)
                                                     }
@@ -184,7 +182,7 @@ struct iPadDashboardView: View {
                                             ForEach(Array(wishlistWhiskeys.prefix(15)), id: \.id) { whiskey in
                                                 DashboardWishlistItemRow(whiskey: whiskey)
                                                     .onTapGesture {
-                                                        selectedWhiskey = whiskey
+                                                        navigationState.openWishlistWhiskey(whiskey)
                                                     }
                                                     .contextMenu {
                                                         Button {
@@ -218,7 +216,7 @@ struct iPadDashboardView: View {
                                     ForEach(infinityBottles, id: \.id) { bottle in
                                         InfinityBottleCard(infinityBottle: bottle)
                                             .onTapGesture {
-                                                selectedInfinityBottle = bottle
+                                                navigationState.openInfinityBottle(bottle)
                                             }
                                     }
                                 }
@@ -232,60 +230,24 @@ struct iPadDashboardView: View {
             }
             .background(Color(UIColor.systemGroupedBackground).ignoresSafeArea())
         }
-        .sheet(item: $selectedJournalEntry) { entry in
-            NavigationView {
-                JournalEntryDetailView(entry: entry)
-                    .navigationBarTitleDisplayMode(.inline)
-                    .toolbar {
-                        ToolbarItem(placement: .navigationBarTrailing) {
-                            Button("Done") {
-                                selectedJournalEntry = nil
-                            }
-                        }
-                    }
-            }
-        }
-        .sheet(item: $selectedWhiskey) { whiskey in
-            NavigationView {
-                WhiskeyDetailView(whiskey: whiskey)
-                    .navigationBarTitleDisplayMode(.inline)
-                    .toolbar {
-                        ToolbarItem(placement: .navigationBarTrailing) {
-                            Button("Done") {
-                                selectedWhiskey = nil
-                            }
-                        }
-                    }
-            }
-        }
         .sheet(item: $whiskeyToEdit) { whiskey in
             EditWishlistItemView(whiskey: whiskey)
-        }
-        .sheet(item: $selectedInfinityBottle) { bottle in
-            NavigationView {
-                InfinityBottleDetailView(bottle: bottle)
-                    .environment(\.managedObjectContext, viewContext)
-                    .navigationBarTitleDisplayMode(.inline)
-                    .toolbar {
-                        ToolbarItem(placement: .navigationBarLeading) {
-                            Button("Done") {
-                                selectedInfinityBottle = nil
-                            }
-                        }
-                    }
-            }
+                .iPadFormSheetChrome()
         }
         .sheet(isPresented: $showingAddWhiskey) {
             AddWhiskeyView()
                 .environment(\.managedObjectContext, viewContext)
+                .iPadFormSheetChrome()
         }
         .sheet(isPresented: $showingAddWishlist) {
             AddWhiskeyToWishlistView()
                 .environment(\.managedObjectContext, viewContext)
+                .iPadFormSheetChrome()
         }
         .sheet(isPresented: $showingAddJournal) {
             AddJournalEntryView()
                 .environment(\.managedObjectContext, viewContext)
+                .iPadFormSheetChrome()
         }
     }
     

@@ -69,6 +69,8 @@ struct JournalView: View {
     @State private var showingFilterSheet = false
     @State private var showingSettings = false
     @State private var selectedEntry: JournalEntry?
+    @State private var columnVisibility: NavigationSplitViewVisibility = .automatic
+    @StateObject private var navigationState = NavigationStateManager.shared
     @FocusState private var isSearchFocused: Bool
     @AppStorage("hasSeenJournalTutorial") private var hasSeenJournalTutorial = false
     @State private var showingJournalTutorialOverlay = false
@@ -361,27 +363,41 @@ struct JournalView: View {
         }
         .sheet(isPresented: $showingAddEntry) {
             AddJournalEntryView()
+                .iPadFormSheetChrome()
         }
         .sheet(isPresented: $showingEditSheet, onDismiss: {
             editingEntry = nil
         }) {
             if let entry = editingEntry {
                 EditJournalEntryView(entry: entry)
+                    .iPadFormSheetChrome()
             }
         }
         .sheet(isPresented: $showingSortSheet) {
             JournalHierarchicalSortPickerView(sortConfig: $sortConfig)
+                .iPadFormSheetChrome()
         }
         .sheet(isPresented: $showingFilterSheet) {
             journalFilterSheet
+                .iPadFormSheetChrome()
         }
         .sheet(isPresented: $showingSettings) {
             SettingsView()
+                .iPadFormSheetChrome()
         }
         .onAppear {
             sortConfig = FilterSettingsManager.loadJournalHierarchicalSortConfig()
             if !hasSeenJournalTutorial {
                 showingJournalTutorialOverlay = true
+            }
+            consumePendingJournalNavigation()
+        }
+        .onChange(of: navigationState.pendingJournalEntryID) { _ in
+            consumePendingJournalNavigation()
+        }
+        .onChange(of: selectedEntry) { entry in
+            if DeviceTypeHelper.isIPad {
+                columnVisibility = entry == nil ? .automatic : .all
             }
         }
         .onChange(of: sortConfig.activeSorts) { _ in
@@ -389,8 +405,17 @@ struct JournalView: View {
         }
     }
     
+    private func consumePendingJournalNavigation() {
+        guard let id = navigationState.pendingJournalEntryID else { return }
+        if let entry = entries.first(where: { $0.id == id }) {
+            selectedEntry = entry
+            columnVisibility = .all
+        }
+        navigationState.pendingJournalEntryID = nil
+    }
+    
     private var iPadJournalLayout: some View {
-        NavigationSplitView {
+        NavigationSplitView(columnVisibility: $columnVisibility) {
             journalMainColumn
                 .navigationTitle("Tastings")
                 .navigationBarTitleDisplayMode(.large)

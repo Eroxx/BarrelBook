@@ -28,9 +28,7 @@ struct SubscriptionGuardView<Content: View>: View {
                 await subscriptionManager.loadProducts()
             }
         }
-        .fullScreenCover(isPresented: $showingPaywall) {
-            PaywallView(isPresented: $showingPaywall)
-        }
+        .barrelPaywallPresentation(isPresented: $showingPaywall)
     }
     
     private var subscriptionBlockedView: some View {
@@ -126,9 +124,7 @@ struct LockedFeatureOverlay: View {
                     .cornerRadius(8)
                 }
             }
-            .fullScreenCover(isPresented: $showingPaywall) {
-                PaywallView(isPresented: $showingPaywall)
-            }
+            .barrelPaywallPresentation(isPresented: $showingPaywall)
         }
     }
 }

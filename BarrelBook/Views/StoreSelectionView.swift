@@ -276,8 +276,12 @@ struct StoreSelectionView: View {
             print("Location status: not determined")
             if !hasRequestedLocation {
                 hasRequestedLocation = true
-                print("Requesting location authorization")
-                newManager.requestWhenInUseAuthorization()
+                if ProcessInfo.processInfo.arguments.contains("-marketingScreenshot") {
+                    print("Skipping location authorization for marketing screenshot")
+                } else {
+                    print("Requesting location authorization")
+                    newManager.requestWhenInUseAuthorization()
+                }
             }
         case .restricted, .denied:
             print("Location status: restricted/denied")

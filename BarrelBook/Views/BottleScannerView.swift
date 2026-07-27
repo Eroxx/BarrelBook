@@ -11,6 +11,7 @@
 import SwiftUI
 import UIKit
 import AVFoundation
+import PhotosUI
 
 // MARK: - Scan state machine
 
@@ -31,7 +32,12 @@ struct BottleScannerView: View {
 
     @State private var scanState: ScanState = .idle
     @State private var showingCamera: Bool = false
+    @State private var photoPickerItem: PhotosPickerItem? = nil
     @AppStorage("bb_hasSeenScannerTip") private var hasSeenScannerTip = false
+
+    private var cameraAvailable: Bool {
+        UIImagePickerController.isSourceTypeAvailable(.camera)
+    }
 
     var body: some View {
         ZStack {
@@ -56,12 +62,10 @@ struct BottleScannerView: View {
                         { finalData in
                             callback(finalData)
                             scanState = .idle
-                            showingCamera = UIImagePickerController.isSourceTypeAvailable(.camera)
                         }
                     },
                     onRetake: {
                         scanState = .idle
-                        showingCamera = UIImagePickerController.isSourceTypeAvailable(.camera)
                     },
                     onCancel: {
                         isPresented = false
@@ -80,14 +84,26 @@ struct BottleScannerView: View {
                 },
                 onCancel: {
                     showingCamera = false
-                    if case .idle = scanState { isPresented = false }
+                    // Stay on Ready to Scan / tip so user can choose Take Photo or Library
                 }
             )
             .ignoresSafeArea()
         }
-        .onAppear {
-            if hasSeenScannerTip && UIImagePickerController.isSourceTypeAvailable(.camera) {
-                showingCamera = true
+        .onChange(of: photoPickerItem) { newItem in
+            guard let newItem else { return }
+            hasSeenScannerTip = true
+            Task {
+                if let data = try? await newItem.loadTransferable(type: Data.self),
+                   let image = UIImage(data: data) {
+                    await MainActor.run {
+                        photoPickerItem = nil
+                        scanState = .preview(image)
+                    }
+                } else {
+                    await MainActor.run {
+                        photoPickerItem = nil
+                    }
+                }
             }
         }
     }
@@ -99,21 +115,43 @@ struct BottleScannerView: View {
         if !hasSeenScannerTip {
             tipView
         } else {
-            // Simulator / no camera
+            // Simulator / no camera — library still works
             ZStack {
                 Color.black.ignoresSafeArea()
-                VStack(spacing: 16) {
-                    Image(systemName: "camera.slash")
+                VStack(spacing: 20) {
+                    Image(systemName: cameraAvailable ? "camera.viewfinder" : "photo.on.rectangle")
                         .font(.system(size: 48))
                         .foregroundColor(.white.opacity(0.6))
-                    Text("Camera not available on this device")
+                    Text(cameraAvailable ? "Ready to Scan" : "Camera not available")
                         .font(.headline)
                         .foregroundColor(.white)
                         .multilineTextAlignment(.center)
+                    if cameraAvailable {
+                        Button {
+                            showingCamera = true
+                        } label: {
+                            Label("Take Photo", systemImage: "camera.fill")
+                                .font(.headline)
+                                .foregroundColor(.black)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 14)
+                                .background(Color.white)
+                                .cornerRadius(14)
+                        }
+                    }
+                    PhotosPicker(selection: $photoPickerItem, matching: .images, photoLibrary: .shared()) {
+                        Label("Choose from Library", systemImage: "photo.on.rectangle")
+                            .font(.headline)
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 14)
+                            .background(Color.white.opacity(0.18))
+                            .cornerRadius(14)
+                    }
                     Button("Close") { isPresented = false }
-                        .foregroundColor(.blue)
+                        .foregroundColor(.white.opacity(0.7))
                 }
-                .padding()
+                .padding(.horizontal, 32)
             }
         }
     }
@@ -150,7 +188,7 @@ struct BottleScannerView: View {
                         .font(.title2.bold())
                         .foregroundColor(.white)
 
-                    Text("Take a photo of the **front label** in good light. BarrelBook will identify the name, type, proof, age, and cask finish.")
+                    Text("Take a photo of the **front label** in good light — or pick one from your library. BarrelBook will identify the name, type, proof, age, and cask finish.")
                         .font(.body)
                         .foregroundColor(.white.opacity(0.85))
                         .multilineTextAlignment(.center)
@@ -159,17 +197,31 @@ struct BottleScannerView: View {
 
                 Spacer()
 
-                Button {
-                    hasSeenScannerTip = true
-                    showingCamera = UIImagePickerController.isSourceTypeAvailable(.camera)
-                } label: {
-                    Label("Take Photo", systemImage: "camera.fill")
-                        .font(.headline)
-                        .foregroundColor(.black)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 16)
-                        .background(Color.white)
-                        .cornerRadius(14)
+                VStack(spacing: 12) {
+                    if cameraAvailable {
+                        Button {
+                            hasSeenScannerTip = true
+                            showingCamera = true
+                        } label: {
+                            Label("Take Photo", systemImage: "camera.fill")
+                                .font(.headline)
+                                .foregroundColor(.black)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 16)
+                                .background(Color.white)
+                                .cornerRadius(14)
+                        }
+                    }
+
+                    PhotosPicker(selection: $photoPickerItem, matching: .images, photoLibrary: .shared()) {
+                        Label("Choose from Library", systemImage: "photo.on.rectangle")
+                            .font(.headline)
+                            .foregroundColor(cameraAvailable ? .white : .black)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 16)
+                            .background(cameraAvailable ? Color.white.opacity(0.18) : Color.white)
+                            .cornerRadius(14)
+                    }
                 }
                 .padding(.horizontal, 32)
                 .padding(.bottom, 52)
@@ -201,9 +253,8 @@ struct BottleScannerView: View {
                 HStack(spacing: 16) {
                     Button {
                         scanState = .idle
-                        showingCamera = UIImagePickerController.isSourceTypeAvailable(.camera)
                     } label: {
-                        Text("Retake")
+                        Text(cameraAvailable ? "Retake" : "Choose Again")
                             .font(.headline)
                             .foregroundColor(.white)
                             .frame(maxWidth: .infinity)
@@ -280,16 +331,28 @@ struct BottleScannerView: View {
                 }
 
                 VStack(spacing: 12) {
-                    Button {
-                        scanState = .idle
-                        showingCamera = UIImagePickerController.isSourceTypeAvailable(.camera)
-                    } label: {
-                        Label("Try Again", systemImage: "camera.fill")
+                    if cameraAvailable {
+                        Button {
+                            scanState = .idle
+                            showingCamera = true
+                        } label: {
+                            Label("Try Again", systemImage: "camera.fill")
+                                .font(.headline)
+                                .foregroundColor(.black)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 16)
+                                .background(Color.white)
+                                .cornerRadius(14)
+                        }
+                    }
+
+                    PhotosPicker(selection: $photoPickerItem, matching: .images, photoLibrary: .shared()) {
+                        Label("Choose from Library", systemImage: "photo.on.rectangle")
                             .font(.headline)
-                            .foregroundColor(.black)
+                            .foregroundColor(cameraAvailable ? .white : .black)
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 16)
-                            .background(Color.white)
+                            .background(cameraAvailable ? Color.white.opacity(0.18) : Color.white)
                             .cornerRadius(14)
                     }
 

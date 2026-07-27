@@ -890,7 +890,9 @@ struct WhiskeyDetailView: View {
                 }
             }
             cleanupInvalidBottleInstances()
-            locationManager.requestLocation()
+            if !ProcessInfo.processInfo.arguments.contains("-marketingScreenshot") {
+                locationManager.requestLocation()
+            }
             verifyBottleCounts()
             if !whiskey.isWishlist {
                 bottleDetailVisitCount += 1

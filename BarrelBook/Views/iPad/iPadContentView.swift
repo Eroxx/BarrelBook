@@ -32,6 +32,7 @@ struct iPadContentView: View {
         }
         .sheet(isPresented: $showingSettings) {
             SettingsView()
+                .iPadFormSheetChrome()
         }
     }
     

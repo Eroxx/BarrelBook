@@ -29,7 +29,10 @@ class SubscriptionManager: ObservableObject {
     // Update hasAccess based on bypass setting and subscription status
     private func updateHasAccess() {
         let newValue: Bool
-        if bypassFreemiumMode {
+        // Marketing screenshot launches should show the full premium iPad frames.
+        if ProcessInfo.processInfo.arguments.contains("-marketingScreenshot") {
+            newValue = true
+        } else if bypassFreemiumMode {
             newValue = true
             #if DEBUG
             #endif

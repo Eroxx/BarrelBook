@@ -37,6 +37,35 @@ struct DeviceTypeHelper {
     }
 }
 
+extension View {
+    /// Large form-style sheet chrome on iPad; unchanged on iPhone.
+    @ViewBuilder
+    func iPadFormSheetChrome() -> some View {
+        if DeviceTypeHelper.isIPad {
+            self
+                .presentationDetents([.large])
+                .presentationDragIndicator(.visible)
+        } else {
+            self
+        }
+    }
+    
+    /// Paywall: large sheet on iPad, full-screen cover on iPhone.
+    @ViewBuilder
+    func barrelPaywallPresentation(isPresented: Binding<Bool>) -> some View {
+        if DeviceTypeHelper.isIPad {
+            self.sheet(isPresented: isPresented) {
+                PaywallView(isPresented: isPresented)
+                    .iPadFormSheetChrome()
+            }
+        } else {
+            self.fullScreenCover(isPresented: isPresented) {
+                PaywallView(isPresented: isPresented)
+            }
+        }
+    }
+}
+
 /// Empty detail placeholder for iPad split columns (iOS 16–compatible).
 struct iPadEmptyDetailView: View {
     let title: String

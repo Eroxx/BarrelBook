@@ -579,18 +579,34 @@ struct StatisticsView: View {
     @AppStorage("hasSeenStatisticsTutorial") private var hasSeenStatisticsTutorial = false
     @State private var showingStatisticsTutorialOverlay = false
     
+    private var statisticsGridColumns: [GridItem] {
+        if DeviceTypeHelper.isIPad {
+            return [
+                GridItem(.flexible(), spacing: 24),
+                GridItem(.flexible(), spacing: 24)
+            ]
+        }
+        return [GridItem(.flexible())]
+    }
+    
+    private var statisticsFullWidthSpan: Int {
+        DeviceTypeHelper.isIPad ? 2 : 1
+    }
+    
     var body: some View {
         ScrollViewReader { proxy in
             ZStack {
                 ScrollView {
-                    VStack(spacing: 24) {
+                    LazyVGrid(columns: statisticsGridColumns, spacing: 24) {
 
                         // 1. Collection Value — hero card (CollectionValueSection has its own card styling)
                         CollectionValueSection(whiskeys: whiskeys)
                             .id("value")
+                            .gridCellColumns(statisticsFullWidthSpan)
 
                         // 2. Quick Stats Row — 4 pills
                         QuickStatsRow(whiskeys: whiskeys)
+                            .gridCellColumns(statisticsFullWidthSpan)
 
                         // 3. Special Attributes
                         StatCard(title: "Special Attributes") {
@@ -728,6 +744,7 @@ struct StatisticsView: View {
                                 ActivityTimelineStats(whiskeys: whiskeys, section: .collectionCharts)
                             }
                             .id("timeline")
+                            .gridCellColumns(statisticsFullWidthSpan)
                         } else {
                             PremiumFeatureCard(
                                 title: "Collection History",
@@ -735,6 +752,7 @@ struct StatisticsView: View {
                             ) {
                                 showingPaywall = true
                             }
+                            .gridCellColumns(statisticsFullWidthSpan)
                         }
                     }
                     .padding()
@@ -822,10 +840,9 @@ struct StatisticsView: View {
         }
         .sheet(isPresented: $showingSettings) {
             SettingsView()
+                .iPadFormSheetChrome()
         }
-        .fullScreenCover(isPresented: $showingPaywall) {
-            PaywallView(isPresented: $showingPaywall)
-        }
+        .barrelPaywallPresentation(isPresented: $showingPaywall)
         .preferredColorScheme(storedColorScheme == .dark ? .dark : storedColorScheme == .light ? .light : nil)
     }
 }
