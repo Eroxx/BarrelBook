@@ -478,14 +478,15 @@ struct CollectionView: View {
                                 let totalBottles = currentWhiskeys.reduce(0) { total, whiskey in
                                     return total + Int(whiskey.numberOfBottles)
                                 }
-                                let currentValue = currentWhiskeys.reduce(0.0) { $0 + ($1.price * Double($1.numberOfBottles)) }
+                                let currentValue = currentWhiskeys.totalCurrentValue
+                                let secondaryValue = currentWhiskeys.totalSecondaryMarketValue
                                 
                                 // Show both unique whiskeys and total bottles
                                 Text("\(currentWhiskeys.count) whiskeys (\(totalBottles) bottles)")
                                     .foregroundColor(.secondary)
                                 Text("•")
                                     .foregroundColor(.secondary)
-                                PrivacyAwareValueText(value: currentValue)
+                                PrivacyAwareValueText(value: currentValue, secondaryValue: secondaryValue)
                             }
                             .font(.footnote)
                             .padding(.horizontal)

@@ -22,6 +22,7 @@ struct AddWhiskeyView: View {
     @State private var activeBottles = 1
     @State private var openBottles = 0
     @State private var price = ""
+    @State private var secondaryMarketValue = ""
     @State private var deadBottles = 0
     @State private var isBiB = false
     @State private var isSiB = false
@@ -29,6 +30,7 @@ struct AddWhiskeyView: View {
     @State private var storePickName = ""
     @State private var isOpen = false
     @State private var notes = ""
+    @ObservedObject private var privacyManager = PrivacyManager.shared
     
     // Fetch current whiskeys to check limits
     @FetchRequest(
@@ -51,6 +53,10 @@ struct AddWhiskeyView: View {
                     TextField("Finish", text: $finish)
                     TextField("Price", text: $price)
                         .keyboardType(.decimalPad)
+                    if privacyManager.showSecondaryMarketValue {
+                        TextField("Secondary Market Value", text: $secondaryMarketValue)
+                            .keyboardType(.decimalPad)
+                    }
                 }
                 
                 Section(header: Text("Inventory Info")) {
@@ -278,6 +284,9 @@ struct AddWhiskeyView: View {
             newWhiskey.distillery = distillery
             newWhiskey.numberOfBottles = Int16(activeBottles)
             newWhiskey.price = Double(price) ?? 0.0
+            if privacyManager.showSecondaryMarketValue {
+                newWhiskey.secondaryMarketValue = Double(secondaryMarketValue) ?? 0.0
+            }
             newWhiskey.isFinished = Int16(deadBottles)
             newWhiskey.isOpen = openBottles > 0
             newWhiskey.isBiB = isBiB

@@ -850,6 +850,16 @@ Know thy shelf - Eric
                     .font(.caption)
                     .foregroundColor(.secondary)
             }
+            
+            Toggle(isOn: $privacyManager.showSecondaryMarketValue) {
+                Text("Show Secondary Market Value")
+            }
+            
+            if privacyManager.showSecondaryMarketValue {
+                Text("Adds an optional secondary market value on bottles and shows Paid vs Secondary collection totals.")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
         }
     }
     

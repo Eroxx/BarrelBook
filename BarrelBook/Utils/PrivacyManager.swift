@@ -10,9 +10,17 @@ class PrivacyManager: ObservableObject {
         }
     }
     
+    /// When on, Add/Edit show a Secondary Market Value field and dual totals appear.
+    @Published var showSecondaryMarketValue: Bool {
+        didSet {
+            FilterSettingsManager.saveShowSecondaryMarketValueSetting(showSecondaryMarketValue)
+        }
+    }
+    
     private init() {
         // Load from UserDefaults
         hidePrices = FilterSettingsManager.loadHidePricesSetting()
+        showSecondaryMarketValue = FilterSettingsManager.loadShowSecondaryMarketValueSetting()
     }
     
     func toggleHidePrices() {

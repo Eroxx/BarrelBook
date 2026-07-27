@@ -136,6 +136,9 @@ class PersistenceController {
         description.setOption(true as NSNumber, forKey: NSPersistentStoreRemoteChangeNotificationPostOptionKey)
         description.setOption(true as NSNumber, forKey: NSPersistentHistoryTrackingKey)
         description.cloudKitContainerOptions = NSPersistentCloudKitContainerOptions(containerIdentifier: "iCloud.com.ericlinder.barrelbookapp")
+        // Lightweight migration for model version bumps (e.g. secondaryMarketValue)
+        description.shouldMigrateStoreAutomatically = true
+        description.shouldInferMappingModelAutomatically = true
         
         // Load the persistent stores
         container.loadPersistentStores { description, error in

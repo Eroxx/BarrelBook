@@ -322,6 +322,7 @@ struct HomeView: View {
                 } else {
                     // Normal home content
                     actionCardsSection
+                    homeCollectionValueSummary
                     UsageCounterView(
                         currentWhiskeyCount: whiskeys.count,
                         currentTastingCount: allJournalEntries.count
@@ -825,14 +826,27 @@ struct HomeView: View {
         .shadow(color: ColorManager.primaryBrandColor.opacity(colorScheme == .dark ? 0.12 : 0.08), radius: 8, x: 0, y: 2)
     }
     
-    // Calculate total collection value
+    // Calculate total collection value (canonical bottle-based paid total)
     private var totalCollectionValue: Double {
-        let total = whiskeys.filter { $0.statusEnum == .owned }.reduce(0.0) { result, whiskey in
-            guard let bottles = whiskey.bottleInstances as? Set<BottleInstance> else { return result }
-            let activeBottles = bottles.filter { !$0.isDead }.count
-            return result + (whiskey.price * Double(activeBottles))
+        whiskeys.filter { $0.statusEnum == .owned }.totalCurrentValue
+    }
+    
+    private var totalSecondaryMarketValue: Double {
+        whiskeys.filter { $0.statusEnum == .owned }.totalSecondaryMarketValue
+    }
+    
+    private var homeCollectionValueSummary: some View {
+        HStack {
+            Text("Collection value")
+                .foregroundColor(.secondary)
+            Spacer()
+            PrivacyAwareValueText(
+                value: totalCollectionValue,
+                secondaryValue: totalSecondaryMarketValue
+            )
         }
-        return total
+        .font(.footnote)
+        .padding(.horizontal, 4)
     }
     
     // Get last added bottle text for context
@@ -1515,9 +1529,14 @@ struct RecentActivityView: View {
 // Add a privacy-aware value text component
 struct PrivacyAwareValueText: View {
     let value: Double
+    var secondaryValue: Double? = nil
     
     @ObservedObject private var privacyManager = PrivacyManager.shared
     @State private var temporarilyShowValue: Bool = false
+    
+    private var showsSecondary: Bool {
+        privacyManager.showSecondaryMarketValue && secondaryValue != nil
+    }
     
     var body: some View {
         HStack(spacing: 4) {
@@ -1535,6 +1554,19 @@ struct PrivacyAwareValueText: View {
                 }) {
                     Image(systemName: "lock.fill")
                         .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+            } else if showsSecondary, let secondaryValue {
+                Text("Paid \(AppFormatters.formatCurrency(value))")
+                    .fontWeight(.semibold)
+                Text("·")
+                    .foregroundColor(.secondary)
+                Text("Sec \(AppFormatters.formatCurrency(secondaryValue))")
+                    .fontWeight(.semibold)
+                
+                if privacyManager.hidePrices && temporarilyShowValue {
+                    Image(systemName: "timer")
+                        .font(.caption2)
                         .foregroundColor(.secondary)
                 }
             } else {

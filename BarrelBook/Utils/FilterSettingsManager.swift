@@ -29,6 +29,7 @@ class FilterSettingsManager {
     
     // MARK: - Privacy Settings
     private static let hidePricesKey = "hidePrices"
+    private static let showSecondaryMarketValueKey = "showSecondaryMarketValue"
     
     // Save current sort option
     static func saveCurrentSort(_ sort: SortOption) {
@@ -237,5 +238,15 @@ class FilterSettingsManager {
     // Load privacy setting for hiding prices
     static func loadHidePricesSetting() -> Bool {
         return UserDefaults.standard.bool(forKey: hidePricesKey)
+    }
+    
+    // Save setting for showing secondary market value fields/totals
+    static func saveShowSecondaryMarketValueSetting(_ enabled: Bool) {
+        UserDefaults.standard.set(enabled, forKey: showSecondaryMarketValueKey)
+    }
+    
+    // Load setting for showing secondary market value (defaults to false)
+    static func loadShowSecondaryMarketValueSetting() -> Bool {
+        return UserDefaults.standard.bool(forKey: showSecondaryMarketValueKey)
     }
 } 

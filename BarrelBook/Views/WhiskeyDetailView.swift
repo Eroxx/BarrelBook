@@ -380,7 +380,21 @@ struct WhiskeyDetailView: View {
                         
                         // Add price information only if price is greater than 0
                         if whiskey.price > 0 {
-                            DetailRow(label: "Price", value: String(format: "$%.2f", whiskey.price))
+                            HStack {
+                                Text(PrivacyManager.shared.showSecondaryMarketValue && whiskey.secondaryMarketValue > 0 ? "Paid" : "Price")
+                                    .foregroundColor(.secondary)
+                                Spacer()
+                                PriceDetailView(price: whiskey.price)
+                            }
+                        }
+                        
+                        if PrivacyManager.shared.showSecondaryMarketValue && whiskey.secondaryMarketValue > 0 {
+                            HStack {
+                                Text("Secondary")
+                                    .foregroundColor(.secondary)
+                                Spacer()
+                                PriceDetailView(price: whiskey.secondaryMarketValue)
+                            }
                         }
                         
                         // Add rarity and store location for wishlist items
@@ -1433,6 +1447,7 @@ struct EditWhiskeyView: View {
     @State private var distillery: String
     @State private var numberOfBottles: String
     @State private var price: String
+    @State private var secondaryMarketValue: String
     @State private var isFinished: Int16
     @State private var isBiB: Bool
     @State private var isSiB: Bool
@@ -1441,6 +1456,7 @@ struct EditWhiskeyView: View {
     @State private var notes: String
     @State private var isCaskStrength: Bool
     @State private var isTasted: Bool
+    @ObservedObject private var privacyManager = PrivacyManager.shared
     
     @StateObject private var viewStateUpdater = ViewStateUpdater()
     
@@ -1485,6 +1501,7 @@ struct EditWhiskeyView: View {
         // Initialize with active bottles (total - finished)
         _numberOfBottles = State(initialValue: String(max(0, Int(whiskey.numberOfBottles) - Int(whiskey.isFinished))))
         _price = State(initialValue: whiskey.price > 0 ? String(format: "%.2f", whiskey.price) : "")
+        _secondaryMarketValue = State(initialValue: whiskey.secondaryMarketValue > 0 ? String(format: "%.2f", whiskey.secondaryMarketValue) : "")
         _isFinished = State(initialValue: whiskey.isFinished)
         _isBiB = State(initialValue: whiskey.isBiB)
         _isSiB = State(initialValue: whiskey.isSiB)
@@ -1515,6 +1532,10 @@ struct EditWhiskeyView: View {
                     TextField("Finish", text: $finish)
                     TextField("Price", text: $price)
                         .keyboardType(.decimalPad)
+                    if privacyManager.showSecondaryMarketValue {
+                        TextField("Secondary Market Value", text: $secondaryMarketValue)
+                            .keyboardType(.decimalPad)
+                    }
                 }
                 
                 Section(header: Text("Inventory Info")) {
@@ -1642,6 +1663,9 @@ struct EditWhiskeyView: View {
             whiskey.finish = finish
             whiskey.distillery = distillery
             whiskey.price = Double(price) ?? 0.0
+            if privacyManager.showSecondaryMarketValue {
+                whiskey.secondaryMarketValue = Double(secondaryMarketValue) ?? 0.0
+            }
             whiskey.isOpen = isOpen
             whiskey.isBiB = isBiB
             whiskey.isSiB = isSiB

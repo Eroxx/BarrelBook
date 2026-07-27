@@ -73,6 +73,14 @@ extension Whiskey {
         return bottleInstances.filter { !$0.isDead }.reduce(0) { $0 + $1.price }
     }
     
+    /// Secondary market estimate for this whiskey × active (!isDead) bottles.
+    /// Blank/0 secondaryMarketValue contributes nothing to collection secondary totals.
+    var secondaryCurrentValue: Double {
+        guard secondaryMarketValue > 0 else { return 0 }
+        if isFinished > 0 { return 0 }
+        return secondaryMarketValue * Double(activeBottleCount)
+    }
+    
     // Add a property to check if a whiskey has any dead bottles (for filtering)
     var hasAnyDeadBottles: Bool {
         guard let bottleInstances = bottleInstances as? Set<BottleInstance> else { return false }
@@ -298,6 +306,11 @@ extension Collection where Element == Whiskey {
     var totalCurrentValue: Double {
         // Sum of all unfinished bottles' current values
         self.reduce(0) { $0 + $1.currentValue }
+    }
+    
+    /// Sum of secondary market estimates for whiskeys with a set secondary value.
+    var totalSecondaryMarketValue: Double {
+        self.reduce(0) { $0 + $1.secondaryCurrentValue }
     }
     
     var totalHistoricalValue: Double {

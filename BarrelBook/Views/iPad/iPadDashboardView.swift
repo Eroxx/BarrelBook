@@ -93,10 +93,10 @@ struct iPadDashboardView: View {
                                             color: .blue
                                         )
                                         
-                                        // Collection Value Card
+                                        // Collection Value Card (Paid / Secondary when enabled)
                                         QuickStatView(
-                                            title: "Collection Value",
-                                            value: AppFormatters.formatCurrency(getTotalValue()),
+                                            title: collectionValueStatTitle,
+                                            value: collectionValueStatText,
                                             icon: "dollarsign.circle.fill",
                                             color: .green
                                         )
@@ -294,7 +294,26 @@ struct iPadDashboardView: View {
     }
     
     private func getTotalValue() -> Double {
-        recentWhiskeys.reduce(0.0) { $0 + (($1.price as? Double) ?? 0.0) * Double($1.numberOfBottles) }
+        // Canonical bottle-based paid total (active bottle instance prices)
+        recentWhiskeys.totalCurrentValue
+    }
+    
+    private func getTotalSecondaryValue() -> Double {
+        recentWhiskeys.totalSecondaryMarketValue
+    }
+    
+    private var collectionValueStatTitle: String {
+        PrivacyManager.shared.showSecondaryMarketValue ? "Paid / Secondary" : "Collection Value"
+    }
+    
+    private var collectionValueStatText: String {
+        let privacy = PrivacyManager.shared
+        if privacy.hidePrices {
+            return "Hidden"
+        }
+        let paid = AppFormatters.formatCurrency(getTotalValue())
+        guard privacy.showSecondaryMarketValue else { return paid }
+        return "\(paid) / \(AppFormatters.formatCurrency(getTotalSecondaryValue()))"
     }
     
     private func getAveragePPP() -> Double {

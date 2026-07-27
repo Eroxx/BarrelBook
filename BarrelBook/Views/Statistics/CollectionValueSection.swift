@@ -2,6 +2,7 @@ import SwiftUI
 
 struct CollectionValueSection: View {
     let whiskeys: FetchedResults<Whiskey>
+    @ObservedObject private var privacyManager = PrivacyManager.shared
 
     private var totalBottles: Int {
         whiskeys.reduce(0) { $0 + ($1.bottleInstances?.count ?? 0) }
@@ -9,9 +10,15 @@ struct CollectionValueSection: View {
 
     private var uniqueCount: Int { whiskeys.count }
 
+    private var paidTotal: Double { whiskeys.totalCurrentValue }
+
+    private var secondaryTotal: Double { whiskeys.totalSecondaryMarketValue }
+
+    private var showSecondary: Bool { privacyManager.showSecondaryMarketValue }
+
     private var avgPerBottle: Double {
         guard totalBottles > 0 else { return 0 }
-        return whiskeys.totalCurrentValue / Double(totalBottles)
+        return paidTotal / Double(totalBottles)
     }
 
     private var avgPPP: Double {
@@ -49,12 +56,16 @@ struct CollectionValueSection: View {
             .alert("Collection Value", isPresented: $showingInfo) {
                 Button("Got it", role: .cancel) {}
             } message: {
-                Text("Total Value — sum of all recorded purchase prices.\n\nAvg — average price per bottle across your entire collection.\n\nPPP (Price Per Proof) — average cost per proof degree across your collection. A lower number means better value for the alcohol content. Only bottles with both a price and proof recorded are included.")
+                Text(infoMessage)
             }
 
-            Text(currencyFormatter.string(from: NSNumber(value: whiskeys.totalCurrentValue)) ?? "$0")
-                .font(.system(size: 46, weight: .light))
-                .foregroundColor(ColorManager.primaryText)
+            if showSecondary {
+                dualTotalsView
+            } else {
+                Text(privacyManager.formatPrice(paidTotal, formatter: currencyFormatter))
+                    .font(.system(size: 46, weight: .light))
+                    .foregroundColor(ColorManager.primaryText)
+            }
 
             HStack(spacing: 4) {
                 Text("Across \(totalBottles) bottle\(totalBottles == 1 ? "" : "s")")
@@ -63,12 +74,12 @@ struct CollectionValueSection: View {
                     .foregroundColor(ColorManager.secondaryText)
                 Text("·")
                     .foregroundColor(ColorManager.secondaryText)
-                Text("\(currencyFormatter.string(from: NSNumber(value: avgPerBottle)) ?? "$0") avg")
+                Text("\(privacyManager.formatPrice(avgPerBottle, formatter: currencyFormatter)) avg")
                     .foregroundColor(ColorManager.secondaryText)
                 if avgPPP > 0 {
                     Text("·")
                         .foregroundColor(ColorManager.secondaryText)
-                    Text(String(format: "$%.2f PPP", avgPPP))
+                    Text(privacyManager.hidePrices ? "Hidden PPP" : String(format: "$%.2f PPP", avgPPP))
                         .foregroundColor(ColorManager.secondaryText)
                 }
             }
@@ -78,6 +89,35 @@ struct CollectionValueSection: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(ColorManager.secondaryBackground)
         .cornerRadius(16)
+    }
+
+    private var dualTotalsView: some View {
+        HStack(alignment: .top, spacing: 24) {
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Paid")
+                    .font(.caption)
+                    .foregroundColor(ColorManager.secondaryText)
+                Text(privacyManager.formatPrice(paidTotal, formatter: currencyFormatter))
+                    .font(.system(size: 34, weight: .light))
+                    .foregroundColor(ColorManager.primaryText)
+            }
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Secondary")
+                    .font(.caption)
+                    .foregroundColor(ColorManager.secondaryText)
+                Text(privacyManager.formatPrice(secondaryTotal, formatter: currencyFormatter))
+                    .font(.system(size: 34, weight: .light))
+                    .foregroundColor(ColorManager.primaryText)
+            }
+            Spacer(minLength: 0)
+        }
+    }
+
+    private var infoMessage: String {
+        if showSecondary {
+            return "Paid — sum of recorded purchase prices for active bottles.\n\nSecondary — secondary market estimate × active bottles (only whiskeys with a secondary value set).\n\nAvg — average paid price per bottle.\n\nPPP (Price Per Proof) — average cost per proof degree. Only bottles with both a price and proof are included."
+        }
+        return "Total Value — sum of all recorded purchase prices.\n\nAvg — average price per bottle across your entire collection.\n\nPPP (Price Per Proof) — average cost per proof degree across your collection. A lower number means better value for the alcohol content. Only bottles with both a price and proof recorded are included."
     }
 }
 
@@ -125,4 +165,4 @@ struct WhiskeyPriceTrendRow: View {
         entity: Whiskey.entity(),
         sortDescriptors: []
     ).wrappedValue)
-} 
+}
