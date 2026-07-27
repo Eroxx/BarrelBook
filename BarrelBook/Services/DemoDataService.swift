@@ -75,6 +75,8 @@ struct DemoDataService {
             struct OwnedSeed {
                 let name, type, distillery: String
                 let proof, price: Double
+                /// Estimated secondary-market value; nil/0 falls back to paid in secondary totals.
+                let secondaryMarketValue: Double?
                 let bottles: [BottleState]
                 let isBiB, isSiB, isStorePick, isCaskStrength: Bool
                 let storePickName: String?
@@ -82,107 +84,123 @@ struct DemoDataService {
                 init(_ name: String, _ type: String, _ distillery: String,
                      _ proof: Double, _ price: Double,
                      _ bottles: [BottleState],
+                     secondaryMarketValue: Double? = nil,
                      isBiB: Bool = false, isSiB: Bool = false,
                      isStorePick: Bool = false, storePickName: String? = nil,
                      isCaskStrength: Bool = false, age: String? = nil) {
                     self.name = name; self.type = type; self.distillery = distillery
-                    self.proof = proof; self.price = price; self.bottles = bottles
+                    self.proof = proof; self.price = price
+                    self.secondaryMarketValue = secondaryMarketValue
+                    self.bottles = bottles
                     self.isBiB = isBiB; self.isSiB = isSiB; self.isStorePick = isStorePick
                     self.storePickName = storePickName; self.isCaskStrength = isCaskStrength
                     self.age = age
                 }
             }
 
+            // Secondary values: mix of above / below / equal MSRP; a few left unset (nil)
+            // so Secondary ≈ Paid until those bottles get an override (toggle still useful).
             let ownedSeeds: [OwnedSeed] = [
                 // EVERYDAY BOURBONS
                 OwnedSeed("Buffalo Trace", "Bourbon", "Buffalo Trace", 90, 24.99,
                           [BottleState(true, false, daysAgoAdded: 45, daysAgoOpened: 20),
-                           BottleState(false, false, daysAgoAdded: 45)]),
+                           BottleState(false, false, daysAgoAdded: 45)],
+                          secondaryMarketValue: 29.99),
 
                 OwnedSeed("Wild Turkey 101", "Bourbon", "Wild Turkey", 101, 22.99,
                           [BottleState(true, false, daysAgoAdded: 60, daysAgoOpened: 30)],
-                          isBiB: true),
+                          secondaryMarketValue: 27.99, isBiB: true),
 
                 OwnedSeed("Maker's Mark", "Bourbon", "Maker's Mark", 90, 26.99,
                           [BottleState(true, false, daysAgoAdded: 30, daysAgoOpened: 10),
-                           BottleState(false, false, daysAgoAdded: 30)]),
+                           BottleState(false, false, daysAgoAdded: 30)],
+                          secondaryMarketValue: 24.99),
 
+                // unset — falls back to paid
                 OwnedSeed("Evan Williams Black Label", "Bourbon", "Heaven Hill", 86, 12.99,
                           [BottleState(true, false, daysAgoAdded: 90, daysAgoOpened: 60)],
                           isBiB: false),
 
                 OwnedSeed("Old Grand-Dad Bonded", "Bourbon", "Jim Beam", 100, 19.99,
                           [BottleState(false, false, daysAgoAdded: 14)],
-                          isBiB: true),
+                          secondaryMarketValue: 21.99, isBiB: true),
 
                 OwnedSeed("Elijah Craig Small Batch", "Bourbon", "Heaven Hill", 94, 29.99,
                           [BottleState(true, false, daysAgoAdded: 55, daysAgoOpened: 25),
-                           BottleState(false, false, daysAgoAdded: 55)]),
+                           BottleState(false, false, daysAgoAdded: 55)],
+                          secondaryMarketValue: 34.99),
 
                 // MID-SHELF BOURBONS
                 OwnedSeed("Eagle Rare 10 Year", "Bourbon", "Buffalo Trace", 90, 34.99,
                           [BottleState(true, false, daysAgoAdded: 70, daysAgoOpened: 40),
                            BottleState(false, false, daysAgoAdded: 70)],
-                          age: "10"),
+                          secondaryMarketValue: 79.99, age: "10"),
 
                 OwnedSeed("Woodford Reserve", "Bourbon", "Woodford Reserve", 90.4, 34.99,
-                          [BottleState(true, false, daysAgoAdded: 35, daysAgoOpened: 15)]),
+                          [BottleState(true, false, daysAgoAdded: 35, daysAgoOpened: 15)],
+                          secondaryMarketValue: 32.99),
 
                 OwnedSeed("Knob Creek 9 Year", "Bourbon", "Jim Beam", 100, 38.99,
                           [BottleState(true, false, daysAgoAdded: 80, daysAgoOpened: 50),
                            BottleState(false, false, daysAgoAdded: 80)],
+                          secondaryMarketValue: 44.99,
                           isStorePick: true, storePickName: "Local Liquor & Wine", age: "9"),
 
                 OwnedSeed("Russell's Reserve 10 Year", "Bourbon", "Wild Turkey", 90, 39.99,
                           [BottleState(true, false, daysAgoAdded: 50, daysAgoOpened: 20)],
-                          age: "10"),
+                          secondaryMarketValue: 42.99, age: "10"),
 
                 OwnedSeed("Four Roses Single Barrel", "Bourbon", "Four Roses", 100, 44.99,
                           [BottleState(true, false, daysAgoAdded: 100, daysAgoOpened: 60),
                            BottleState(true, true, daysAgoAdded: 180, daysAgoOpened: 120,
                                        daysAgoFinished: 10)],
-                          isSiB: true),
+                          secondaryMarketValue: 49.99, isSiB: true),
 
+                // unset — falls back to paid
                 OwnedSeed("1792 Full Proof", "Bourbon", "Barton 1792", 125, 34.99,
                           [BottleState(false, false, daysAgoAdded: 7)]),
 
                 OwnedSeed("Benchmark Full Proof", "Bourbon", "Buffalo Trace", 125, 14.99,
                           [BottleState(true, false, daysAgoAdded: 40, daysAgoOpened: 15),
-                           BottleState(false, false, daysAgoAdded: 40)]),
+                           BottleState(false, false, daysAgoAdded: 40)],
+                          secondaryMarketValue: 16.99),
 
                 // HIGH-SHELF / ALLOCATED BOURBONS
                 OwnedSeed("Booker's Bourbon", "Bourbon", "Jim Beam", 127.4, 89.99,
                           [BottleState(true, false, daysAgoAdded: 120, daysAgoOpened: 30)],
-                          isCaskStrength: true),
+                          secondaryMarketValue: 99.99, isCaskStrength: true),
 
                 OwnedSeed("Larceny Barrel Proof A124", "Bourbon", "Heaven Hill", 122, 54.99,
                           [BottleState(false, false, daysAgoAdded: 21)],
-                          isCaskStrength: true),
+                          secondaryMarketValue: 59.99, isCaskStrength: true),
 
                 OwnedSeed("Elijah Craig Barrel Proof B523", "Bourbon", "Heaven Hill", 119.6, 59.99,
                           [BottleState(true, false, daysAgoAdded: 150, daysAgoOpened: 80)],
-                          isCaskStrength: true),
+                          secondaryMarketValue: 79.99, isCaskStrength: true),
 
                 OwnedSeed("Old Forester 1920", "Bourbon", "Brown-Forman", 115, 54.99,
                           [BottleState(true, false, daysAgoAdded: 60, daysAgoOpened: 20)],
-                          isBiB: false),
+                          secondaryMarketValue: 69.99, isBiB: false),
 
                 OwnedSeed("Henry McKenna 10 Year BiB", "Bourbon", "Heaven Hill", 100, 39.99,
                           [BottleState(true, true, daysAgoAdded: 300, daysAgoOpened: 200,
                                        daysAgoFinished: 30),
                            BottleState(false, false, daysAgoAdded: 20)],
-                          isBiB: true, age: "10"),
+                          secondaryMarketValue: 99.99, isBiB: true, age: "10"),
 
                 OwnedSeed("Blanton's Original", "Bourbon", "Buffalo Trace", 93, 64.99,
                           [BottleState(true, false, daysAgoAdded: 200, daysAgoOpened: 90)],
-                          isSiB: true),
+                          secondaryMarketValue: 175.00, isSiB: true),
 
                 OwnedSeed("Weller Special Reserve", "Bourbon", "Buffalo Trace", 90, 29.99,
-                          [BottleState(false, false, daysAgoAdded: 5)]),
+                          [BottleState(false, false, daysAgoAdded: 5)],
+                          secondaryMarketValue: 74.99),
 
                 OwnedSeed("Angel's Envy", "Bourbon", "Angel's Envy", 86.6, 44.99,
-                          [BottleState(true, false, daysAgoAdded: 75, daysAgoOpened: 30)]),
+                          [BottleState(true, false, daysAgoAdded: 75, daysAgoOpened: 30)],
+                          secondaryMarketValue: 42.99),
 
+                // unset — falls back to paid
                 OwnedSeed("Legent Bourbon", "Bourbon", "Jim Beam / Suntory", 94, 34.99,
                           [BottleState(false, false, daysAgoAdded: 12)]),
 
@@ -190,52 +208,55 @@ struct DemoDataService {
                 OwnedSeed("Sazerac Rye", "Rye", "Buffalo Trace", 90, 28.99,
                           [BottleState(true, false, daysAgoAdded: 85, daysAgoOpened: 40),
                            BottleState(false, false, daysAgoAdded: 85)],
-                          isBiB: true),
+                          secondaryMarketValue: 34.99, isBiB: true),
 
                 OwnedSeed("Rittenhouse Rye", "Rye", "Heaven Hill", 100, 24.99,
                           [BottleState(true, false, daysAgoAdded: 65, daysAgoOpened: 35)],
-                          isBiB: true),
+                          secondaryMarketValue: 29.99, isBiB: true),
 
                 OwnedSeed("High West Double Rye", "Rye", "High West", 92, 34.99,
                           [BottleState(true, true, daysAgoAdded: 200, daysAgoOpened: 130,
                                        daysAgoFinished: 15),
-                           BottleState(false, false, daysAgoAdded: 10)]),
+                           BottleState(false, false, daysAgoAdded: 10)],
+                          secondaryMarketValue: 32.99),
 
                 OwnedSeed("Knob Creek Rye", "Rye", "Jim Beam", 100, 34.99,
                           [BottleState(false, false, daysAgoAdded: 18)],
-                          isSiB: true),
+                          secondaryMarketValue: 37.99, isSiB: true),
 
                 OwnedSeed("WhistlePig 10 Year", "Rye", "WhistlePig", 100, 79.99,
                           [BottleState(true, false, daysAgoAdded: 110, daysAgoOpened: 50)],
-                          age: "10"),
+                          secondaryMarketValue: 74.99, age: "10"),
 
                 // SCOTCH
+                // unset — falls back to paid
                 OwnedSeed("Glenfiddich 12 Year", "Scotch", "Glenfiddich", 80, 42.99,
                           [BottleState(true, false, daysAgoAdded: 90, daysAgoOpened: 45)],
                           age: "12"),
 
                 OwnedSeed("Lagavulin 16 Year", "Scotch", "Lagavulin", 86, 89.99,
                           [BottleState(true, false, daysAgoAdded: 130, daysAgoOpened: 60)],
-                          age: "16"),
+                          secondaryMarketValue: 94.99, age: "16"),
 
                 OwnedSeed("Laphroaig 10 Year", "Scotch", "Laphroaig", 86, 49.99,
                           [BottleState(true, true, daysAgoAdded: 250, daysAgoOpened: 180,
                                        daysAgoFinished: 25),
                            BottleState(false, false, daysAgoAdded: 15)],
-                          isCaskStrength: false, age: "10"),
+                          secondaryMarketValue: 47.99, isCaskStrength: false, age: "10"),
 
                 OwnedSeed("Ardbeg 10 Year", "Scotch", "Ardbeg", 92, 54.99,
                           [BottleState(true, false, daysAgoAdded: 60, daysAgoOpened: 25)],
-                          age: "10"),
+                          secondaryMarketValue: 64.99, age: "10"),
 
                 OwnedSeed("Oban 14 Year", "Scotch", "Oban", 86, 74.99,
                           [BottleState(false, false, daysAgoAdded: 9)],
-                          age: "14"),
+                          secondaryMarketValue: 79.99, age: "14"),
 
                 OwnedSeed("The Macallan 12 Year Sherry", "Scotch", "The Macallan", 86, 69.99,
                           [BottleState(true, false, daysAgoAdded: 95, daysAgoOpened: 40)],
-                          age: "12"),
+                          secondaryMarketValue: 84.99, age: "12"),
 
+                // unset — falls back to paid
                 OwnedSeed("GlenDronach 12 Year", "Scotch", "GlenDronach", 86, 49.99,
                           [BottleState(false, false, daysAgoAdded: 22)],
                           age: "12"),
@@ -243,69 +264,80 @@ struct DemoDataService {
                 // IRISH
                 OwnedSeed("Redbreast 12 Year", "Irish", "Midleton", 80, 59.99,
                           [BottleState(true, false, daysAgoAdded: 75, daysAgoOpened: 30)],
-                          age: "12"),
+                          secondaryMarketValue: 64.99, age: "12"),
 
                 OwnedSeed("Green Spot", "Irish", "Midleton", 80, 49.99,
                           [BottleState(true, true, daysAgoAdded: 220, daysAgoOpened: 140,
                                        daysAgoFinished: 20),
-                           BottleState(false, false, daysAgoAdded: 8)]),
+                           BottleState(false, false, daysAgoAdded: 8)],
+                          secondaryMarketValue: 54.99),
 
+                // unset — falls back to paid
                 OwnedSeed("Jameson Black Barrel", "Irish", "Midleton", 80, 34.99,
                           [BottleState(true, false, daysAgoAdded: 40, daysAgoOpened: 15)]),
 
                 // JAPANESE
                 OwnedSeed("Nikka Coffey Grain", "Japanese", "Nikka", 90, 69.99,
-                          [BottleState(false, false, daysAgoAdded: 6)]),
+                          [BottleState(false, false, daysAgoAdded: 6)],
+                          secondaryMarketValue: 72.99),
 
                 OwnedSeed("Toki Suntory", "Japanese", "Suntory", 86, 44.99,
-                          [BottleState(true, false, daysAgoAdded: 85, daysAgoOpened: 40)]),
+                          [BottleState(true, false, daysAgoAdded: 85, daysAgoOpened: 40)],
+                          secondaryMarketValue: 39.99),
 
                 OwnedSeed("Hibiki Harmony", "Japanese", "Suntory", 86, 79.99,
-                          [BottleState(true, false, daysAgoAdded: 160, daysAgoOpened: 70)]),
+                          [BottleState(true, false, daysAgoAdded: 160, daysAgoOpened: 70)],
+                          secondaryMarketValue: 99.99),
 
                 // AMERICAN SINGLE MALT / OTHER
+                // unset — falls back to paid
                 OwnedSeed("Westland American Oak", "Single Malt", "Westland", 92, 59.99,
                           [BottleState(false, false, daysAgoAdded: 11)]),
 
                 OwnedSeed("Balcones Texas Single Malt", "Single Malt", "Balcones", 106, 54.99,
-                          [BottleState(true, false, daysAgoAdded: 70, daysAgoOpened: 30)]),
+                          [BottleState(true, false, daysAgoAdded: 70, daysAgoOpened: 30)],
+                          secondaryMarketValue: 52.99),
 
                 // STORE PICKS
                 OwnedSeed("Old Fitzgerald Bottled-in-Bond", "Bourbon", "Heaven Hill", 100, 44.99,
                           [BottleState(false, false, daysAgoAdded: 4)],
-                          isBiB: true),
+                          secondaryMarketValue: 54.99, isBiB: true),
 
                 OwnedSeed("Maker's Mark Private Select", "Bourbon", "Maker's Mark", 108.2, 59.99,
                           [BottleState(true, false, daysAgoAdded: 140, daysAgoOpened: 60)],
+                          secondaryMarketValue: 69.99,
                           isStorePick: true, storePickName: "Total Wine & More"),
 
                 OwnedSeed("Four Roses Single Barrel Store Pick", "Bourbon", "Four Roses", 100, 54.99,
                           [BottleState(false, false, daysAgoAdded: 3)],
+                          secondaryMarketValue: 64.99,
                           isSiB: true, isStorePick: true, storePickName: "The Whiskey Shop"),
 
                 OwnedSeed("Elijah Craig Toasted Barrel", "Bourbon", "Heaven Hill", 94, 44.99,
-                          [BottleState(true, false, daysAgoAdded: 55, daysAgoOpened: 20)]),
+                          [BottleState(true, false, daysAgoAdded: 55, daysAgoOpened: 20)],
+                          secondaryMarketValue: 54.99),
 
                 OwnedSeed("Widow Jane 10 Year", "Bourbon", "Widow Jane", 91, 79.99,
                           [BottleState(false, false, daysAgoAdded: 16)],
-                          age: "10"),
+                          secondaryMarketValue: 69.99, age: "10"),
 
                 // REPLACEMENT DEMO — idx 47
                 // Killed 7 days ago, marked as wanting a replacement
                 OwnedSeed("Old Weller Antique 107", "Bourbon", "Buffalo Trace", 107, 29.99,
                           [BottleState(true, true, daysAgoAdded: 120, daysAgoOpened: 80,
-                                       daysAgoFinished: 7)]),
+                                       daysAgoFinished: 7)],
+                          secondaryMarketValue: 119.99),
 
                 // REPLACEMENT CHAIN — idx 48 (original) → idx 49 (replacement)
                 // Original Bulleit killed 45 days ago; replacement bottle bought shortly after
                 OwnedSeed("Bulleit 10 Year", "Bourbon", "Four Roses", 91.2, 44.99,
                           [BottleState(true, true, daysAgoAdded: 150, daysAgoOpened: 100,
                                        daysAgoFinished: 45)],
-                          age: "10"),
+                          secondaryMarketValue: 49.99, age: "10"),
 
                 OwnedSeed("Bulleit 10 Year", "Bourbon", "Four Roses", 91.2, 47.99,
                           [BottleState(false, false, daysAgoAdded: 40)],
-                          age: "10"),
+                          secondaryMarketValue: 49.99, age: "10"),
             ]
 
             var ownedWhiskeys: [Whiskey] = []
@@ -317,6 +349,9 @@ struct DemoDataService {
                 w.distillery = seed.distillery
                 w.proof = seed.proof
                 w.price = seed.price
+                // Persist secondary when seeded; leave Core Data default 0 when nil
+                // (blank → secondaryCurrentValue falls back to paid).
+                w.secondaryMarketValue = seed.secondaryMarketValue ?? 0
                 w.status = "owned"
                 w.isBiB = seed.isBiB
                 w.isSiB = seed.isSiB

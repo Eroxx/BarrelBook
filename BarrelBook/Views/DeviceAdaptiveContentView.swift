@@ -37,6 +37,7 @@ struct DeviceAdaptiveContentView: View {
     private func loadDemoData() {
         DemoDataService.load(context: viewContext) { _ in
             isDemoDataActive = true
+            PrivacyManager.shared.showSecondaryMarketValue = true
             HapticManager.shared.successFeedback()
         }
     }
@@ -72,6 +73,7 @@ struct DeviceAdaptiveContentView: View {
         await withCheckedContinuation { (cont: CheckedContinuation<Void, Never>) in
             DemoDataService.load(context: viewContext) { _ in
                 isDemoDataActive = true
+                PrivacyManager.shared.showSecondaryMarketValue = true
                 cont.resume()
             }
         }

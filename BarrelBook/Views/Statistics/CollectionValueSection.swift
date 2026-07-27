@@ -115,7 +115,7 @@ struct CollectionValueSection: View {
 
     private var infoMessage: String {
         if showSecondary {
-            return "Paid — sum of recorded purchase prices for active bottles.\n\nSecondary — secondary market estimate × active bottles (only whiskeys with a secondary value set).\n\nAvg — average paid price per bottle.\n\nPPP (Price Per Proof) — average cost per proof degree. Only bottles with both a price and proof are included."
+            return "Paid — sum of recorded purchase prices for active bottles.\n\nSecondary — secondary market estimate × active bottles; if unset, defaults to what you paid.\n\nAvg — average paid price per bottle.\n\nPPP (Price Per Proof) — average cost per proof degree. Only bottles with both a price and proof are included."
         }
         return "Total Value — sum of all recorded purchase prices.\n\nAvg — average price per bottle across your entire collection.\n\nPPP (Price Per Proof) — average cost per proof degree across your collection. A lower number means better value for the alcohol content. Only bottles with both a price and proof recorded are included."
     }

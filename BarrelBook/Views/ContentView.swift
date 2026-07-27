@@ -537,6 +537,7 @@ struct HomeView: View {
     private func loadDemoData() {
         DemoDataService.load(context: viewContext) { _ in
             isDemoDataActive = true
+            PrivacyManager.shared.showSecondaryMarketValue = true
             HapticManager.shared.successFeedback()
         }
     }

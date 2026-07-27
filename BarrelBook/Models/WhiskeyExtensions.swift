@@ -56,29 +56,21 @@ extension Whiskey {
 extension Whiskey {
     // Calculate the current value of this whiskey
     var currentValue: Double {
-        // If this whiskey is finished and has a replacement,
-        // it has no current value
-        if isFinished > 0 && replacedBy != nil {
-            return 0
-        }
-        
-        // If this whiskey is finished with no replacement,
-        // it has no current value
-        if isFinished > 0 {
-            return 0
-        }
-        
-        // For active bottles, sum their prices
+        // Sum purchase prices of active (!isDead) bottles only.
+        // Fully finished whiskeys (no active bottles) contribute $0.
         guard let bottleInstances = bottleInstances as? Set<BottleInstance> else { return 0 }
         return bottleInstances.filter { !$0.isDead }.reduce(0) { $0 + $1.price }
     }
     
     /// Secondary market estimate for this whiskey × active (!isDead) bottles.
-    /// Blank/0 secondaryMarketValue contributes nothing to collection secondary totals.
+    /// Blank/0 secondaryMarketValue falls back to paid `currentValue` (sum of active bottle prices).
     var secondaryCurrentValue: Double {
-        guard secondaryMarketValue > 0 else { return 0 }
-        if isFinished > 0 { return 0 }
-        return secondaryMarketValue * Double(activeBottleCount)
+        let active = Int(activeBottleCount)
+        guard active > 0 else { return 0 }
+        if secondaryMarketValue > 0 {
+            return secondaryMarketValue * Double(active)
+        }
+        return currentValue
     }
     
     // Add a property to check if a whiskey has any dead bottles (for filtering)

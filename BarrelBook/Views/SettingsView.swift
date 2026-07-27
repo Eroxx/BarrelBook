@@ -105,6 +105,7 @@ struct SettingsView: View {
     @State private var showingDeleteAllConfirmation = false
     @State private var showingLoadDemoDataConfirmation = false
     @State private var showingDemoDataInfo = false
+    @State private var showingSecondaryMarketValueAlert = false
     
     // Add new @State variables for DisclosureGroup and info alert:
     @State private var showingDeleteDataOptions = false
@@ -851,12 +852,25 @@ Know thy shelf - Eric
                     .foregroundColor(.secondary)
             }
             
-            Toggle(isOn: $privacyManager.showSecondaryMarketValue) {
+            Toggle(isOn: Binding(
+                get: { privacyManager.showSecondaryMarketValue },
+                set: { newValue in
+                    privacyManager.showSecondaryMarketValue = newValue
+                    if newValue {
+                        showingSecondaryMarketValueAlert = true
+                    }
+                }
+            )) {
                 Text("Show Secondary Market Value")
+            }
+            .alert("Enter Secondary Values", isPresented: $showingSecondaryMarketValueAlert) {
+                Button("OK", role: .cancel) { }
+            } message: {
+                Text("Secondary market values are estimates you enter yourself—not live market data. Secondary defaults to what you paid unless you enter a different estimate on a bottle.")
             }
             
             if privacyManager.showSecondaryMarketValue {
-                Text("Adds an optional secondary market value on bottles and shows Paid vs Secondary collection totals.")
+                Text("Shows Paid vs Secondary collection totals. Secondary defaults to what you paid unless you enter a different estimate.")
                     .font(.caption)
                     .foregroundColor(.secondary)
             }
@@ -2513,7 +2527,9 @@ Know thy shelf - Eric
             switch result {
             case .success:
                 self.isDemoDataActive = true
-                self.successMessage = "Demo data loaded. You now have a sample collection, tastings, and wishlist."
+                // Demo seeds include divergent secondary values — surface Paid vs Secondary immediately.
+                self.privacyManager.showSecondaryMarketValue = true
+                self.successMessage = "Demo data loaded. Secondary Market Value is on — check Statistics: Paid and Secondary totals should differ."
                 self.showingSuccess = true
                 HapticManager.shared.successFeedback()
             case .failure(let error):
